@@ -19,8 +19,8 @@ win64
 /adm/lin
 /adm/mac
 /adm/make
-*.vcproj*user
-*.vcxproj*user
+# *.vcproj*user
+# *.vcxproj*user
 *.csproj*user
 *.ncb
 *.suo
