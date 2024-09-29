@@ -15,11 +15,68 @@ src size=94M
 
 ### cmake配置
 
-- 添加3rdparty_dir
-- 勾选Build_sample_MFC
+- 添加3rdparty_dir（下面的库会自动填充，不需要手动选）
+- 勾选Build_sample_MFC（不要勾选Qt，cmake编不过）
 - 设置install_dir
 
 执行Install项目编译的时候，报错（MSB3073 命令 "setlocal）
 
 解决方法，以管理员身份运行 [VS](C:\Program Files (x86)\Common Files\Microsoft Shared\MSEnv\VSLauncher.exe)
+
+
+
+### debug配置
+
+occt.natvis 拷贝[至](C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Packages\Debugger\Visualizers\)
+
+---
+
+
+
+ 
+
+### 七个模块 
+
+现在8个了，增加了DETools
+
+Module FoundationClasses //所有基类
+
+Module ModelingData 2D3D//几何基本体数据结构
+
+Module ModelingAlgorithms //几何拓扑算法库
+
+Module Visualization //图形表达机制
+
+Module ApplicationFramework //应用框架，常用函数机制
+
+Module DataExchange //数据交换
+
+Module Draw //Test测试工具
+
+
+
+### 名词翻译
+
+|        |                            |              |
+| ------ | -------------------------- | ------------ |
+| TK     | toolkits                   |              |
+|        | deferred class             | 滞后类       |
+|        | Triangulation              | 三角剖分     |
+| TopoDS | Topological Data Structure | 拓扑数据结构 |
+|        | Standard_Transient         | 短暂的       |
+|        | Curve Surface              | 曲线曲面     |
+|        | Tessellate/simplification  | Mesh细分     |
+| BRep   |                            |              |
+|        |                            |              |
+|        |                            |              |
+|        |                            |              |
+|        |                            |              |
+|        |                            |              |
+|        |                            |              |
+
+
+
+
+
+
 

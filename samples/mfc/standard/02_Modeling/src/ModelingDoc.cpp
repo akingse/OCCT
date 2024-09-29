@@ -393,6 +393,7 @@ TopoDS_Shape TransformedShape = myBRepGTransformation.Shape();	\n");
    ====================   P R I M I T I V E S   ====================================
    ================================================================================= */
 
+//基本体
 void CModelingDoc::OnBox() 
 {
 	AIS_ListOfInteractive aList;
@@ -456,7 +457,6 @@ TopoDS_Shape C2 = BRepPrimAPI_MakeCylinder (gp_Ax2(gp_Pnt(200.,200.,0.), \n\
 		\n");
 	PocessTextInDialog("Make a cylinder", Message);
 }
-
 
 void CModelingDoc::OnCone() 
 {
@@ -1079,6 +1079,7 @@ for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
    ====================   O P E R A T I O N S   ====================================
    ================================================================================= */
 
+//3d boolean
 void CModelingDoc::OnCut() 
 {
 	AIS_ListOfInteractive aList;
@@ -1138,15 +1139,6 @@ TopoDS_Shape ShapeCut = BRepAlgoAPI_Cut(theSphere,theBox); \n\
 
 
 }
-
-
-
-
-
-
-
-
-
 
 void CModelingDoc::OnFuse() 
 {
@@ -1264,6 +1256,7 @@ TopoDS_Shape theCommonSurface = BRepAlgoAPI_Common(theBox,theWedge); \n\
 	PocessTextInDialog("Compute the common surface ", Message);
 
 }
+
 
 void CModelingDoc::OnSection() 
 {
@@ -1765,6 +1758,7 @@ TopoDS_Shape ChanfrenedBox = MC.Shape();  \n");
    ====================   L O C A L   O P E R A T I O N S   ========================
    ================================================================================= */
 
+//局部操作
 void CModelingDoc::OnPrismLocal() 
 {
 	AIS_ListOfInteractive aList;
@@ -2566,7 +2560,6 @@ PocessTextInDialog("Split a shape", Message);
 }
 
 
-
 void CModelingDoc::OnThickLocal() 
 {
 	AIS_ListOfInteractive L;
@@ -2701,7 +2694,7 @@ PocessTextInDialog("Make an offset shape", Message);
    ====================   B U I L D I N G   ========================================
    ================================================================================= */
 
-
+//创建
 void CModelingDoc::OnVertex() 
 {
 	AIS_ListOfInteractive aList;
@@ -3426,9 +3419,6 @@ builder.Add(Comp,aBox);	\n\
 }
 
 
-
-
-
 void CModelingDoc::OnSewing() 
 {
 	AIS_ListOfInteractive aList;
@@ -3536,12 +3526,6 @@ TopoDS_Shape sewedShape = aMethod.SewedShape();	\n\
 	PocessTextInDialog("Sew faces ", Message);
 
 }
-
-
-
-
-
-
 
 void CModelingDoc::OnBuilder() 
 {
@@ -4273,6 +4257,7 @@ for (TopExp_Explorer exp (aBox,TopAbs_FACE);exp.More();exp.Next()) {	\n\
    ====================   A N A L Y S I S   ========================================
    ================================================================================= */
 
+//属性分析
 void CModelingDoc::OnValid() 
 {
 	AIS_ListOfInteractive aList;
@@ -4307,7 +4292,6 @@ else\n\
 	Standard_Boolean theShapeIsValid = BRepAlgo::IsValid(S);
   MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, theShapeIsValid ? L"The Shape Is Valid !! " : L"The Shape Is NOT Valid !! ", L"Checking Shape", MB_OK);
 }
-
 
 void CModelingDoc::OnLinear() 
 {
@@ -4601,7 +4585,6 @@ gp_Mat I = System.MatrixOfInertia();\n\
   PocessTextInDialog("Volume Properties", Message);
 	MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, string.ToWideString(), L"Volume Properties", MB_OK);
 }
-
 
 void CModelingDoc::OnButtonFill() 
 {
