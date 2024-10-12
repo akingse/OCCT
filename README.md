@@ -31,7 +31,14 @@ src size=94M
 
 occt.natvis 拷贝[至](C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Packages\Debugger\Visualizers\)
 
+### DRAWEXE测试项目
 
+```
+pload ALL
+axo
+box b 10 10 10
+fit
+```
 
 
 
@@ -63,22 +70,25 @@ Module Draw //Test测试工具
 
 ### 名词翻译
 
-|        |                            |              |
-| ------ | -------------------------- | ------------ |
-| TK     | toolkits                   | 工具集       |
-|        | deferred class             | 滞后类       |
-|        | Triangulation              | 三角剖分     |
-| TopoDS | Topological Data Structure | 拓扑数据结构 |
-|        | Standard_Transient         | 短暂的       |
-|        | Curve Surface              | 曲线曲面     |
-|        | Tessellate/simplification  | Mesh细分     |
-| BRep   | Boundary representation    |              |
-|        | Transient                  | 瞬态，暂时   |
-| gp     | geometric processor        |              |
-|        | Confusion                  | 模糊，不明确 |
-|        | Orientation                | 方向/朝向    |
-|        |                            |              |
-|        |                            |              |
+|            |                                        |                                                              |
+| ---------- | -------------------------------------- | ------------------------------------------------------------ |
+| TK         | toolkits                               | 工具集                                                       |
+|            | deferred class                         | 滞后类                                                       |
+|            | Triangulation                          | 三角剖分                                                     |
+| TopoDS     | Topological Data Structure             | 拓扑数据结构                                                 |
+|            | Standard_Transient                     | 短暂的                                                       |
+|            | Curve Surface                          | 曲线曲面                                                     |
+|            | Tessellate/simplification              | Mesh细分                                                     |
+| BRep       | Boundary representation                |                                                              |
+|            | Transient                              | 瞬态，暂时                                                   |
+| gp         | geometric processor                    |                                                              |
+|            | Confusion                              | 模糊，不明确                                                 |
+|            | Orientation                            | 方向/朝向                                                    |
+| AIS        |                                        |                                                              |
+| OSD        |                                        | OCCT 为 OSD 包中的低级操作系统设施提供独立于平台的接口。该包类似“python”编程语言中的“os”模块。 |
+| Collection | TCollection/NCollection   容器         | NCollection 包是一个较新的基于模板的包，提供现代容器。应该使用它尽可能代替 TCollection 类。<br/>OCCT 中索引从 1 开始，NCollection_Vector 除外（其中索引从 0 开始）。这样做是为了与基于 STL的算法兼容。 |
+| MVC        | Model-View-Controller                  |                                                              |
+| GC         | TKGeomBase/GC_Root（geometry common?） |                                                              |
 
 
 
@@ -101,4 +111,13 @@ typedef std::time_t   Standard_Time;
 
 Transient，意味着数据是临时的或瞬态的，它们不会被持久化保存，意味着对象只存在于内存中，一旦程序终止或对象生命周期结束时，它们就会消失。
 Persistent，意味着数据是持久化的，它们被存储在某种持久化存储介质，如数据库或者磁盘文件，并且在程序终止后仍然存在。程序重新启动时，该对象的数据仍然可以加载到内存中。
-Standard_Transient类主要提供了三个机制，内存分配，RTTI和引用计数
+Standard_Transient类主要提供了三个机制，内存分配，RTTI和引用计数；
+
+
+
+### Handle机制
+
+handle是整个 OCCT 中使用的智能指针。一般来说，handle机制基于两种要素：
+
+- 存储对内存中对象的引用次数的计数器
+- 指向内存中对象的指针，每次创建对象的新handle时，该对象的引用计数器都会递增  
