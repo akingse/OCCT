@@ -34,6 +34,8 @@ occt.natvis 拷贝至[路径](C:\Program Files\Microsoft Visual Studio\2022\Comm
 ```
 coppy to: repos\OCCT\build\win64\vc14\bind
 PATH= repos\TPL\3rdparty-vc14-64\freetype-2.5.5-vc14-64\bin;
+
+项目添加测试文件
 ```
 
 
