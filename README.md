@@ -106,3 +106,8 @@ handle是整个 OCCT 中使用的智能指针。一般来说，handle机制基�
 
 - 存储对内存中对象的引用次数的计数器
 - 指向内存中对象的指针，每次创建对象的新handle时，该对象的引用计数器都会递增  
+
+
+
+博客[教程](https://www.cnblogs.com/opencascade/p/OpenCASCADE_StartGuide.html)
+
