@@ -53,7 +53,8 @@ BEGIN_MESSAGE_MAP(CModelingDoc, OCC_3dBaseDoc)
 	ON_COMMAND(ID_THRU, OnThru)
 	ON_COMMAND(ID_EVOLVED, OnEvolved)
 	ON_COMMAND(ID_DRAFT, OnDraft)
-	ON_COMMAND(ID_CUT, OnCut)
+	//ON_COMMAND(ID_CUT, OnCut) 
+	ON_COMMAND(ID_CUT, OnMyTest) //change the button
 	ON_COMMAND(ID_FUSE, OnFuse)
 	ON_COMMAND(ID_SECTION, OnSection)
 	ON_COMMAND(ID_COMMON, OnCommon)
@@ -1078,6 +1079,37 @@ for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
 /* =================================================================================
    ====================   O P E R A T I O N S   ====================================
    ================================================================================= */
+
+void CModelingDoc::OnMyTest()
+{
+	TopoDS_Shape theBox1 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+	//Handle(AIS_Shape) ais1 = new AIS_Shape(theBox1);
+
+	//TopoDS_Shape theBox2 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
+	gp_Trsf trsf;    
+	trsf.SetTranslation(gp_Vec(5, 5, 0));
+	BRepBuilderAPI_Transform theBox2(theBox1, trsf);
+	//Handle(AIS_Shape) ais2 = new AIS_Shape(myBRepTransformation);
+
+	//TopoDS_Shape ShapeCut = BRepAlgoAPI_Cut(theBox1, theBox2); 
+	TopoDS_Shape ShapeFuse = BRepAlgoAPI_Fuse(theBox1, theBox2); //共面布尔后合并
+	//ShapeCut.TShape()
+	//遍历数据
+	TopTools_IndexedMapOfShape M_edge;
+	TopTools_IndexedMapOfShape M_face;
+	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_EDGE, M_edge);
+	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_FACE, M_face);
+
+	//draw
+	Handle(AIS_Shape) aisShape = new AIS_Shape(ShapeFuse);
+	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+	myAISContext->SetColor(aisShape, Quantity_NOC_RED, Standard_False);
+	myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->Display(aisShape, Standard_False);
+	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+	myAISContext->SetSelected(anIOShape, Standard_False);
+	Fit();
+}
 
 //3d boolean
 void CModelingDoc::OnCut() 

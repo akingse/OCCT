@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include <iostream>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -107,6 +109,12 @@ static void test1()
     Handle(AIS_Shape) aSection = new AIS_Shape(ShapeCut);
     return;
 }
+#include <OCC_3dDoc.h>
+class CModelingTest : public OCC_3dDoc
+{
+public:
+    //void test2();
+};
 
 //test demo, box-box
 static void test2()
@@ -115,14 +123,32 @@ static void test2()
     Handle(AIS_Shape) ais1 = new AIS_Shape(theBox1);
 
     TopoDS_Shape theBox2 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
-    gp_Trsf trsf;
-    //trsf.Transforms(gp_XYZ(5, 5, 0));
+    gp_Trsf trsf;    //trsf.Transforms(gp_XYZ(5, 5, 0));
     trsf.SetTranslation(gp_Vec(5, 5, 0));
     BRepBuilderAPI_Transform myBRepTransformation(theBox2, trsf);
     Handle(AIS_Shape) ais2 = new AIS_Shape(myBRepTransformation);
 
-    TopoDS_Shape ShapeCut = BRepAlgoAPI_Cut(theBox1, theBox2);
-    Handle(AIS_Shape) aSection = new AIS_Shape(ShapeCut);
+    //TopoDS_Shape ShapeCut = BRepAlgoAPI_Cut(theBox1, theBox2); 
+    TopoDS_Shape ShapeFuse = BRepAlgoAPI_Fuse(theBox1, theBox2); //共面布尔后合并
+    //ShapeCut.TShape()
+    //遍历数据
+    TopTools_IndexedMapOfShape M_edge;
+    TopTools_IndexedMapOfShape M_face;
+    TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_EDGE, M_edge);
+    TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_FACE, M_face);
+
+    Handle(AIS_Shape) aisShape = new AIS_Shape(ShapeFuse);
+
+    //Handle(AIS_InteractiveContext) myAISContext;
+    //AIS_ListOfInteractive aList;
+    //myAISContext->DisplayedObjects(aList);
+    //myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+    //myAISContext->SetColor(aisShape, Quantity_NOC_YELLOW, Standard_False);
+    //myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
+    //myAISContext->Display(aisShape, Standard_False);
+    //const Handle(AIS_InteractiveObject)& anIO2 = aisShape;
+    //myAISContext->SetSelected(anIO2, Standard_False);
+    //OCC_3dBaseDoc::Fit();
     return;
 }
 
@@ -242,7 +268,8 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
 
 static int enrol = []()
     {
-        test1();
+        //test1();
+        //test2();
         return 0;
     }();
 

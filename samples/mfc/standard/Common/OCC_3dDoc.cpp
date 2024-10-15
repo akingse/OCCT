@@ -16,7 +16,7 @@ END_MESSAGE_MAP()
 OCC_3dDoc::OCC_3dDoc (bool theIsResultDialog)
 : myDimensionDlg()
 {
-  if (theIsResultDialog)
+  if (0)//(theIsResultDialog)
   {
     myCResultDialog.Create(CResultDialog::IDD,NULL);
 

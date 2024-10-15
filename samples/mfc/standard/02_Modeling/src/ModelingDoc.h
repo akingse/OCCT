@@ -50,6 +50,7 @@ protected:
 	afx_msg void OnThru();
 	afx_msg void OnEvolved();
 	afx_msg void OnDraft();
+	afx_msg void OnMyTest();
 	afx_msg void OnCut();
 	afx_msg void OnFuse();
 	afx_msg void OnSection();
