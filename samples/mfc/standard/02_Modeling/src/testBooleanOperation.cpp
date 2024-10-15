@@ -266,6 +266,11 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
     return aRes;
 }
 
+static void test3()
+{
+
+}
+
 static int enrol = []()
     {
         //test1();
