@@ -57,17 +57,17 @@
 #define Standard_True  true
 
 #include <Standard_Macro.hxx>
-
-typedef int           Standard_Integer;
-typedef unsigned int  Standard_UInteger;
-typedef double        Standard_Real;
-typedef bool          Standard_Boolean;
-typedef float         Standard_ShortReal;
-typedef char          Standard_Character;
-typedef unsigned char Standard_Byte;
-typedef void*         Standard_Address;
-typedef size_t        Standard_Size;
-typedef std::time_t   Standard_Time;
+//to read code visualization
+typedef int           Standard_Integer;     //int           
+typedef unsigned int  Standard_UInteger;    //unsigned int  
+typedef double        Standard_Real;        //double        
+typedef bool          Standard_Boolean;     //bool          
+typedef float         Standard_ShortReal;   //float         
+typedef char          Standard_Character;   //char          
+typedef unsigned char Standard_Byte;        //unsigned char 
+typedef void*         Standard_Address;     //void*         
+typedef size_t        Standard_Size;        //size_t        
+typedef std::time_t   Standard_Time;        //std::time_t   
 
 // Unicode primitives, char16_t, char32_t
 typedef char          Standard_Utf8Char;     //!< signed   UTF-8 char
@@ -84,8 +84,7 @@ typedef char32_t      Standard_Utf32Char;    //!< UTF-32 char (always unsigned)
 #endif
 typedef wchar_t       Standard_WideChar;     //!< wide char (unsigned UTF-16 on Windows platform and signed UTF-32 on Linux)
 
-//
-typedef const Standard_Character*    Standard_CString;
-typedef const Standard_ExtCharacter* Standard_ExtString;
+typedef const Standard_Character*    Standard_CString;  //const char*
+typedef const Standard_ExtCharacter* Standard_ExtString;//const char16_t*
 
 #endif // _Standard_TypeDef_HeaderFile

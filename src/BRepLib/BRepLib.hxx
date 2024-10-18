@@ -58,7 +58,7 @@ public:
   //! and its 2d representation on the face.
   //! Sets the default precision.  The current Precision
   //! is returned.
-  Standard_EXPORT static void Precision (const Standard_Real P);
+  Standard_EXPORT static void Precision (const Standard_Real P); //default get from Precision::Confusion(1e-7)
   
   //! Returns the default precision.
   Standard_EXPORT static Standard_Real Precision();

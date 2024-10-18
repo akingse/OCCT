@@ -253,7 +253,7 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 
 //=======================================================================
 // function: PerformInternal
-// purpose: 
+// purpose: all boolean intersectShape process
 //=======================================================================
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
