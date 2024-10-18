@@ -13,7 +13,10 @@
 #include "GC_MakeSegment.hxx"
 #include "BRepBuilderAPI_MakeEdge.hxx"
 #pragma comment(lib,"TKPrim.lib")
+#include "commonOCCUtility.h"
+
 using namespace std;
+using namespace occ;
 //using namespace opencascade;
 
 #include <sstream>
@@ -29,6 +32,7 @@ std::string doubleToString(double value)
     //return std::to_string(value);
 }
 
+//输出STEP
 static void test0() 
 {
     // 创建截面形状
@@ -109,12 +113,6 @@ static void test1()
     Handle(AIS_Shape) aSection = new AIS_Shape(ShapeCut);
     return;
 }
-#include <OCC_3dDoc.h>
-class CModelingTest : public OCC_3dDoc
-{
-public:
-    //void test2();
-};
 
 //test demo, box-box
 static void test2()
@@ -125,8 +123,8 @@ static void test2()
     TopoDS_Shape theBox2 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
     gp_Trsf trsf;    //trsf.Transforms(gp_XYZ(5, 5, 0));
     trsf.SetTranslation(gp_Vec(5, 5, 0));
-    BRepBuilderAPI_Transform myBRepTransformation(theBox2, trsf);
-    Handle(AIS_Shape) ais2 = new AIS_Shape(myBRepTransformation);
+    BRepBuilderAPI_Transform theBox3(theBox2, trsf);
+    Handle(AIS_Shape) ais2 = new AIS_Shape(theBox3);
 
     //TopoDS_Shape ShapeCut = BRepAlgoAPI_Cut(theBox1, theBox2); 
     TopoDS_Shape ShapeFuse = BRepAlgoAPI_Fuse(theBox1, theBox2); //共面布尔后合并
@@ -268,13 +266,34 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
 
 static void test3()
 {
+    gp_Trsf scaling = occ::scale(3, 2, 1);
 
+    TColgp_Array1OfPnt Poles(1, 4);
+    Poles.SetValue(1, gp_Pnt(0, -50, 0));
+    Poles.SetValue(2, gp_Pnt(50, -50, 0));
+    Poles.SetValue(3, gp_Pnt(100, -25, 0));
+    Poles.SetValue(4, gp_Pnt(100, 0, 0));
+    //Handle(Geom_BSplineCurve) spline = CreateBSplineCurve(Poles, 3);
+
+    TColgp_Array1OfPnt poles(1, 5);
+    poles(1) = gp_Pnt(0, 0, 0);
+    poles(2) = gp_Pnt(1, 2, 0);
+    poles(3) = gp_Pnt(2, 3, 0);
+    poles(4) = gp_Pnt(3, 1, 0);
+    poles(5) = gp_Pnt(4, 0, 0);
+
+    Standard_Integer degree = 4;
+    Handle(Geom_BSplineCurve) bspline = CreateBSplineCurve(poles, degree);
+
+    return;
 }
+
 
 static int enrol = []()
     {
         //test1();
         //test2();
+        test3();
         return 0;
     }();
 

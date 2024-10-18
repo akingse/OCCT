@@ -18,10 +18,12 @@
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <TColStd_Array2OfReal.hxx>
 #include <OCC_MainFrame.h>
-#include <BRepPrimAPI_MakeCylinder.hxx>
 #include <TopExp_Explorer.hxx>
 #include <Geom_Plane.hxx>
 #include <BRepTools.hxx>
+//modeling
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <BRepPrimAPI_MakePrism.hxx>
 
 static Handle(AIS_Shape) AIS1;
 static TopoDS_Face THE_F1, THE_F2;
@@ -1079,50 +1081,6 @@ for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
 /* =================================================================================
    ====================   O P E R A T I O N S   ====================================
    ================================================================================= */
-#include <BRepPrimAPI_MakePrism.hxx>
-Handle(Geom_BSplineCurve) CreateBSplineCurve() 
-{
-	/*
-	* 曲线4类
-	//BSplineCurve
-	Poles (const TColgp_Array1OfPnt& Poles)：
-	这是控制点数组，表示曲线的“极点”（poles）。每个控制点定义了曲线的形状。曲线的形状会受到这些控制点的影响，
-	但曲线本身通常不会经过这些控制点（除非是插值曲线）。
-	Knots (const TColStd_Array1OfReal& Knots)：
-	这是节点矢量（knots vector），定义了曲线的参数空间。节点矢量决定了控制点对曲线的影响范围以及曲线的分段。
-	节点矢量的长度通常为 m + p + 1，其中 m 是控制点的个数，p 是曲线的度数。
-	Multiplicities (const TColStd_Array1OfInteger& Multiplicities)：
-	这是一个整数数组，定义了每个节点的重数（multiplicity）。重数影响曲线的连续性，重数越高，曲线在节点处的
-	光滑性越低。例如，重数为 1 表示曲线在该节点处是光滑的，而重数大于 1 表示曲线在该节点处的切线可能会发生变化。
-	Degree (const Standard_Integer Degree)：
-	这是曲线的度数，指定了 B 样条曲线的多项式度数。常见的度数有 1（线性），2（二次），3（三次）等。度数决定
-	了曲线的性质和形状。
-	Periodic (const Standard_Boolean Periodic = Standard_False)：
-	这是一个布尔值，指示曲线是否是周期性的。如果为 Standard_True，则曲线在端点处连接形成一个闭合的循环；
-	如果为 Standard_False，则曲线是开放的。这对于创建某些类型的曲线（例如环状或圆形路径）非常重要。
-	
-	*/
-	TColgp_Array1OfPnt controlPoints(1, 4); // 控制点数组
-	controlPoints(1) = gp_Pnt(0, 0, 0);
-	controlPoints(2) = gp_Pnt(1, 2, 0);
-	controlPoints(3) = gp_Pnt(2, 1, 0);
-	controlPoints(4) = gp_Pnt(3, 0, 0);
-
-	TColStd_Array1OfInteger multiplicities(1, 4);
-	multiplicities(1) = 1;
-	multiplicities(2) = 1;
-	multiplicities(3) = 1;
-	multiplicities(4) = 1;
-
-	// 节点矢量
-	TColStd_Array1OfReal knots(1, 7);
-	knots(1) = 0.0; knots(2) = 0.0; knots(3) = 0.0; // 重复节点
-	knots(4) = 1.0; knots(5) = 2.0; knots(6) = 2.0; knots(7) = 2.0;
-
-	// 创建 B 样条曲线
-	// TColgp_Array1OfPnt& Poles, TColStd_Array1OfReal& Knots, TColStd_Array1OfInteger& Multiplicities
-	return new Geom_BSplineCurve(controlPoints, knots, multiplicities, 3, false);
-}
 
 void CModelingDoc::OnMyTest()
 {
@@ -1143,7 +1101,7 @@ void CModelingDoc::OnMyTest()
 	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_EDGE, M_edge);
 	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_FACE, M_face);
 #endif 
-	Handle(Geom_BSplineCurve) bsplineCurve = CreateBSplineCurve();
+	//Handle(Geom_BSplineCurve) bsplineCurve = CreateBSplineCurve();
 	gp_Vec direction(0, 0, 5); // 沿 Z 轴拉伸 5 个单位
 	//CreateExtrudedShape
 	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
