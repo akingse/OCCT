@@ -111,3 +111,37 @@ handle是整个 OCCT 中使用的智能指针。一般来说，handle机制基�
 
 博客[教程](https://www.cnblogs.com/opencascade/p/OpenCASCADE_StartGuide.html)
 
+
+
+OCC中曲面有两种形式：
+
+- 1 代数方程f(x,y,z)=0表示
+- 2 参数方程S(u,v)表示
+
+Plane，Cylinder，Cone，Sphere：为代数方程表示
+
+BezierSurface，BSplineSurface：为参数方程的表示
+
+Param代表的参数方程曲面，Geom代表的代数方程曲面
+
+
+
+---
+
+### MarkDown整理
+
+copy from [path](C:\Users\Aking\source\repos\OCCT\dox) ，markdown版本，内容与html文件一致 [html](C:\Users\Aking\source\repos\OCCT\doc\overview\index 7.8.0.html)；
+
+```
+build
+contribution
+debug
+introduction
+resources
+samples
+specification
+tutorial
+upgrade
+user_guides
+```
+

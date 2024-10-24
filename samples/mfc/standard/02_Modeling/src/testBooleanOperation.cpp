@@ -13,10 +13,12 @@
 #include "GC_MakeSegment.hxx"
 #include "BRepBuilderAPI_MakeEdge.hxx"
 #pragma comment(lib,"TKPrim.lib")
-#include "commonOCCUtility.h"
 
-using namespace std;
+#ifdef USING_BIMBASE_SLN
+#include "commonOCCUtility.h"
 using namespace occ;
+#endif
+using namespace std;
 //using namespace opencascade;
 
 #include <sstream>
@@ -266,8 +268,6 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
 
 static void test3()
 {
-    gp_Trsf scaling = occ::scale(3, 2, 1);
-
     TColgp_Array1OfPnt Poles(1, 4);
     Poles.SetValue(1, gp_Pnt(0, -50, 0));
     Poles.SetValue(2, gp_Pnt(50, -50, 0));
@@ -283,9 +283,15 @@ static void test3()
     poles(5) = gp_Pnt(4, 0, 0);
 
     Standard_Integer degree = 4;
-    Handle(Geom_BSplineCurve) bspline = CreateBSplineCurve(poles, degree);
+    //Handle(Geom_BSplineCurve) bspline = CreateBSplineCurve(poles, degree);
 
     return;
+}
+
+static void test4()
+{
+    TopoDS_Shape ConeO = BRepPrimAPI_MakeCylinder(100., 300.).Shape();
+
 }
 
 
@@ -293,7 +299,8 @@ static int enrol = []()
     {
         //test1();
         //test2();
-        test3();
+        //test3();
+        //test4();
         return 0;
     }();
 
