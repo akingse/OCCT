@@ -17,7 +17,7 @@ OCC_3dDoc::OCC_3dDoc (bool theIsResultDialog)
 : myDimensionDlg()
 {
     //close  ResultDialog
-  if (0)//(theIsResultDialog)
+  if (theIsResultDialog) //ÆÆ°¸ÁË£¬×¢ÊÍµôµ¼ÖÂ±ÀÀ£
   {
     myCResultDialog.Create(CResultDialog::IDD,NULL);
 
