@@ -1082,14 +1082,12 @@ for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
    ====================   O P E R A T I O N S   ====================================
    ================================================================================= */
 
-void CModelingDoc::OnMyTest()
+//两个共面立方体-布尔Fuse
+static TopoDS_Shape getBooleanTest_01()
 {
-#if 1
 	TopoDS_Shape theBox1 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
-	//Handle(AIS_Shape) ais1 = new AIS_Shape(theBox1);
-
 	//TopoDS_Shape theBox2 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
-	gp_Trsf trsf;    
+	gp_Trsf trsf;
 	trsf.SetTranslation(gp_Vec(5, 5, 0));
 	BRepBuilderAPI_Transform theBox2(theBox1, trsf);
 	//Handle(AIS_Shape) ais2 = new AIS_Shape(myBRepTransformation);
@@ -1100,18 +1098,70 @@ void CModelingDoc::OnMyTest()
 	TopTools_IndexedMapOfShape M_face;
 	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_EDGE, M_edge);
 	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_FACE, M_face);
-#endif 
+
+	return ShapeFuse;
+}
+
+static TopoDS_Shape getBooleanTest_02()
+{
+	//创建拉伸体
 	//Handle(Geom_BSplineCurve) bsplineCurve = CreateBSplineCurve();
-	gp_Vec direction(0, 0, 5); // 沿 Z 轴拉伸 5 个单位
 	//CreateExtrudedShape
 	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
 	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
 	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
 	TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1, E2, E3);
+	gp_Vec direction(0, 0, 5); // 沿 Z 轴拉伸 5 个单位
 	TopoDS_Shape extrudedShape = BRepPrimAPI_MakePrism(W, direction);
 
+	return extrudedShape;
+}
+
+//OCCT布尔BUG-Torus Cut Cone
+static TopoDS_Shape getBooleanTest_03()
+{
+	double R = 10, r = 2;
+	double H = 30;
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r,0, H).Shape();
+	gp_Trsf trsfR;
+	gp_Ax1 axe = gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0., 1., 0.));
+	trsfR.SetRotation(axe, 90 * M_PI / 180);
+	gp_Trsf trsfT;
+    trsfT.SetTranslation(gp_Vec(R - H + 2, 0, 0));
+
+    BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
+	//TopoDS_Shape shapeBool = BRepAlgoAPI_Fuse(theShapeA, theShapeC);
+	TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
+	return shapeBool;
+	/*
+	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看
+	布尔中处理这些相切情况的表现，会涉及到共线、共面的判断，而共线、共面判断除了算法上的难
+	度以外还依赖对几何内核容差的掌控。
+	*/
+}
+
+//OCCT布尔BUG-Cylinder Cut Sphere
+static TopoDS_Shape getBooleanTest_04()
+{
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeCylinder(1, 1).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(1).Shape();
+	gp_Trsf trsf;
+	trsf.SetTranslation(gp_Vec(1, 1, 1));
+	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
+	TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
+	return shapeBool;
+}
+
+void CModelingDoc::OnMyTest()
+{
+	//验证布尔
+	//TopoDS_Shape boolShape = getBooleanTest_01();
+	TopoDS_Shape boolShape = getBooleanTest_03();
+	//TopoDS_Shape boolShape = getBooleanTest_04();
+
 	//draw
-	Handle(AIS_Shape) aisShape = new AIS_Shape(ShapeFuse);
+	Handle(AIS_Shape) aisShape = new AIS_Shape(boolShape);
 	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 	myAISContext->SetColor(aisShape, Quantity_NOC_RED, Standard_False);
 	myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
@@ -1119,6 +1169,7 @@ void CModelingDoc::OnMyTest()
 	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
 	myAISContext->SetSelected(anIOShape, Standard_False);
 	Fit();
+	return;
 }
 
 //3d boolean
