@@ -1082,6 +1082,44 @@ for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
    ====================   O P E R A T I O N S   ====================================
    ================================================================================= */
 
+class BoolNode
+{
+public:
+	std::shared_ptr<BoolNode> m_leftNode;
+	std::shared_ptr<BoolNode> m_rightNode;
+	BOPAlgo_Operation m_operation; //
+};
+
+class CsgTree
+{
+public:
+	std::vector<TopoDS_Shape> m_shapeVct;
+	std::shared_ptr<BoolNode> m_node;
+	CsgTree(const TopoDS_Shape& target, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
+	{
+		m_shapeVct.push_back(target);
+		m_shapeVct.push_back(tool);
+		m_node = std::make_shared<BoolNode>();
+		m_node->m_operation = operation;
+		TopoDS_Shape result;
+		if (BOPAlgo_Operation::BOPAlgo_COMMON == operation)
+			result = BRepAlgoAPI_Common(target, tool);
+		else if (BOPAlgo_Operation::BOPAlgo_FUSE == operation)
+			result = BRepAlgoAPI_Fuse(target, tool);
+		else if (BOPAlgo_Operation::BOPAlgo_CUT == operation)
+			result = BRepAlgoAPI_Cut(target, tool);
+		m_shapeVct.push_back(result);
+	}
+
+	TopoDS_Shape getResult()
+	{
+		if (m_shapeVct.size() != 3)
+			return {};
+		return m_shapeVct[2];
+	}
+
+};
+
 //两个共面立方体-布尔Fuse
 static TopoDS_Shape getBooleanTest_01()
 {
@@ -1118,7 +1156,7 @@ static TopoDS_Shape getBooleanTest_02()
 }
 
 //OCCT布尔BUG-Torus Cut Cone
-static TopoDS_Shape getBooleanTest_03()
+static CsgTree getBooleanTest_03()
 {
 	double R = 10, r = 2;
 	double H = 30;
@@ -1132,8 +1170,9 @@ static TopoDS_Shape getBooleanTest_03()
 
     BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Fuse(theShapeA, theShapeC);
-	TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
-	return shapeBool;
+	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
+	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	return csgtree;
 	/*
 	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看
 	布尔中处理这些相切情况的表现，会涉及到共线、共面的判断，而共线、共面判断除了算法上的难
@@ -1157,18 +1196,39 @@ void CModelingDoc::OnMyTest()
 {
 	//验证布尔
 	//TopoDS_Shape boolShape = getBooleanTest_01();
-	TopoDS_Shape boolShape = getBooleanTest_03();
+	//TopoDS_Shape boolShape = getBooleanTest_03();
 	//TopoDS_Shape boolShape = getBooleanTest_04();
 
-	//draw
-	Handle(AIS_Shape) aisShape = new AIS_Shape(boolShape);
-	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-	myAISContext->SetColor(aisShape, Quantity_NOC_RED, Standard_False);
-	myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
-	myAISContext->Display(aisShape, Standard_False);
-	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
-	myAISContext->SetSelected(anIOShape, Standard_False);
-	Fit();
+	CsgTree csgtree = getBooleanTest_03();
+	bool isDrawResult = false;
+	if (isDrawResult)
+	{
+		//draw bool result
+		Handle(AIS_Shape) aisShape = new AIS_Shape(csgtree.getResult());
+		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NOC_RED, Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
+		myAISContext->Display(aisShape, Standard_False);
+		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+		myAISContext->SetSelected(anIOShape, Standard_False);
+		Fit();
+	}
+	else
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			int color = rand() % (508 + 1);
+            int material = rand() % (25 + 1);
+			Handle(AIS_Shape) ais1 = new AIS_Shape(csgtree.m_shapeVct[i]);
+			myAISContext->SetDisplayMode(ais1, 1, Standard_False);
+			myAISContext->SetColor(ais1, Quantity_NameOfColor(color), Standard_False);
+			myAISContext->SetMaterial(ais1, Graphic3d_NameOfMaterial(material), Standard_False);
+			myAISContext->Display(ais1, Standard_False);
+			const Handle(AIS_InteractiveObject)& anIO1 = ais1;
+			myAISContext->SetSelected(anIO1, Standard_False);
+		}
+        Fit();
+	}
 	return;
 }
 
