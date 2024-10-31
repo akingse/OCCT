@@ -50,7 +50,8 @@ protected:
 	afx_msg void OnThru();
 	afx_msg void OnEvolved();
 	afx_msg void OnDraft();
-	afx_msg void OnMyTest();
+	afx_msg void OnTestBoolBefore();
+	afx_msg void OnTestBoolAfter();
 	afx_msg void OnCut();
 	afx_msg void OnFuse();
 	afx_msg void OnSection();
@@ -85,6 +86,15 @@ protected:
 	afx_msg void OnFillwithtang();
 	afx_msg void OnButtonFill();
 	afx_msg void OnStopStop();
+	afx_msg void clear()
+	{
+		//clear
+		AIS_ListOfInteractive aList;
+		myAISContext->DisplayedObjects(aList);
+		AIS_ListIteratorOfListOfInteractive aListIterator;
+		for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
+			myAISContext->Remove(aListIterator.Value(), Standard_False);
+	}
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

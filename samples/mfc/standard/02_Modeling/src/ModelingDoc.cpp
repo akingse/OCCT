@@ -56,8 +56,9 @@ BEGIN_MESSAGE_MAP(CModelingDoc, OCC_3dBaseDoc)
 	ON_COMMAND(ID_EVOLVED, OnEvolved)
 	ON_COMMAND(ID_DRAFT, OnDraft)
 	//ON_COMMAND(ID_CUT, OnCut) 
-	ON_COMMAND(ID_CUT, OnMyTest) //change the button
-	ON_COMMAND(ID_FUSE, OnFuse)
+	//ON_COMMAND(ID_FUSE, OnFuse)
+	ON_COMMAND(ID_CUT, OnTestBoolBefore) //change the button
+	ON_COMMAND(ID_FUSE, OnTestBoolAfter)
 	ON_COMMAND(ID_SECTION, OnSection)
 	ON_COMMAND(ID_COMMON, OnCommon)
 	ON_COMMAND(ID_PSECTION, OnPsection)
@@ -1181,54 +1182,67 @@ static CsgTree getBooleanTest_03()
 }
 
 //OCCT布尔BUG-Cylinder Cut Sphere
-static TopoDS_Shape getBooleanTest_04()
+static CsgTree getBooleanTest_04()
 {
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeCylinder(1, 1).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(1).Shape();
 	gp_Trsf trsf;
 	trsf.SetTranslation(gp_Vec(1, 1, 1));
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
-	TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
-	return shapeBool;
+	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
+	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	return csgtree;
 }
 
-void CModelingDoc::OnMyTest()
-{
 	//验证布尔
-	//TopoDS_Shape boolShape = getBooleanTest_01();
-	//TopoDS_Shape boolShape = getBooleanTest_03();
-	//TopoDS_Shape boolShape = getBooleanTest_04();
+CsgTree csgtree = getBooleanTest_03();
 
-	CsgTree csgtree = getBooleanTest_03();
-	bool isDrawResult = false;
-	if (isDrawResult)
+void CModelingDoc::OnTestBoolBefore()
+{
+	//clear
+	AIS_ListOfInteractive aList;
+	myAISContext->DisplayedObjects(aList);
+	AIS_ListIteratorOfListOfInteractive aListIterator;
+	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
+		myAISContext->Remove(aListIterator.Value(), Standard_False);
+	
+	for (int i = 0; i < 2; i++)
 	{
-		//draw bool result
-		Handle(AIS_Shape) aisShape = new AIS_Shape(csgtree.getResult());
+		int color = rand() % (508 + 1);
+        int material = rand() % (25 + 1);
+		Handle(AIS_Shape) aisShape = new AIS_Shape(csgtree.m_shapeVct[i]);
 		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-		myAISContext->SetColor(aisShape, Quantity_NOC_RED, Standard_False);
-		myAISContext->SetMaterial(aisShape, Graphic3d_NOM_PLASTIC, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
 		myAISContext->Display(aisShape, Standard_False);
 		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
 		myAISContext->SetSelected(anIOShape, Standard_False);
-		Fit();
 	}
-	else
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			int color = rand() % (508 + 1);
-            int material = rand() % (25 + 1);
-			Handle(AIS_Shape) ais1 = new AIS_Shape(csgtree.m_shapeVct[i]);
-			myAISContext->SetDisplayMode(ais1, 1, Standard_False);
-			myAISContext->SetColor(ais1, Quantity_NameOfColor(color), Standard_False);
-			myAISContext->SetMaterial(ais1, Graphic3d_NameOfMaterial(material), Standard_False);
-			myAISContext->Display(ais1, Standard_False);
-			const Handle(AIS_InteractiveObject)& anIO1 = ais1;
-			myAISContext->SetSelected(anIO1, Standard_False);
-		}
-        Fit();
-	}
+    Fit();
+	return;
+}
+
+void CModelingDoc::OnTestBoolAfter()
+{
+	//clear
+	AIS_ListOfInteractive aList;
+	myAISContext->DisplayedObjects(aList);
+	AIS_ListIteratorOfListOfInteractive aListIterator;
+	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
+		myAISContext->Remove(aListIterator.Value(), Standard_False);
+
+	//draw bool result
+	int color = rand() % (508 + 1);
+	int material = rand() % (25 + 1);
+	Handle(AIS_Shape) aisShape = new AIS_Shape(csgtree.getResult());
+	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+	myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+	myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+	myAISContext->Display(aisShape, Standard_False);
+	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+	myAISContext->SetSelected(anIOShape, Standard_False);
+	Fit();
+
 	return;
 }
 
