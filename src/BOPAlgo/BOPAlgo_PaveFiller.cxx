@@ -25,6 +25,10 @@
 #include <NCollection_BaseAllocator.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
+//time consuming
+#include <iostream>
+#include <chrono>
+#include "DataCountSingleton.h"
 
 namespace
 {
@@ -255,61 +259,101 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 // function: PerformInternal
 // purpose: all boolean intersectShape process
 //=======================================================================
+
+#define USING_MACRO_TIME_START(start) start = std::chrono::high_resolution_clock::now();
+#define USING_MACRO_TIME_END(end, name)\
+    end = std::chrono::high_resolution_clock::now();\
+    duration_ms = end - timestart;\
+    current.m_dataTime.emplace(name, duration_ms.count());
+
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
+#ifdef USING_OPENCASCADE_TEST
+  using namespace std;
+  using namespace chrono;
+  using namespace test;
+  steady_clock::time_point timestart;
+  steady_clock::time_point timeend;
+  std::chrono::duration<double, std::milli> duration_ms;
+  DataCountSingleton& instance = DataCountSingleton::getInstance();
+  std::vector<DataCountSingleton::DataMap>& data = instance.getData();// 
+  DataCountSingleton::DataMap current;
+  instance.sm_index++;
+#endif
+
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
 
+  //timestart = std::chrono::high_resolution_clock::now();
+  USING_MACRO_TIME_START(timestart)
   Init (aPS.Next (5));
+  USING_MACRO_TIME_END(timeend,"PaveFiller::Init")
+
+  //timeend = std::chrono::high_resolution_clock::now();
+  //duration_ms = timeend - timestart;
+  //current.m_dataTime.emplace("PaveFiller::Init", duration_ms.count());
   if (HasErrors()) {
     return;
   }
 
   // Compute steps of the PI
   BOPAlgo_PISteps aSteps (PIOperation_Last);
+  timestart = std::chrono::high_resolution_clock::now();
   analyzeProgress (95, aSteps);
   //
+  timestart = std::chrono::high_resolution_clock::now();
   Prepare (aPS.Next (aSteps.GetStep (PIOperation_Prepare)));
   if (HasErrors()) {
     return;
   }
   // 00
+  timestart = std::chrono::high_resolution_clock::now();
   PerformVV (aPS.Next (aSteps.GetStep (PIOperation_PerformVV)));
   if (HasErrors()) {
     return;
   }
   // 01
+  timestart = std::chrono::high_resolution_clock::now();
   PerformVE (aPS.Next (aSteps.GetStep (PIOperation_PerformVE)));
   if (HasErrors()) {
     return;
   }
   //
+  timestart = std::chrono::high_resolution_clock::now();
   UpdatePaveBlocksWithSDVertices();
   // 11
+  timestart = std::chrono::high_resolution_clock::now();
   PerformEE (aPS.Next (aSteps.GetStep (PIOperation_PerformEE)));
   if (HasErrors()) {
     return;
   }
+  timestart = std::chrono::high_resolution_clock::now();
   UpdatePaveBlocksWithSDVertices();
   // 02
   PerformVF (aPS.Next (aSteps.GetStep (PIOperation_PerformVF)));
   if (HasErrors()) {
     return;
   }
+  timestart = std::chrono::high_resolution_clock::now();
   UpdatePaveBlocksWithSDVertices();
   // 12
+  timestart = std::chrono::high_resolution_clock::now();
   PerformEF (aPS.Next (aSteps.GetStep (PIOperation_PerformEF)));
   if (HasErrors()) {
     return;
   }
+  timestart = std::chrono::high_resolution_clock::now();
   UpdatePaveBlocksWithSDVertices();
+  timestart = std::chrono::high_resolution_clock::now();
   UpdateInterfsWithSDVertices();
 
   // Repeat Intersection with increased vertices
+  timestart = std::chrono::high_resolution_clock::now();
   RepeatIntersection (aPS.Next (aSteps.GetStep (PIOperation_RepeatIntersection)));
   if (HasErrors())
     return;
   // Force intersection of edges after increase
   // of the tolerance values of their vertices
+  timestart = std::chrono::high_resolution_clock::now();
   ForceInterfEE (aPS.Next (aSteps.GetStep (PIOperation_ForceInterfEE)));
   if (HasErrors())
   {
@@ -317,6 +361,7 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   }
   // Force Edge/Face intersection after increase
   // of the tolerance values of their vertices
+  timestart = std::chrono::high_resolution_clock::now();
   ForceInterfEF (aPS.Next (aSteps.GetStep (PIOperation_ForceInterfEF)));
   if (HasErrors())
   {
@@ -324,40 +369,53 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   }
   //
   // 22
+  timestart = std::chrono::high_resolution_clock::now();
   PerformFF (aPS.Next (aSteps.GetStep (PIOperation_PerformFF)));
   if (HasErrors()) {
     return;
   }
   //
+  timestart = std::chrono::high_resolution_clock::now();
   UpdateBlocksWithSharedVertices();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   myDS->RefineFaceInfoIn();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   MakeSplitEdges (aPS.Next (aSteps.GetStep (PIOperation_MakeSplitEdges)));
   if (HasErrors()) {
     return;
   }
   //
+  timestart = std::chrono::high_resolution_clock::now();
   UpdatePaveBlocksWithSDVertices();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   MakeBlocks (aPS.Next (aSteps.GetStep (PIOperation_MakeBlocks)));
   if (HasErrors()) {
     return;
   }
   //
+  timestart = std::chrono::high_resolution_clock::now();
   CheckSelfInterference();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   UpdateInterfsWithSDVertices();
+  timestart = std::chrono::high_resolution_clock::now();
   myDS->ReleasePaveBlocks();
+  timestart = std::chrono::high_resolution_clock::now();
   myDS->RefineFaceInfoOn();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   RemoveMicroEdges();
   //
+  timestart = std::chrono::high_resolution_clock::now();
   MakePCurves (aPS.Next (aSteps.GetStep (PIOperation_MakePCurves)));
   if (HasErrors()) {
     return;
   }
   //
+  timestart = std::chrono::high_resolution_clock::now();
   ProcessDE (aPS.Next (aSteps.GetStep (PIOperation_ProcessDE)));
   if (HasErrors()) {
     return;
