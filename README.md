@@ -23,6 +23,10 @@ cmake直接打开源码目录，设置build生成路径，点击configure会报�
 
 解决方法，以管理员身份运行 [VS](C:\Program Files (x86)\Common Files\Microsoft Shared\MSEnv\VSLauncher.exe)
 
+建议卸载CMakePredefinedTargets下的两个项目 `ALL_BUILD` `INSTALL`
+
+
+
 ### debug配置
 
 occt.natvis 拷贝至[路径](C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Packages\Debugger\Visualizers\)
@@ -45,6 +49,65 @@ fit
 ```
 
 ---
+
+### MarkDown整理
+
+官方文档有4个版本
+
+[html](C:\Users\Aking\source\repos\OCCT\doc\overview\index 7.8.0.html)版本，[chm](C:\Users\Aking\source\repos\OCCT\doc\occt_overview.chm)版本，html版有最新780，chm最新是760的occt_overview，对应官网[OpenCascade User Guide](https://dev.opencascade.org/doc/overview/html/user_guides.html)；
+
+[markdown](C:\Users\Aking\source\repos\OCCT\dox)版本，内容与html文件一致，文件夹目录稍有变化，目前图片无法正确加载；
+
+[pdf](C:\Users\Aking\source\repos\OCCT\doc\pdf\dev_guides)版本，分为dev_guides和user_guides，分别开发者指南（目录下其他内容，包括specification）对应User Guides用户指南（按sln项目模块组织的分类）；
+
+![image-20241103134553416](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241103134553416.png)
+
+分别统计求交和构建的耗时
+
+求交
+
+```
+BRepAlgoAPI_BuilderAlgo::IntersectShapes
+{
+  BOPAlgo_PaveFiller::Perform
+  {
+    BOPAlgo_PaveFiller::PerformInternal
+  }
+}
+
+```
+
+构建
+
+```
+BRepAlgoAPI_BuilderAlgo::BuildResult
+{
+  BOPAlgo_Builder::PerformWithFiller
+  {
+    BOPAlgo_Builder::PerformInternal
+    {
+      BOPAlgo_BOP::PerformInternal1
+    }
+  }
+}
+
+```
+
+
+
+770配置
+
+```
+..\..\..\..\..\OCC7.7.0\OCCPublicAPI\Include
+..\..\..\..\..\OCC7.7.0\Release
+```
+
+780配置
+
+```
+C:\Users\Aking\source\repos\OCCT\build\inc
+C:\Users\Aking\source\repos\OCCT\build\win64\vc14\lib
+```
 
 
 
@@ -113,27 +176,6 @@ Param代表的参数方程曲面，Geom代表的代数方程曲面
 
 
 ---
-
-### MarkDown整理
-
-copy from [path](C:\Users\Aking\source\repos\OCCT\dox) ，markdown版本，内容与html文件一致 [html](C:\Users\Aking\source\repos\OCCT\doc\overview\index 7.8.0.html)；
-
-```
-build
-contribution
-debug
-introduction
-resources
-samples
-specification
-tutorial
-upgrade
-user_guides
-```
-
-
-
-[OpenCascade User Guide](https://dev.opencascade.org/doc/overview/html/user_guides.html)
 
 
 
