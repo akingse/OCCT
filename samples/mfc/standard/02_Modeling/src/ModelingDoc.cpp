@@ -1167,10 +1167,9 @@ static CsgTree getBooleanTest_03()
 	gp_Ax1 axe = gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0., 1., 0.));
 	trsfR.SetRotation(axe, 90 * M_PI / 180);
 	gp_Trsf trsfT;
-    trsfT.SetTranslation(gp_Vec(R - H + 2, 0, 0));
+    trsfT.SetTranslation(gp_Vec(R - H + r, 0, 0));
 
     BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
-	//TopoDS_Shape shapeBool = BRepAlgoAPI_Fuse(theShapeA, theShapeC);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
 	return csgtree;
