@@ -2,9 +2,7 @@
 //
 
 #include "stdafx.h"
-
 #include "ModelingDoc.h"
-
 #include "ModelingApp.h"
 #include "ResultDialog.h"
 #include "State.h"
@@ -24,6 +22,20 @@
 //modeling
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
+#define USING_OPENCASCADE_TEST
+//#include <DataCountSingleton.h>
+#include "C:\Users\Aking\source\repos\OCCT\src\BOPAlgo\DataCountSingleton.h"
+using namespace test;
+
+#include<afx.h>
+inline std::string getExePath() // #include<afx.h>
+{
+	TCHAR buff[MAX_PATH];
+	GetModuleFileNameW(NULL, buff, MAX_PATH);
+	CString path = buff;
+	path = path.Left(path.ReverseFind('\\')); // delete exename
+	return (std::string)(CStringA)path;
+}
 
 static Handle(AIS_Shape) AIS1;
 static TopoDS_Face THE_F1, THE_F2;
@@ -1096,6 +1108,7 @@ class CsgTree
 public:
 	std::vector<TopoDS_Shape> m_shapeVct;
 	std::shared_ptr<BoolNode> m_node;
+	CsgTree() = default;
 	CsgTree(const TopoDS_Shape& target, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
 	{
 		m_shapeVct.push_back(target);
@@ -1112,7 +1125,18 @@ public:
 		m_shapeVct.push_back(result);
 	}
 
-	TopoDS_Shape getResult()
+	void writeData() const
+	{
+		DataCountSingleton& instance = DataCountSingleton::getInstance();
+		const std::vector<DataCountSingleton::DataMap>& datas = instance.getData();
+		std::string filename = getExePath();
+		//windows系统函数，用于获取自系统启动以来所经过的毫秒数
+        filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
+		instance.writeToCsvInOne(filename);
+		instance.clear();
+	}
+
+	TopoDS_Shape getResult() const
 	{
 		if (m_shapeVct.size() != 3)
 			return {};
@@ -1161,17 +1185,19 @@ static CsgTree getBooleanTest_03()
 {
 	double R = 10, r = 2;
 	double H = 30;
+	double offset = 0.1;
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r,0, H).Shape();
 	gp_Trsf trsfR;
 	gp_Ax1 axe = gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(0., 1., 0.));
 	trsfR.SetRotation(axe, 90 * M_PI / 180);
 	gp_Trsf trsfT;
-    trsfT.SetTranslation(gp_Vec(R - H + r, 0, 0));
+    trsfT.SetTranslation(gp_Vec(R - H + r + offset, 0, 0));
 
     BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	csgtree.writeData();
 	return csgtree;
 	/*
 	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看
@@ -1193,11 +1219,25 @@ static CsgTree getBooleanTest_04()
 	return csgtree;
 }
 
-	//验证布尔
-CsgTree csgtree = getBooleanTest_03();
+//不相交的两个体
+static CsgTree getBooleanTest_05()
+{
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(1).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(1).Shape();
+	gp_Trsf trsf;
+	trsf.SetTranslation(gp_Vec(1, 1, 0));
+	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
+	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_COMMON);
+	csgtree.writeData();
+	return csgtree;
+}
+
+//验证布尔
+CsgTree csgtree;
 
 void CModelingDoc::OnTestBoolBefore()
 {
+	csgtree = getBooleanTest_03();
 	//clear
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
@@ -1240,6 +1280,7 @@ void CModelingDoc::OnTestBoolAfter()
 	myAISContext->Display(aisShape, Standard_False);
 	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
 	myAISContext->SetSelected(anIOShape, Standard_False);
+	myAISContext->DisplayAll(true); //强制刷新
 	Fit();
 
 	return;

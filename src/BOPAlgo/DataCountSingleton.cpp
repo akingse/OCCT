@@ -9,6 +9,7 @@ using namespace std;
 //init
 //bool DataCountSingleton::sm_openSwitch = false;
 //int DataCountSingleton::sm_index = 0;
+int DataCountSingleton::sm_hasBuild = 0;
 std::vector<DataCountSingleton::DataMap> DataCountSingleton::sm_recordData;
 
 void DataCountSingleton::writeToCsvInOne(const std::string& filename)
@@ -35,7 +36,7 @@ void DataCountSingleton::writeToCsvInOne(const std::string& filename)
         std::cerr << "Could not open the file!" << std::endl;
         return;
     }
-    for (int i = 1; i < mergeData.m_dataTimeVct.size(); i++)
+    for (int i = 0; i < mergeData.m_dataTimeVct.size(); i++)
     {
         ofsFile << mergeData.m_dataTimeVct[i].first << ",";
         ofsFile << mergeData.m_dataTimeVct[i].second << std::setprecision(numeric_limits<double>::digits10) << std::endl;

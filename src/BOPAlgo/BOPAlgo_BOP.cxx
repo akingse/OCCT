@@ -428,7 +428,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   DataCountSingleton& instance = DataCountSingleton::getInstance();
-  DataCountSingleton::DataMap& current = instance.getData().back();
+  DataCountSingleton::DataMap& current = instance.getDataCount().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();
@@ -495,7 +495,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   // 3.3 Wires
   MACRO_EXPANSION_TIME_START()
   FillImagesContainers(TopAbs_WIRE, aPS.Next(aSteps.GetStep(PIOperation_TreatWires)));
-  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_WIRE")
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_WIRE")
   if (HasErrors()) {
     return;
   }
@@ -521,7 +521,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   // 3.5 Shells
   MACRO_EXPANSION_TIME_START()
   FillImagesContainers(TopAbs_SHELL, aPS.Next(aSteps.GetStep(PIOperation_TreatShells)));
-  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_SHELL")
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_SHELL")
   if (HasErrors()) {
     return;
   }
@@ -547,7 +547,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   // 3.7 CompSolids
   MACRO_EXPANSION_TIME_START()
   FillImagesContainers(TopAbs_COMPSOLID, aPS.Next(aSteps.GetStep(PIOperation_TreatCompsolids)));
-  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_COMPSOLID")
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_COMPSOLID")
   if (HasErrors()) {
     return;
   }
@@ -591,6 +591,8 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   MACRO_EXPANSION_TIME_START()
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PostTreat")
+
+  instance.hasBuild();
 }
 #else
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,

@@ -2,12 +2,18 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <Standard_Macro.hxx>
+//#include <Standard_Macro.hxx>
 
 //#define USING_OPENCASCADE_TEST //set in project config
 #ifdef USING_OPENCASCADE_TEST
+//custom export macro
+#ifdef OPENCASCADE_TEST_EXPORTS
+#define OPENCASCADE_TEST_API __declspec(dllexport)
+#else
+#define OPENCASCADE_TEST_API __declspec(dllimport)
+#endif
 
-//macro
+//macro expand
 #define MACRO_EXPANSION_TIME_START() \
     timestart = std::chrono::high_resolution_clock::now();
 #define MACRO_EXPANSION_TIME_END(name)\
@@ -23,8 +29,8 @@ namespace test
     class DataCountSingleton
     {
     private:
-        Standard_EXPORT DataCountSingleton() = default;
-        Standard_EXPORT ~DataCountSingleton() = default;
+        OPENCASCADE_TEST_API DataCountSingleton() = default;
+        OPENCASCADE_TEST_API ~DataCountSingleton() = default;
         DataCountSingleton(const DataCountSingleton&) = delete;
         DataCountSingleton(DataCountSingleton&&) = delete;
 
@@ -39,9 +45,11 @@ namespace test
             std::vector<std::pair<std::string, double>> m_dataTimeVct; //to keep order
         };
 
+    private:
         //static bool sm_openSwitch;
         //static int sm_index;
-        Standard_EXPORT static std::vector<DataMap> sm_recordData;
+        static int sm_hasBuild; //to process once MakeBlocks recursion
+        OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
 
     public:
         static DataCountSingleton& getInstance()
@@ -49,16 +57,30 @@ namespace test
             static DataCountSingleton instance;
             return instance;
         }
-        Standard_EXPORT static std::vector<DataMap>& getData()// std::vector<DataCountSingleton::DataMap>
+        OPENCASCADE_TEST_API static std::vector<DataMap>& getData()
         {
             return sm_recordData;
         }
-        Standard_EXPORT static void clear()
+        OPENCASCADE_TEST_API static void clear()
         {
             sm_recordData.clear();
             //sm_index = 0;
         }
-        Standard_EXPORT static void writeToCsvInOne(const std::string& filename);
+        static std::vector<DataMap>& getDataCount()
+        {
+            sm_hasBuild++;
+            return sm_recordData;
+        }
+        static void hasBuild()
+        {
+            if (sm_hasBuild == 3) //when MakeBlocks call recursion
+            {
+                size_t mb = sm_recordData.size() - 2;
+                sm_recordData.erase(sm_recordData.begin() + mb);
+            }
+            sm_hasBuild = 0;
+        }
+        OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
 
         //static void open(bool isOpen=true)
         //{
