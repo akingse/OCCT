@@ -26,8 +26,9 @@ namespace test
             std::map<std::string, double> m_dataFloat;
             std::map<std::string, double> m_dataTime;
             std::map<std::string, unsigned char> m_dataByte;
-
+            std::vector<std::pair<std::string, double>> m_dataTimeVct; //to keep order
         };
+
         static bool sm_openSwitch;
         static int sm_index;
         static std::vector<DataMap> sm_recordData;
@@ -38,14 +39,14 @@ namespace test
             static DataCountSingleton instance;
             return instance;
         }
+        static std::vector<DataMap>& getData()// std::vector<DataCountSingleton::DataMap>
+        {
+            return sm_recordData;
+        }
         static void clear()
         {
             sm_recordData.clear();
             sm_index = 0;
-        }
-        static std::vector<DataMap>& getData()// std::vector<DataCountSingleton::DataMap>
-        {
-            return sm_recordData;
         }
         static void open(bool isOpen=true)
         {
@@ -56,7 +57,7 @@ namespace test
             return sm_openSwitch;
         }
         //output
-        static void writeToCsv(const std::string& filename);
+        static void writeToCsvInOne(const std::string& filename);
 
     };
 }
