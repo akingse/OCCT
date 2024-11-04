@@ -7,8 +7,8 @@
 using namespace test;
 using namespace std;
 //init
-bool DataCountSingleton::sm_openSwitch = false;
-int DataCountSingleton::sm_index = 0;
+//bool DataCountSingleton::sm_openSwitch = false;
+//int DataCountSingleton::sm_index = 0;
 std::vector<DataCountSingleton::DataMap> DataCountSingleton::sm_recordData;
 
 void DataCountSingleton::writeToCsvInOne(const std::string& filename)

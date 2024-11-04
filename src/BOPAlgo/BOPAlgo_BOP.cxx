@@ -38,6 +38,9 @@
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_MapOfShape.hxx>
+//time consuming
+#include <chrono>
+#include "DataCountSingleton.h"
 
 static
   TopAbs_ShapeEnum TypeToExplore(const Standard_Integer theDim);
@@ -411,8 +414,185 @@ void BOPAlgo_BOP::fillPIConstants (const Standard_Real theWhole, BOPAlgo_PISteps
 
 //=======================================================================
 //function : PerformInternal1
-//purpose  : 
+//purpose  : all boolean BuildResult process
 //=======================================================================
+#ifdef USING_OPENCASCADE_TEST
+void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
+                                   const Message_ProgressRange& theRange)
+{
+  // USING_OPENCASCADE_TEST
+  using namespace std;
+  using namespace chrono;
+  using namespace test;
+  steady_clock::time_point timestart;// = steady_clock::now();
+  steady_clock::time_point timeend;
+  std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
+  DataCountSingleton& instance = DataCountSingleton::getInstance();
+  DataCountSingleton::DataMap& current = instance.getData().back();
+
+  myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
+  myDS=myPaveFiller->PDS();
+  myContext=myPaveFiller->Context();
+  myFuzzyValue = myPaveFiller->FuzzyValue();
+  myNonDestructive = myPaveFiller->NonDestructive();
+  
+  // 1. CheckData
+  MACRO_EXPANSION_TIME_START()
+  CheckData();
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::CheckData")
+  if (HasErrors()) {
+    return;
+  }
+  // 2. Prepare
+  MACRO_EXPANSION_TIME_START()
+  Prepare();
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::Prepare")
+  if (HasErrors()) {
+    return;
+  }
+  
+  if (GetReport()->HasAlert (STANDARD_TYPE(BOPAlgo_AlertEmptyShape)))
+  {
+    Standard_Boolean bDone = TreatEmptyShape();
+    if (bDone) {
+      PrepareHistory (theRange);
+      return;
+    }
+  }
+  Message_ProgressScope aPS(theRange, "Building the result of Boolean operation", 100);
+  BOPAlgo_PISteps aSteps (PIOperation_Last);
+  MACRO_EXPANSION_TIME_START()
+  analyzeProgress (100, aSteps);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Algo::analyze")
+
+  // 3. Fill Images
+  // 3.1 Vertices
+  MACRO_EXPANSION_TIME_START()
+  FillImagesVertices(aPS.Next(aSteps.GetStep(PIOperation_TreatVertices)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesVertices")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_VERTEX);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.2 Edges
+  MACRO_EXPANSION_TIME_START()
+  FillImagesEdges(aPS.Next(aSteps.GetStep(PIOperation_TreatEdges)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesEdges")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_EDGE);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.3 Wires
+  MACRO_EXPANSION_TIME_START()
+  FillImagesContainers(TopAbs_WIRE, aPS.Next(aSteps.GetStep(PIOperation_TreatWires)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_WIRE")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_WIRE);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.4 Faces
+  MACRO_EXPANSION_TIME_START()
+  FillImagesFaces(aPS.Next(aSteps.GetStep(PIOperation_TreatFaces)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesFaces")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_FACE);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.5 Shells
+  MACRO_EXPANSION_TIME_START()
+  FillImagesContainers(TopAbs_SHELL, aPS.Next(aSteps.GetStep(PIOperation_TreatShells)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_SHELL")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_SHELL);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.6 Solids
+  MACRO_EXPANSION_TIME_START()
+  FillImagesSolids(aPS.Next(aSteps.GetStep(PIOperation_TreatSolids)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesSolids")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_SOLID);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.7 CompSolids
+  MACRO_EXPANSION_TIME_START()
+  FillImagesContainers(TopAbs_COMPSOLID, aPS.Next(aSteps.GetStep(PIOperation_TreatCompsolids)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_TopAbs_COMPSOLID")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_COMPSOLID);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  // 3.8 Compounds
+  MACRO_EXPANSION_TIME_START()
+  FillImagesCompounds(aPS.Next(aSteps.GetStep(PIOperation_TreatCompounds)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesCompounds")
+  if (HasErrors()) {
+    return;
+  }
+  MACRO_EXPANSION_TIME_START()
+  BuildResult(TopAbs_COMPOUND);
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
+  if (HasErrors()) {
+    return;
+  }
+  
+  // 4.BuildShape;
+  MACRO_EXPANSION_TIME_START()
+  BuildShape(aPS.Next(aSteps.GetStep(PIOperation_BuildShape)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildShape")
+  if (HasErrors()) {
+    return;
+  }
+  
+  // 5.History
+  MACRO_EXPANSION_TIME_START()
+  PrepareHistory(aPS.Next(aSteps.GetStep(PIOperation_FillHistory)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PrepareHistory")
+  if (HasErrors()) {
+    return;
+  }
+  
+  // 6 Post-treatment 
+  MACRO_EXPANSION_TIME_START()
+  PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
+  MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PostTreat")
+}
+#else
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
@@ -550,6 +730,8 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   // 6 Post-treatment 
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
 }
+#endif //USING_OPENCASCADE_TEST
+
 //=======================================================================
 //function : BuildRC
 //purpose  : 

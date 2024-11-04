@@ -260,17 +260,9 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 //=======================================================================
 
 #ifdef USING_OPENCASCADE_TEST
-//macro
-#define MACRO_EXPANSION_TIME_START() \
-    timestart = std::chrono::high_resolution_clock::now();
-#define MACRO_EXPANSION_TIME_END(name)\
-    timeend = std::chrono::high_resolution_clock::now();\
-    duration_ms = timeend - timestart;\
-    current.m_dataTimeVct.push_back(std::make_pair(name, duration_ms.count()));
-
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
-//#ifdef USING_OPENCASCADE_TEST
+// USING_OPENCASCADE_TEST
   using namespace std;
   using namespace chrono;
   using namespace test;
@@ -280,26 +272,24 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   DataCountSingleton& instance = DataCountSingleton::getInstance();
   std::vector<DataCountSingleton::DataMap>& data = instance.getData();// 
   DataCountSingleton::DataMap current;
-  instance.sm_index++;
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
-
   MACRO_EXPANSION_TIME_START()
   Init (aPS.Next (5));
   MACRO_EXPANSION_TIME_END("PaveFiller::Init")
   if (HasErrors()) {
     return;
   }
-  // Compute steps of the PI
+  // Compute steps of the PI=(Progress Indicator)
   BOPAlgo_PISteps aSteps (PIOperation_Last);
   MACRO_EXPANSION_TIME_START()
   analyzeProgress (95, aSteps);
   MACRO_EXPANSION_TIME_END("PaveFiller::analyze")
-      //
+  
   MACRO_EXPANSION_TIME_START()
   Prepare (aPS.Next (aSteps.GetStep (PIOperation_Prepare)));
   MACRO_EXPANSION_TIME_END("PaveFiller::Prepare")
-      if (HasErrors()) {
+  if (HasErrors()) {
     return;
   }
   // 00
@@ -316,7 +306,6 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
-  //
   MACRO_EXPANSION_TIME_START()
   UpdatePaveBlocksWithSDVertices(); //主要用于处理几何体的拼接和重建 //SDVertices=same domain vertex
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
@@ -342,6 +331,7 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   MACRO_EXPANSION_TIME_START()
   UpdatePaveBlocksWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
+
   // 12
   MACRO_EXPANSION_TIME_START()
   PerformEF (aPS.Next (aSteps.GetStep (PIOperation_PerformEF)));
@@ -389,7 +379,6 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
-  //
   MACRO_EXPANSION_TIME_START()
   UpdateBlocksWithSharedVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdateBlocks")
@@ -449,6 +438,7 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
+  //DataCountSingleton::DataMap
   data.push_back(current);
 }
 #else
