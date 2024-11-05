@@ -591,7 +591,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   MACRO_EXPANSION_TIME_START()
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PostTreat")
-
+  //reset data, process recursion
   instance.hasBuild();
 }
 #else
