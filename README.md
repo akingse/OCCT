@@ -64,34 +64,7 @@ fit
 
 分别统计求交和构建的耗时
 
-求交
 
-```
-BRepAlgoAPI_BuilderAlgo::IntersectShapes
-{
-  BOPAlgo_PaveFiller::Perform
-  {
-    BOPAlgo_PaveFiller::PerformInternal
-  }
-}
-
-```
-
-构建
-
-```
-BRepAlgoAPI_BuilderAlgo::BuildResult
-{
-  BOPAlgo_Builder::PerformWithFiller
-  {
-    BOPAlgo_Builder::PerformInternal
-    {
-      BOPAlgo_BOP::PerformInternal1
-    }
-  }
-}
-
-```
 
 ### TKBO布尔
 
@@ -109,22 +82,6 @@ BRepAlgoAPI_BooleanOperation::Build
                 BOPAlgo_BOP::PerformInternal1
                 //BOPAlgo\BOPAlgo_BOP.cxx
                     
-```
-
-
-
-770配置
-
-```
-..\..\..\..\..\OCC7.7.0\OCCPublicAPI\Include
-..\..\..\..\..\OCC7.7.0\Release
-```
-
-780配置
-
-```
-C:\Users\Aking\source\repos\OCCT\build\inc
-C:\Users\Aking\source\repos\OCCT\build\win64\vc14\lib
 ```
 
 

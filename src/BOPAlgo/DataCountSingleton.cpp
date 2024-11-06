@@ -36,6 +36,7 @@ void DataCountSingleton::writeToCsvInOne(const std::string& filename)
         std::cerr << "Could not open the file!" << std::endl;
         return;
     }
+    ofsFile << "function" << "," << "time/ms" << endl;
     for (int i = 0; i < mergeData.m_dataTimeVct.size(); i++)
     {
         ofsFile << mergeData.m_dataTimeVct[i].first << ",";
