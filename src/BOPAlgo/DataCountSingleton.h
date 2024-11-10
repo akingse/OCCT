@@ -37,12 +37,15 @@ namespace test
     public:
         struct DataMap
         {
+            //int m_index;
             std::string m_name;
             std::map<std::string, int> m_dataCount;
             std::map<std::string, double> m_dataFloat;
             std::map<std::string, double> m_dataTime;
             std::map<std::string, unsigned char> m_dataByte;
-            std::vector<std::pair<std::string, double>> m_dataTimeVct; //to keep order
+            //to keep order
+            std::vector<std::pair<std::string, int>> m_dataItemVct;
+            std::vector<std::pair<std::string, double>> m_dataTimeVct;
         };
 
     private:
