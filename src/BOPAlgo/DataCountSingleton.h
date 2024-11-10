@@ -14,7 +14,7 @@
 #endif
 
 /*
-  //communal
+ //communal
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
