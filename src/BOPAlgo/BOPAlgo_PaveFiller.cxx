@@ -267,7 +267,8 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
-  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
+  std::vector<test::DataCountSingleton::DataMap>& dataCount = instance.getDataCount();
+  test::DataCountSingleton::DataMap current;
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
   MACRO_EXPANSION_TIME_START()
@@ -429,8 +430,8 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
-  //DataCountSingleton::DataMap
-  data.push_back(current);
+  //add current to recordData
+  dataCount.push_back(current);
 }
 #else
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)

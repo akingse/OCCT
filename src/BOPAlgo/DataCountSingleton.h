@@ -14,11 +14,13 @@
 #endif
 
 /*
+  //communal
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
-  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
+  //respective
+
 */
 
 //macro expand
@@ -79,6 +81,8 @@ namespace test
         }
         static std::vector<DataMap>& getDataCount()
         {
+			//if (sm_hasBuild == 0)
+            //     sm_recordData.push_back({});
             sm_hasBuild++;
             return sm_recordData;
         }
@@ -86,8 +90,7 @@ namespace test
         {
             if (sm_hasBuild == 3) //when MakeBlocks call recursion
             {
-                size_t mb = sm_recordData.size() - 2;
-                sm_recordData.erase(sm_recordData.begin() + mb);
+                sm_recordData.erase(sm_recordData.begin() + sm_recordData.size() - 2);
             }
             sm_hasBuild = 0;
         }

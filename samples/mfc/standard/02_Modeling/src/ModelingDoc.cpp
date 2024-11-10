@@ -24,7 +24,7 @@
 #include <BRepPrimAPI_MakePrism.hxx>
 #define USING_OPENCASCADE_TEST
 //#include <DataCountSingleton.h>
-#include "C:\Users\Aking\source\repos\OCCT\src\BOPAlgo\DataCountSingleton.h"
+#include "..\..\..\OCCT\src\BOPAlgo\DataCountSingleton.h"
 using namespace test;
 
 #include<afx.h>
