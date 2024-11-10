@@ -263,15 +263,11 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
 // USING_OPENCASCADE_TEST
-  using namespace std;
-  using namespace chrono;
-  using namespace test;
-  steady_clock::time_point timestart;// = steady_clock::now();
-  steady_clock::time_point timeend;
+  std::chrono::steady_clock::time_point timestart;
+  std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  DataCountSingleton& instance = DataCountSingleton::getInstance();
-  std::vector<DataCountSingleton::DataMap>& data = instance.getDataCount();
-  DataCountSingleton::DataMap current;
+  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
+  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
   MACRO_EXPANSION_TIME_START()

@@ -13,6 +13,14 @@
 #define OPENCASCADE_TEST_API __declspec(dllimport)
 #endif
 
+/*
+  std::chrono::steady_clock::time_point timestart;
+  std::chrono::steady_clock::time_point timeend;
+  std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
+  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
+  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
+*/
+
 //macro expand
 #define MACRO_EXPANSION_TIME_START() \
     timestart = std::chrono::high_resolution_clock::now();

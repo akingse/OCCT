@@ -421,14 +421,11 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
   // USING_OPENCASCADE_TEST
-  using namespace std;
-  using namespace chrono;
-  using namespace test;
-  steady_clock::time_point timestart;// = steady_clock::now();
-  steady_clock::time_point timeend;
+  std::chrono::steady_clock::time_point timestart;
+  std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  DataCountSingleton& instance = DataCountSingleton::getInstance();
-  DataCountSingleton::DataMap& current = instance.getDataCount().back();
+  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
+  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();
