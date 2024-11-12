@@ -22,3 +22,7 @@ BRepAlgoAPI_BooleanOperation::Build
 
 
 
+罗德里格斯旋转公式表述为：一个向量 v**v** 绕单位向量 k**k** 旋转 θ*θ* 角后的新向量 vrot**v**rot 为
+$$
+\mathbf{v}_{\text{rot}} = \mathbf{v} \cos \theta + (\mathbf{k} \times \mathbf{v}) \sin \theta + \mathbf{k} (\mathbf{k} \cdot \mathbf{v}) (1 - \cos \theta)
+$$

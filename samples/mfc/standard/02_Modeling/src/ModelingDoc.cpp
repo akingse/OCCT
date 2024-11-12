@@ -22,6 +22,7 @@
 //modeling
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
+#include <BRepAlgoAPI_Check.hxx>
 #define USING_OPENCASCADE_TEST
 //#include <DataCountSingleton.h>
 #include "..\..\..\OCCT\src\BOPAlgo\DataCountSingleton.h"
@@ -1130,6 +1131,20 @@ public:
 		if (m_shapeVct.size() != 3)
 			return {};
 		return m_shapeVct[2];
+	}
+
+	void checkTopology() const
+	{
+		if (m_shapeVct.empty())
+			return;
+		TopoDS_Shape checkedShape = m_shapeVct.back();
+		BRepAlgoAPI_Check checker;
+		if (checker.IsValid()) 
+		{
+			std::cout << "Shape is valid." << std::endl;
+			return;
+		}
+
 	}
 
 };

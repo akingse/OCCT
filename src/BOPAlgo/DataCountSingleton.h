@@ -36,7 +36,7 @@ namespace test
     /// <summary>
     /// For time detial count
     /// </summary>
-    class DataCountSingleton
+    class DataCountSingleton //DataRecordSingleton
     {
     private:
         OPENCASCADE_TEST_API DataCountSingleton() = default;
