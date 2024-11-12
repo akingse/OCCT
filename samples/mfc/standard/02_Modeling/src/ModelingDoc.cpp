@@ -1125,17 +1125,6 @@ public:
 		m_shapeVct.push_back(result);
 	}
 
-	void writeData() const
-	{
-		DataCountSingleton& instance = DataCountSingleton::getInstance();
-		const std::vector<DataCountSingleton::DataMap>& datas = instance.getData();
-		std::string filename = getExePath();
-		//windows系统函数，用于获取自系统启动以来所经过的毫秒数
-        filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
-		instance.writeToCsvInOne(filename);
-		instance.clear();
-	}
-
 	TopoDS_Shape getResult() const
 	{
 		if (m_shapeVct.size() != 3)
@@ -1144,6 +1133,17 @@ public:
 	}
 
 };
+
+void writeCsvData()
+{
+	DataCountSingleton& instance = DataCountSingleton::getInstance();
+	const std::vector<DataCountSingleton::DataMap>& datas = instance.getData();
+	std::string filename = getExePath();
+	//windows系统函数，用于获取自系统启动以来所经过的毫秒数
+	filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
+	instance.writeToCsvInOne(filename);
+	instance.clear();
+}
 
 //两个共面立方体-布尔Fuse
 static TopoDS_Shape getBooleanTest_01()
@@ -1197,7 +1197,8 @@ static CsgTree getBooleanTest_03()
     BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-	csgtree.writeData();
+	CsgTree csgtree2 = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	writeCsvData();
 	return csgtree;
 	/*
 	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看
@@ -1228,7 +1229,6 @@ static CsgTree getBooleanTest_05()
 	trsf.SetTranslation(gp_Vec(1, 1, 0));
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_COMMON);
-	csgtree.writeData();
 	return csgtree;
 }
 

@@ -10,6 +10,7 @@ using namespace std;
 //bool DataCountSingleton::sm_openSwitch = false;
 //int DataCountSingleton::sm_index = 0;
 int DataCountSingleton::sm_hasBuild = 0;
+bool DataCountSingleton::sm_isAverage = false;
 std::vector<DataCountSingleton::DataMap> DataCountSingleton::sm_recordData;
 
 void DataCountSingleton::writeToCsvInOne(const std::string& filename)
@@ -17,7 +18,8 @@ void DataCountSingleton::writeToCsvInOne(const std::string& filename)
     //merge into one DataMap
     if (sm_recordData.empty())
         return;
-    DataMap mergeData = sm_recordData[0];
+    DataMap mergeData = sm_recordData[0];//copy
+    const int time = (int)sm_recordData.size();
     const int size = (int)mergeData.m_dataTimeVct.size();
     for (int i = 1; i < sm_recordData.size(); i++)
     {
@@ -27,6 +29,11 @@ void DataCountSingleton::writeToCsvInOne(const std::string& filename)
                 mergeData.m_dataTimeVct[j].first == sm_recordData[i].m_dataTimeVct[j].first)
                 mergeData.m_dataTimeVct[j].second += sm_recordData[i].m_dataTimeVct[j].second;
         }
+    }
+    if (sm_isAverage && time != 1)
+    {
+        for (int j = 0; j < size; j++)
+            mergeData.m_dataTimeVct[j].second /= time;
     }
     //output
     std::ofstream ofsFile(filename);

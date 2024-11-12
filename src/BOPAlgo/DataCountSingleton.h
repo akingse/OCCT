@@ -11,7 +11,7 @@
 #define OPENCASCADE_TEST_API __declspec(dllexport)
 #else
 #define OPENCASCADE_TEST_API __declspec(dllimport)
-#endif
+#endif //OPENCASCADE_TEST_EXPORTS
 
 /*
  //communal
@@ -62,6 +62,7 @@ namespace test
         //static bool sm_openSwitch;
         //static int sm_index;
         static int sm_hasBuild; //to process once MakeBlocks recursion
+        static bool sm_isAverage;
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
 
     public:
@@ -108,4 +109,4 @@ namespace test
 
     };
 }
-#endif ///USING_CONTAINER_STL
+#endif //USING_OPENCASCADE_TEST
