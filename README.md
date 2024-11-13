@@ -52,7 +52,7 @@ fit
 
 ### MarkDown整理
 
-官方文档有4个版本
+官方文档有3个版本
 
 [html](C:\Users\Aking\source\repos\OCCT\doc\overview\index 7.8.0.html)版本，[chm](C:\Users\Aking\source\repos\OCCT\doc\occt_overview.chm)版本，html版有最新780，chm最新是760的occt_overview，对应官网[OpenCascade User Guide](https://dev.opencascade.org/doc/overview/html/user_guides.html)；
 
@@ -79,5 +79,4 @@ OCC-780配置
 C:\Users\Aking\source\repos\OCCT\build\inc
 C:\Users\Aking\source\repos\OCCT\build\win64\vc14\lib
 ```
-
 

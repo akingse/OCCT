@@ -1138,13 +1138,16 @@ public:
 		if (m_shapeVct.empty())
 			return;
 		TopoDS_Shape checkedShape = m_shapeVct.back();
-		BRepAlgoAPI_Check checker;
+		BRepAlgoAPI_Check checker = BRepAlgoAPI_Check(checkedShape);
 		if (checker.IsValid()) 
 		{
 			std::cout << "Shape is valid." << std::endl;
-			return;
+			//return;
 		}
-
+		Message_ProgressRange theRange;
+		checker.Perform(theRange);
+		const BOPAlgo_ListOfCheckResult& result = checker.Result();
+		return;
 	}
 
 };
@@ -1200,7 +1203,7 @@ static CsgTree getBooleanTest_03()
 {
 	double R = 10, r = 2;
 	double H = 30;
-	double offset = 0.1;
+	double offset = 0.;
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r,0, H).Shape();
 	gp_Trsf trsfR;
@@ -1212,7 +1215,8 @@ static CsgTree getBooleanTest_03()
     BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-	CsgTree csgtree2 = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	//CsgTree csgtree2 = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+	csgtree.checkTopology();
 	writeCsvData();
 	return csgtree;
 	/*
