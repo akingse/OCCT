@@ -27,7 +27,7 @@
 #include <Standard_Failure.hxx>
 //time consuming
 #include <chrono>
-#include "DataCountSingleton.h"
+#include "DataRecordSingleton.h"
 
 namespace
 {
@@ -266,9 +266,9 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
-  std::vector<test::DataCountSingleton::DataMap>& dataCount = instance.getDataCount();
-  test::DataCountSingleton::DataMap current;
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  std::vector<test::DataRecordSingleton::DataMap>& dataCount = instance.getDataCount();
+  test::DataRecordSingleton::DataMap current;
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
   MACRO_EXPANSION_TIME_START()

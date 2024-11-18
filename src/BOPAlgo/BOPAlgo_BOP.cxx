@@ -40,7 +40,7 @@
 #include <TopTools_MapOfShape.hxx>
 //time consuming
 #include <chrono>
-#include "DataCountSingleton.h"
+#include "DataRecordSingleton.h"
 
 static
   TopAbs_ShapeEnum TypeToExplore(const Standard_Integer theDim);
@@ -424,8 +424,8 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
-  test::DataCountSingleton::DataMap& current = instance.getDataCount().back();
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  test::DataRecordSingleton::DataMap& current = instance.getDataCount().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();

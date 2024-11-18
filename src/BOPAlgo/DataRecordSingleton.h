@@ -52,7 +52,7 @@ namespace test
             std::map<std::string, int> m_dataCount;
             std::map<std::string, double> m_dataFloat;
             std::map<std::string, double> m_dataTime;
-            std::map<std::string, unsigned char> m_dataByte;
+            std::map<std::string, std::string> m_dataByte; // equal std::vector<unsigned char>
             //to keep order
             std::vector<std::pair<std::string, int>> m_dataItemVct;
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
@@ -71,11 +71,11 @@ namespace test
             static DataRecordSingleton instance;
             return instance;
         }
-        OPENCASCADE_TEST_API static std::vector<DataMap>& getData()
+        static std::vector<DataMap>& getData()
         {
             return sm_recordData;
         }
-        OPENCASCADE_TEST_API static void clear()
+        static void clear()
         {
             sm_recordData.clear();
             //sm_index = 0;

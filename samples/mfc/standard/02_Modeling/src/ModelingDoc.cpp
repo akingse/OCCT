@@ -24,8 +24,8 @@
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepAlgoAPI_Check.hxx>
 #define USING_OPENCASCADE_TEST
-//#include <DataCountSingleton.h>
-#include "..\..\..\OCCT\src\BOPAlgo\DataCountSingleton.h"
+//#include <DataRecordSingleton.h>
+#include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h"
 using namespace test;
 
 #include<afx.h>
@@ -1154,8 +1154,8 @@ public:
 
 void writeCsvData()
 {
-	DataCountSingleton& instance = DataCountSingleton::getInstance();
-	const std::vector<DataCountSingleton::DataMap>& datas = instance.getData();
+	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
 	std::string filename = getExePath();
 	//windows系统函数，用于获取自系统启动以来所经过的毫秒数
 	filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
