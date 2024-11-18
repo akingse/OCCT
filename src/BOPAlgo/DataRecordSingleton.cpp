@@ -1,4 +1,4 @@
-#include "DataCountSingleton.h"
+#include "DataRecordSingleton.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip> //setprecision()
@@ -7,13 +7,13 @@
 using namespace test;
 using namespace std;
 //init
-//bool DataCountSingleton::sm_openSwitch = false;
-//int DataCountSingleton::sm_index = 0;
-int DataCountSingleton::sm_hasBuild = 0;
-bool DataCountSingleton::sm_isAverage = false;
-std::vector<DataCountSingleton::DataMap> DataCountSingleton::sm_recordData;
+//bool DataRecordSingleton::sm_openSwitch = false;
+//int DataRecordSingleton::sm_index = 0;
+int DataRecordSingleton::sm_hasBuild = 0;
+bool DataRecordSingleton::sm_isAverage = false;
+std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
 
-void DataCountSingleton::writeToCsvInOne(const std::string& filename)
+void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
 {
     //merge into one DataMap
     if (sm_recordData.empty())

@@ -18,7 +18,7 @@
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataCountSingleton& instance = test::DataCountSingleton::getInstance();
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
   //respective
 
 */
@@ -36,13 +36,13 @@ namespace test
     /// <summary>
     /// For time detial count
     /// </summary>
-    class DataCountSingleton //DataRecordSingleton
+    class DataRecordSingleton //DataRecordSingleton
     {
     private:
-        OPENCASCADE_TEST_API DataCountSingleton() = default;
-        OPENCASCADE_TEST_API ~DataCountSingleton() = default;
-        DataCountSingleton(const DataCountSingleton&) = delete;
-        DataCountSingleton(DataCountSingleton&&) = delete;
+        OPENCASCADE_TEST_API DataRecordSingleton() = default;
+        OPENCASCADE_TEST_API ~DataRecordSingleton() = default;
+        DataRecordSingleton(const DataRecordSingleton&) = delete;
+        DataRecordSingleton(DataRecordSingleton&&) = delete;
 
     public:
         struct DataMap
@@ -66,9 +66,9 @@ namespace test
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
 
     public:
-        static DataCountSingleton& getInstance()
+        static DataRecordSingleton& getInstance()
         {
-            static DataCountSingleton instance;
+            static DataRecordSingleton instance;
             return instance;
         }
         OPENCASCADE_TEST_API static std::vector<DataMap>& getData()
