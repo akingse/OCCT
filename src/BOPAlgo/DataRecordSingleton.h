@@ -2,12 +2,11 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <direct.h> //_getcwd
 #ifdef USING_OPENCASCADE_CLASS
 #include <TopoDS_Shape.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepTools.hxx>
-#endif
+#endif //USING_OPENCASCADE_CLASS
 
 //#define USING_OPENCASCADE_TEST //set in project config
 #ifdef USING_OPENCASCADE_TEST
@@ -118,47 +117,18 @@ namespace test
         }
 
 #ifdef USING_OPENCASCADE_CLASS
-        static void exportShapeToFile()
-        {
-            setName({});
-            char buffer[MAX_PATH];
-            std::string path(_getcwd(buffer, sizeof(buffer)));
-            for (int i = 0; i < sm_recordData.size(); i++)
-            {
-                const DataMap& data = sm_recordData[i];
-                std::string filename = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
-                BRepTools::Write(data.m_shape, filename.c_str());
-            }
-        }
         static TopoDS_Shape readBinaryDataToShape(const std::string& filename)
         {
-            //std::ifstream file(filename, std::ios::binary);
-            TopoDS_Shape Sh;
-            BRep_Builder B;
-            BRepTools::Read(Sh, filename.c_str(), B);
-            return Sh;
-        }
-        static std::string readBinaryData(const std::string& filename)
-        {
-            std::string res;
-            std::ifstream file(filename, std::ios::binary);
-            if (!file) {
-                std::cerr << "Error opening file: " << filename << std::endl;
-                return res;
-            }
-            file.seekg(0, std::ios::end);
-            std::streamsize fileSize = file.tellg();
-            file.seekg(0, std::ios::beg);
-            res.resize(fileSize);
-            if (!file.read(const_cast<char*>(res.data()), fileSize)) {
-                std::cerr << "Error reading file: " << filename << std::endl;
-                return {};
-            }
-            return res;
+            TopoDS_Shape Shape;
+            BRep_Builder Builder;
+            BRepTools::Read(Shape, filename.c_str(), Builder);
+            return Shape;
         }
 #endif
-
+        OPENCASCADE_TEST_API static void writeShapeToFile();
+        OPENCASCADE_TEST_API static std::string readBinaryData(const std::string& filename);
         OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
+        OPENCASCADE_TEST_API static std::vector<int> compareBRepFormat();
 
     };
 }

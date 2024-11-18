@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip> //setprecision()
+#include <direct.h> //_getcwd
 
 #ifdef USING_OPENCASCADE_TEST
 using namespace test;
@@ -50,6 +51,71 @@ void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
         ofsFile << mergeData.m_dataTimeVct[i].second << std::setprecision(numeric_limits<double>::digits10) << std::endl;
     }
     ofsFile.close();
+}
+
+std::string DataRecordSingleton::readBinaryData(const std::string& filename)
+{
+    std::string res;
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) 
+    {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return res;
+    }
+    file.seekg(0, std::ios::end);
+    std::streamsize fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    res.resize(fileSize);
+    if (!file.read(const_cast<char*>(res.data()), fileSize)) 
+    {
+        std::cerr << "Error reading file: " << filename << std::endl;
+        return {};
+    }
+    return res;
+}
+
+void DataRecordSingleton::writeShapeToFile()
+{
+    setName({});
+    char buffer[MAX_PATH];
+    std::string path(_getcwd(buffer, sizeof(buffer)));
+    for (int i = 0; i < sm_recordData.size(); i++)
+    {
+        const DataMap& data = sm_recordData[i];
+        std::string filename = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
+        BRepTools::Write(data.m_shape, filename.c_str());
+    }
+    return;
+}
+
+/// <summary>
+/// 在修改代码前，先运行writeShapeToFile函数，生成标准数据，
+/// 
+/// </summary>
+/// <returns></returns>
+std::vector<int> DataRecordSingleton::compareBRepFormat()
+{
+    setName({});
+    char buffer[MAX_PATH];
+    std::string path(_getcwd(buffer, sizeof(buffer)));
+    std::vector<std::string> formatRec;
+    std::vector<int> cmpRes;
+    for (int i = 0; i < sm_recordData.size(); i++)
+    {
+        const DataMap& data = sm_recordData[i];
+        std::string filenameStd = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
+        std::string strStd = readBinaryData(filenameStd);
+        if (strStd.empty())
+            cmpRes.push_back(i);
+        std::string filenameTst = path + "\\binFile\\shape_" + data.m_name + ".txt";
+        if (data.m_shape.IsNull())
+            cmpRes.push_back(i);
+        BRepTools::Write(data.m_shape, filenameTst.c_str());
+        std::string strTst = readBinaryData(filenameTst);
+        if (strStd != strTst)
+            cmpRes.push_back(i);
+    }
+    return cmpRes;
 }
 
 #endif //USING_OPENCASCADE_TEST
