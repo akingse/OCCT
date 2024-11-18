@@ -23,9 +23,7 @@
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepAlgoAPI_Check.hxx>
-#define USING_OPENCASCADE_TEST
-//#include <DataRecordSingleton.h>
-#include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h"
+#include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
 using namespace test;
 
 #include<afx.h>
@@ -1152,7 +1150,7 @@ public:
 
 };
 
-void writeCsvData()
+void writeTimeDataToCsv()
 {
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
 	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
@@ -1162,6 +1160,40 @@ void writeCsvData()
 	instance.writeToCsvInOne(filename);
 	instance.clear();
 }
+
+void writeShapeDataToBin()
+{
+	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
+	//instance.exportShapeToFile(); //write std data, only run once
+	//read
+	char buffer[MAX_PATH];
+	std::string path(_getcwd(buffer, sizeof(buffer))); //get current work directory
+	std::string filenameStd = path + "\\binFile\\shape_std_0.txt";
+	TopoDS_Shape shapeRead = instance.readBinaryDataToShape(filenameStd);
+	//compare
+	DataRecordSingleton::DataMap& current = instance.getData().back();
+	TopoDS_Shape shapeTest = current.m_shape;
+	bool isN = shapeRead.IsNull();
+	bool isE = shapeRead.IsEqual(shapeTest);
+	UINT64 sz1 = sizeof(shapeRead);
+	UINT64 sz2 = sizeof(shapeTest);
+	//compare
+	std::string filenameTest = path + "\\binFile\\shape_0.bin";
+	std::string str_shape0 = instance.readBinaryData(filenameStd);
+	std::string str_shape1 = instance.readBinaryData(filenameTest);
+	//std::string str_shape0(shape0.begin(), shape0.end());
+	//std::string str_shape1(shape1.begin(), shape1.end());
+	//std::cout << str_shape0 << std::endl;
+
+	bool isEq = str_shape0 == str_shape1;
+	if (str_shape0.size() == str_shape1.size())
+	{
+		isEq = memcmp(str_shape0.data(), str_shape1.data(), str_shape0.size()) == 0;
+	}
+	instance.clear();
+}
+
 
 //两个共面立方体-布尔Fuse
 static TopoDS_Shape getBooleanTest_01()
@@ -1216,8 +1248,9 @@ static CsgTree getBooleanTest_03()
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
 	//CsgTree csgtree2 = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-	csgtree.checkTopology();
-	writeCsvData();
+	//csgtree.checkTopology();
+	//writeTimeDataToCsv();
+	writeShapeDataToBin();
 	return csgtree;
 	/*
 	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看

@@ -90,6 +90,7 @@ protected:
   //! object <thePF>
   Standard_EXPORT virtual void PerformInternal1 (const BOPAlgo_PaveFiller& thePF,
                                                  const Message_ProgressRange& theRange) Standard_OVERRIDE;
+  Standard_EXPORT virtual void PerformInternal1_WithInfo(const BOPAlgo_PaveFiller& thePF, const Message_ProgressRange& theRange) override {};
 
   Standard_EXPORT virtual void BuildResult (const TopAbs_ShapeEnum theType) Standard_OVERRIDE;
   

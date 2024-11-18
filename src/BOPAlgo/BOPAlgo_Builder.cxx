@@ -35,6 +35,7 @@
 #include <TopoDS_Solid.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_MapOfOrientedShape.hxx>
+#include "DataRecordSingleton.h"
 
 //=======================================================================
 //function : 
@@ -229,6 +230,9 @@ void BOPAlgo_Builder::PerformInternal(const BOPAlgo_PaveFiller& theFiller, const
   //
   try {
     OCC_CATCH_SIGNALS
+    //if (test::DataRecordSingleton::getInstance().isOpen())
+    //    PerformInternal1_WithInfo(theFiller, theRange);
+    //else
     PerformInternal1(theFiller, theRange);
   }
   //

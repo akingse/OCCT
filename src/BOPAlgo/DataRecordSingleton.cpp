@@ -7,8 +7,8 @@
 using namespace test;
 using namespace std;
 //init
-//bool DataRecordSingleton::sm_openSwitch = false;
 //int DataRecordSingleton::sm_index = 0;
+bool DataRecordSingleton::sm_open = true;
 int DataRecordSingleton::sm_hasBuild = 0;
 bool DataRecordSingleton::sm_isAverage = false;
 std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;

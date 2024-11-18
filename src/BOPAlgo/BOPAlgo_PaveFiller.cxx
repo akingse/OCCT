@@ -245,7 +245,9 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 {
   try {
     OCC_CATCH_SIGNALS
-      //
+  //if (test::DataRecordSingleton::getInstance().isOpen())
+  //    PerformInternal1_WithInfo(theFiller, theRange);
+  //else
       PerformInternal (theRange);
   }
   //
@@ -267,7 +269,7 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  std::vector<test::DataRecordSingleton::DataMap>& dataCount = instance.getDataCount();
+  std::vector<test::DataRecordSingleton::DataMap>& dataCount = instance.getDataR();
   test::DataRecordSingleton::DataMap current;
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);

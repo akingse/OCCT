@@ -199,6 +199,7 @@ protected:
   Standard_EXPORT Standard_Boolean IsPrimary() const;
 
   Standard_EXPORT virtual void PerformInternal(const Message_ProgressRange& theRange);
+  Standard_EXPORT virtual void PerformInternal_WithInfo(const Message_ProgressRange& theRange) {};
   
   Standard_EXPORT virtual void Clear() Standard_OVERRIDE;
   

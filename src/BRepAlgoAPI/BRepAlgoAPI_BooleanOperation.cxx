@@ -29,6 +29,7 @@
 #include <TCollection_AsciiString.hxx>
 
 #include <stdio.h>
+#include "../BOPAlgo/DataRecordSingleton.h"
 
 //=======================================================================
 //class : BRepAlgoAPI_DumpOper
@@ -229,6 +230,11 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
   {
     return;
   }
+#ifdef USING_OPENCASCADE_TEST
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  test::DataRecordSingleton::DataMap& current = instance.getData().back();
+  current.m_shape = myShape;
+#endif//USING_OPENCASCADE_TEST
 
   if (aDumpOper.IsDump()) {
     Standard_Boolean isDumpRes = myShape.IsNull() ||

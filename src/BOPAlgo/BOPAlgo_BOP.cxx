@@ -416,6 +416,7 @@ void BOPAlgo_BOP::fillPIConstants (const Standard_Real theWhole, BOPAlgo_PISteps
 //function : PerformInternal1
 //purpose  : all boolean BuildResult process
 //=======================================================================
+
 #ifdef USING_OPENCASCADE_TEST
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
@@ -425,7 +426,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  test::DataRecordSingleton::DataMap& current = instance.getDataCount().back();
+  test::DataRecordSingleton::DataMap& current = instance.getDataR().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();
