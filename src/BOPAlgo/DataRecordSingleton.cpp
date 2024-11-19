@@ -74,6 +74,7 @@ std::string DataRecordSingleton::readBinaryData(const std::string& filename)
     return res;
 }
 
+#ifdef USING_OPENCASCADE_CLASS 
 void DataRecordSingleton::writeShapeToFile()
 {
     setName({});
@@ -89,8 +90,8 @@ void DataRecordSingleton::writeShapeToFile()
 }
 
 /// <summary>
-/// 在修改代码前，先运行writeShapeToFile函数，生成标准数据，
-/// 
+/// 在修改代码前，先运行writeShapeToFile函数，生成标准数据，可以执行多个布尔，将按序号命名；
+/// 修改代码后，执行布尔，调用此函数，如果对比BRepFormat不同，则返回对应索引值；
 /// </summary>
 /// <returns></returns>
 std::vector<int> DataRecordSingleton::compareBRepFormat()
@@ -117,5 +118,5 @@ std::vector<int> DataRecordSingleton::compareBRepFormat()
     }
     return cmpRes;
 }
-
+#endif //USING_OPENCASCADE_CLASS
 #endif //USING_OPENCASCADE_TEST
