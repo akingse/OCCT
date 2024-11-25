@@ -426,7 +426,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  test::DataRecordSingleton::DataMap& current = instance.getDataR().back();
+  test::DataRecordSingleton::DataMap& current = instance.getDataP().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();

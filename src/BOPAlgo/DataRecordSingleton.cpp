@@ -13,6 +13,9 @@ bool DataRecordSingleton::sm_open = true;
 int DataRecordSingleton::sm_hasBuild = 0;
 bool DataRecordSingleton::sm_isAverage = false;
 std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
+double DataRecordSingleton::sm_toleDist = 1e-6;
+double DataRecordSingleton::sm_tolerence = 1e-6;
+static const int _unvalid_id = -1;
 
 void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
 {
@@ -119,4 +122,82 @@ std::vector<int> DataRecordSingleton::compareBRepFormat()
     return cmpRes;
 }
 #endif //USING_OPENCASCADE_CLASS
+
+//DataCompareSingleton
+template<class T>
+std::vector<T> mapvalue2vector(const std::map<std::string, T>& data)
+{
+	std::vector<T> res;
+	for (const auto& iter : data)
+		res.push_back(iter.second);
+	return res;
+}
+template<class T>
+std::vector<string> mapkey2vector(const std::map<std::string, T>& data)
+{
+	std::vector<string> res;
+	for (const auto& iter : data)
+		res.push_back(iter.first);
+	return res;
+}
+
+vector<DataRecordSingleton::DataMap> DataRecordSingleton::compare(const vector<DataRecordSingleton::DataMap>& stdDataRead)
+{
+	if (stdDataRead.size() != sm_recordData.size())
+		return {};
+	std::set<int> idDifferent;
+	std::vector<DataRecordSingleton::DataMap> dataDifferent;
+	for (int i = 0; i < stdDataRead.size(); i++)
+	{
+		const DataRecordSingleton::DataMap& read = stdDataRead[i]; //从Json中读取的标准数据
+		const DataRecordSingleton::DataMap& test = sm_recordData[i]; //当前测试计算的数据
+		std::vector<int> readDataCount = mapvalue2vector(read.m_dataCount);
+		std::vector<int> testDataCount = mapvalue2vector(test.m_dataCount);
+		std::vector<double> readDataFloat = mapvalue2vector(read.m_dataFloat);
+		std::vector<double> testDataFloat = mapvalue2vector(test.m_dataFloat);
+		std::vector<Point3d> readDataPoint = mapvalue2vector(read.m_dataPoint);
+		std::vector<Point3d> testDataPoint = mapvalue2vector(test.m_dataPoint);
+		std::vector<std::string> keyDataCount = mapkey2vector(read.m_dataCount);
+		std::vector<std::string> keyDataFloat = mapkey2vector(read.m_dataFloat);
+		std::vector<std::string> keyDataPoint = mapkey2vector(read.m_dataPoint);
+		DataRecordSingleton::DataMap dataDiff; //empty name
+		for (int j = 0; j < min(readDataCount.size(), testDataCount.size()); j++)
+		{
+			if (readDataCount[j] != testDataCount[j])
+			{
+				dataDiff.m_name = test.m_name;
+				dataDiff.m_dataCount[keyDataCount[j]] = testDataCount[j];
+				idDifferent.insert(i);
+			}
+			else
+				dataDiff.m_dataCount[keyDataCount[j]] = _unvalid_id;// INT_MAX;
+		}
+		for (int j = 0; j < min(readDataFloat.size(), testDataFloat.size()); j++)
+		{
+			if (sm_tolerence < fabs(readDataFloat[j] - testDataFloat[j]))
+			{
+				dataDiff.m_name = test.m_name;
+				dataDiff.m_dataFloat[keyDataFloat[j]] = testDataFloat[j];
+				idDifferent.insert(i);
+			}
+			else
+				dataDiff.m_dataFloat[keyDataFloat[j]] = std::nan("0");
+		}
+		for (int j = 0; j < min(readDataPoint.size(), testDataPoint.size()); j++)
+		{
+			if (!readDataPoint[j].isEqual(testDataPoint[j], sm_tolerence))
+			{
+				dataDiff.m_name = test.m_name;
+				dataDiff.m_dataPoint[keyDataPoint[j]] = testDataPoint[j];
+				idDifferent.insert(i);
+			}
+			else
+				dataDiff.m_dataPoint[keyDataCount[j]] = Point3d{ std::nan("0"), std::nan("0"), std::nan("0") };
+		}
+		if (!dataDiff.m_name.empty())
+			dataDifferent.push_back(dataDiff);
+	}
+	return dataDifferent;
+}
+
 #endif //USING_OPENCASCADE_TEST
