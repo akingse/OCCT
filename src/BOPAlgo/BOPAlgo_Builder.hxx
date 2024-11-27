@@ -409,7 +409,6 @@ protected: //! @name Methods for building the result
   //! To build the result of any other operation
   //! it will be necessary to override this method.
   Standard_EXPORT virtual void PerformInternal1 (const BOPAlgo_PaveFiller& thePF, const Message_ProgressRange& theRange);
-  Standard_EXPORT virtual void PerformInternal1_WithInfo(const BOPAlgo_PaveFiller& thePF, const Message_ProgressRange& theRange) {};
 
   //! Builds the result of operation.
   //! The method is called for each of the arguments type and
