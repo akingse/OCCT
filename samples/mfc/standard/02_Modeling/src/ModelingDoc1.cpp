@@ -3,14 +3,20 @@
 #include "ModelingApp.h"
 #include "ResultDialog.h"
 #include "State.h"
+//std
+#include <string>
 
 //modeling
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepAlgoAPI_Check.hxx>
+#include <BRep_TEdge.hxx>
+#include <TopoDS_Iterator.hxx>
 #include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
 
+using namespace std;
 using namespace test;
+using opencascade::handle;
 
 #include <direct.h> //_getcwd
 inline std::string getExePath() 
@@ -18,7 +24,6 @@ inline std::string getExePath()
 	char buffer[MAX_PATH];
 	return std::string(_getcwd(buffer, sizeof(buffer))); //get current work directory
 }
-
 
 class BoolNode
 {
@@ -80,6 +85,81 @@ public:
 
 };
 
+std::vector<shared_ptr<BRep_TFace>> brepFaceVct;
+std::vector<shared_ptr<BRep_TEdge>> brepEdgeVct;
+std::vector<shared_ptr<BRep_TVertex>> brepVertexVct;
+std::vector<handle<Geom_Surface>> surfaceVct;
+std::vector<BRep_ListOfCurveRepresentation> curveVct;
+
+void TraverseShape(const TopoDS_Shape& shape) 
+{
+	//string name1 = typeid(shape).name();
+	for (TopoDS_Iterator it(shape); it.More(); it.Next())
+	{
+		TopoDS_Shape subShape = it.Value();
+		string name2 = typeid(*subShape.TShape()).name();
+		const TopAbs_ShapeEnum shapeType = subShape.ShapeType();
+		//switch-case
+		if (shapeType == TopAbs_COMPOUND) {
+			const TopoDS_Compound& compound = TopoDS::Compound(subShape);
+			TraverseShape(compound);
+		}
+		else if (shapeType == TopAbs_COMPSOLID) {
+			const TopoDS_CompSolid& compsolid = TopoDS::CompSolid(subShape);
+			TraverseShape(compsolid);
+		}
+		else if (shapeType == TopAbs_SOLID) {
+			const TopoDS_Solid& solid = TopoDS::Solid(subShape);
+			TraverseShape(solid);
+		}
+		else if (shapeType == TopAbs_SHELL) {
+			const TopoDS_Shell& shell = TopoDS::Shell(subShape);
+			TraverseShape(shell);
+		}
+		else if (shapeType == TopAbs_FACE) {
+			const TopoDS_Face& face = TopoDS::Face(subShape);
+			BRep_TFace* brepFace = dynamic_cast<BRep_TFace*>(face.TShape().get());
+			if (brepFace != nullptr)
+			{
+				brepFaceVct.push_back(shared_ptr<BRep_TFace>(brepFace));
+                //Handle(Geom_Surface) surface = BRep_Tool::Surface(face); //same one
+				surfaceVct.push_back(brepFace->Surface());
+			}
+			TraverseShape(face);
+		}
+		else if (shapeType == TopAbs_WIRE) {
+			const TopoDS_Wire& wire = TopoDS::Wire(subShape);
+			TraverseShape(wire);
+		}
+		else if (shapeType == TopAbs_EDGE) {
+			const TopoDS_Edge& edge = TopoDS::Edge(subShape);
+			BRep_TEdge* brepEdge= dynamic_cast<BRep_TEdge*>(edge.TShape().get());
+			shared_ptr<BRep_TEdge> ptr = shared_ptr<BRep_TEdge>(brepEdge);
+			//if (brepEdge != nullptr &&
+			//	std::find(brepEdgeVct.begin(), brepEdgeVct.end(), ptr) == brepEdgeVct.end())
+			//{
+			//	brepEdgeVct.push_back(ptr);
+			//	//const BRep_ListOfCurveRepresentation& curves = brepEdge->Curves();
+			//	curveVct.push_back(brepEdge->Curves());
+			//}
+			TraverseShape(edge);
+		}
+		else if (shapeType == TopAbs_VERTEX) {
+			const TopoDS_Vertex& vertex = TopoDS::Vertex(subShape);
+			BRep_TVertex* brepVertex = dynamic_cast<BRep_TVertex*>(vertex.TShape().get());
+            shared_ptr<BRep_TVertex> ptr = shared_ptr<BRep_TVertex>(brepVertex);
+			//if (brepVertex != nullptr &&
+			//	std::find(brepVertexVct.begin(), brepVertexVct.end(), ptr) == brepVertexVct.end())
+			//{
+			//	brepVertexVct.push_back(ptr);
+
+			//}
+		}
+	}
+}
+
+
+//输出耗时信息
 void writeTimeDataToCsv()
 {
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
@@ -92,36 +172,35 @@ void writeTimeDataToCsv()
 	instance.clear();
 }
 
+//输出shape二进制数据
 void writeShapeDataToTxt()
 {
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
-	//instance.writeShapeToFile(); //write std data, only run once
+	const std::vector<DataRecordSingleton::DataMap>& data = instance.getData();
+	std::string path = getExePath();
 
 	//read
-	std::string path = getExePath();
 	std::string filenameStd = path + "\\binFile\\shape_std_0.txt";
-	TopoDS_Shape shapeRead = instance.readBinaryDataToShape(filenameStd);
+	TopoDS_Shape shapeStd = instance.readBinToShape(filenameStd);
 	//compare
-	DataRecordSingleton::DataMap& current = instance.getData().back();
-	TopoDS_Shape shapeTest = current.m_shape;
+	TopoDS_Shape shapeTest = *(data.back().m_shape);
 	std::string filenameTest = path + "\\binFile\\shape_0.txt";
 	BRepTools::Write(shapeTest, filenameTest.c_str());
 
-	bool isN = shapeRead.IsNull();
-	bool isE = shapeRead.IsEqual(shapeTest);
-	UINT64 sz1 = sizeof(shapeRead);
-	UINT64 sz2 = sizeof(shapeTest);
+	UINT64 sz0 = sizeof(shapeTest); //24 内存对齐
+	UINT64 sz1 = sizeof(Handle(TopoDS_TShape));//8
+	UINT64 sz2 = sizeof(TopLoc_Location);//8
+	UINT64 sz3 = sizeof(TopAbs_Orientation);//4
+	bool isE1 = shapeStd.IsEqual(shapeTest); //只比较myTShape指针是否相等
+
 	//compare
-	std::string str_shape0 = instance.readBinaryData(filenameStd);
-	std::string str_shape1 = instance.readBinaryData(filenameTest);
+	std::string str_shape0 = instance.readBinToString(filenameStd);
+	std::string str_shape1 = instance.readBinToString(filenameTest);
 	//std::string str_shape0(shape0.begin(), shape0.end());
 	//std::string str_shape1(shape1.begin(), shape1.end());
 	//std::cout << str_shape0 << std::endl;
 
 	bool isEq = str_shape0 == str_shape1;
-	bool isEq1 = str_shape0.size() == str_shape1.size() &&
-		memcmp(str_shape0.data(), str_shape1.data(), str_shape0.size()) == 0;
 	std::vector<int> cmpRes = instance.compareBRepFormat();
 
 	CString cs = isEq ? L"true" : L"false";
@@ -182,10 +261,14 @@ static CsgTree getBooleanTest_03()
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-	//CsgTree csgtree2 = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+
 	//csgtree.checkTopology();
 	//writeTimeDataToCsv();
-	writeShapeDataToTxt();
+	//writeShapeDataToTxt();
+
+	//TraverseShape(theShapeA);
+	TraverseShape(theShapeB);
+	//TraverseShape(csgtree.getResult());
 	return csgtree;
 	/*
 	这个BUG的主要原因是圆锥的尖点正好与圆环面相切了。检验一个几何内核好坏的一个方面就是看
@@ -194,7 +277,7 @@ static CsgTree getBooleanTest_03()
 	*/
 }
 
-//OCCT布尔BUG-Cylinder Cut Sphere
+//OCCT布尔BUG-Cylinder Cut Sphere//已修复
 static CsgTree getBooleanTest_04()
 {
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeCylinder(1, 1).Shape();

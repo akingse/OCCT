@@ -6,7 +6,6 @@
 #include "ModelingApp.h"
 #include "ResultDialog.h"
 #include "State.h"
-
 #include "ISession_Direction.h"
 #include "..\res\resource.h"
 
@@ -18,7 +17,6 @@
 #include <OCC_MainFrame.h>
 #include <TopExp_Explorer.hxx>
 #include <Geom_Plane.hxx>
-#include <BRepTools.hxx>
 #include <BRepPrimAPI_MakeCylinder.hxx>
 
 static Handle(AIS_Shape) AIS1;
