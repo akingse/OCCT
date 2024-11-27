@@ -80,3 +80,5 @@ C:\Users\Aking\source\repos\OCCT\build\inc
 C:\Users\Aking\source\repos\OCCT\build\win64\vc14\lib
 ```
 
+严重性	代码	说明	项目	文件	行	禁止显示状态	详细信息
+错误	C2440	“初始化”: 无法从“TopoDS_Shape”转换为“int”	Modeling	C:\Users\Aking\source\repos\OCCT\samples\mfc\standard\02_Modeling\src\ModelingDoc1.cpp	115		

@@ -1,5 +1,3 @@
-分别统计求交和构建的耗时
-
 
 
 ### TKBO布尔
@@ -22,7 +20,111 @@ BRepAlgoAPI_BooleanOperation::Build
 
 
 
-罗德里格斯旋转公式表述为：一个向量 v**v** 绕单位向量 k**k** 旋转 θ*θ* 角后的新向量 vrot**v**rot 为
-$$
-\mathbf{v}_{\text{rot}} = \mathbf{v} \cos \theta + (\mathbf{k} \times \mathbf{v}) \sin \theta + \mathbf{k} (\mathbf{k} \cdot \mathbf{v}) (1 - \cos \theta)
-$$
+### TopoDS_Shape 数据结构
+
+```C++
+enum TopAbs_ShapeEnum
+{
+TopAbs_COMPOUND,
+TopAbs_COMPSOLID,
+TopAbs_SOLID,
+TopAbs_SHELL,
+TopAbs_FACE,
+TopAbs_WIRE,
+TopAbs_EDGE,
+TopAbs_VERTEX,
+TopAbs_SHAPE
+};
+
+class TopoDS_Shape
+  Handle(TopoDS_TShape) myTShape;
+  TopLoc_Location myLocation;
+  TopAbs_Orientation myOrient;
+
+class TopoDS_TShape //topological
+  TopoDS_ListOfShape myShapes;
+  Standard_Integer   myFlags;
+
+//BRep
+class BRep_TFace : public TopoDS_TFace
+  Handle(Geom_Surface) mySurface;
+  TopLoc_Location myLocation;
+  Standard_Real myTolerance;
+class BRep_TEdge : public TopoDS_TEdge
+  Standard_Real myTolerance;
+  Standard_Integer myFlags;
+  BRep_ListOfCurveRep myCurves;
+class BRep_TVertex : public TopoDS_TVertex
+  gp_Pnt myPnt;
+  Standard_Real myTolerance;
+  BRep_ListOfPointRep myPoints;
+    
+
+    
+```
+
+
+
+
+
+### Geom_Geometry 几何数据
+
+```C++
+public Geom_Geometry
+class Geom_Point //geometric points in 3D space
+class Geom_Vector //vectors in 3D space.
+    class Geom_Direction;
+    class Geom_VectorWithMagnitude;
+class Geom_AxisPlacement //gp_Ax1 单位位矢3D
+    class Geom_Axis1Placement;
+    class Geom_Axis2Placement;
+class Geom_Curve //curves in 3D space, including lines, circles, conics, Bezier or BSpline curves, etc
+class Geom_Surface //
+
+public Geom_Curve
+class Geom_BoundedCurve  //limited by two finite values of the parameter
+    class Geom_BezierCurve;
+    class Geom_BSplineCurve;
+    class Geom_TrimmedCurve ;
+class Geom_Conic //conic curves in 3D space 圆锥曲线
+    class Geom_Circle;
+    class Geom_Ellipse;
+    class Geom_Hyperbola;//双曲线
+    class Geom_Parabola; //抛物线
+class Geom_Line //an infinite line.
+class Geom_OffsetCurve //an offset curve in 3D space
+class ShapeExtend_ComplexCurve  //consists of several segments.
+
+public Geom_Surface
+class Geom_BoundedSurface //defined by a rectangle in its 2D
+    class Geom_BezierSurface;
+    class Geom_BSplineSurface;
+    class Geom_RectangularTrimmedSurface;
+class Geom_ElementarySurface //基本曲面 
+    class Geom_ConicalSurface;//圆锥面
+    class Geom_CylindricalSurface;//圆柱面
+    class Geom_SphericalSurface;//球面
+    class Geom_ToroidalSurface;//环面
+    class Geom_Plane;//无限平面
+class Geom_SweptSurface //constructed by sweeping a curve with another curve
+    class Geom_SurfaceOfExtrusion;
+    class Geom_SurfaceOfRevolution;
+class Geom_OffsetSurface //an offset surface in 3D
+class GeomPlate_Surface //平板平面
+class ShapeExtend_CompositeSurface //a grid of surfaces
+
+public BRep_CurveRepresentation
+    class BRep_CurveOn2Surfaces; //between two surfaces
+    class BRep_GCurve ;//Root class for the geometric curves representation
+        class BRep_Curve3D;
+        class BRep_CurveOnSurface; //
+            class BRep_CurveOnClosedSurface;
+    class BRep_Polygon3D;//a 3D polygon
+    class BRep_PolygonOnSurface;//2D polygon in the parametric space of a surface
+        class BRep_PolygonOnClosedSurface;
+    class BRep_PolygonOnTriangulation ;//an array of nodes on a triangulation.
+        class BRep_PolygonOnClosedTriangulation
+
+
+```
+
