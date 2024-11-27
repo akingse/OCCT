@@ -230,9 +230,6 @@ void BOPAlgo_Builder::PerformInternal(const BOPAlgo_PaveFiller& theFiller, const
   //
   try {
     OCC_CATCH_SIGNALS
-    //if (test::DataRecordSingleton::getInstance().isOpen())
-    //    PerformInternal1_WithInfo(theFiller, theRange);
-    //else
     PerformInternal1(theFiller, theRange);
   }
   //

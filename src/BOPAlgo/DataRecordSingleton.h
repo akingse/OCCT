@@ -102,6 +102,13 @@ namespace test
 #endif
         };
 
+        struct FaceInfo
+        {
+            std::vector<TopoDS_Shape> m_facesTarget;
+            std::vector<TopoDS_Shape> m_facesTool;
+            std::vector<TopoDS_Shape> m_edgesIntersect;
+        };
+
         //DataCompareSingleton
     public:
         static double sm_toleDist;
@@ -109,10 +116,11 @@ namespace test
 
     private:
         //static int sm_index;
-        static bool sm_open;// =false
         static int sm_hasBuild; //to process once MakeBlocks recursion
         static bool sm_isAverage;
+        OPENCASCADE_TEST_API static bool sm_open;// =false
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
+        OPENCASCADE_TEST_API static std::vector<FaceInfo> sm_recordFace;
 
     public:
         static DataRecordSingleton& getInstance()

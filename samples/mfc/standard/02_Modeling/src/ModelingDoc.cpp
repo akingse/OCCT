@@ -1132,6 +1132,10 @@ public:
 
 	void checkTopology() const
 	{
+		//close
+		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+		instance.open(false);
+
 		if (m_shapeVct.empty())
 			return;
 		TopoDS_Shape checkedShape = m_shapeVct.back();
@@ -1239,7 +1243,7 @@ static CsgTree getBooleanTest_03()
 {
 	double R = 10, r = 2;
 	double H = 30;
-	double offset = 0.;
+	double offset = 0.1;
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r,0, H).Shape();
 	gp_Trsf trsfR;

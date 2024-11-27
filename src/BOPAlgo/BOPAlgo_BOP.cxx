@@ -417,15 +417,16 @@ void BOPAlgo_BOP::fillPIConstants (const Standard_Real theWhole, BOPAlgo_PISteps
 //purpose  : all boolean BuildResult process
 //=======================================================================
 
-#ifdef USING_OPENCASCADE_TEST
+//#ifdef USING_OPENCASCADE_TEST
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
-  // USING_OPENCASCADE_TEST
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  if (instance.isOpen()) 
+  {  // USING_OPENCASCADE_TEST
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
   test::DataRecordSingleton::DataMap& current = instance.getDataP().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
@@ -591,11 +592,9 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PostTreat")
   //reset data, process recursion
   instance.hasBuild();
-}
-#else
-void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
-                                   const Message_ProgressRange& theRange)
-{
+  }
+  else //origin //==============================================================
+  { 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();
   myContext=myPaveFiller->Context();
@@ -729,8 +728,9 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   //
   // 6 Post-treatment 
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
+  }
 }
-#endif //USING_OPENCASCADE_TEST
+//#endif //USING_OPENCASCADE_TEST
 
 //=======================================================================
 //function : BuildRC

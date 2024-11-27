@@ -261,14 +261,15 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 // purpose: all boolean intersectShape process
 //=======================================================================
 
-#ifdef USING_OPENCASCADE_TEST
+//#ifdef USING_OPENCASCADE_TEST
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
-// USING_OPENCASCADE_TEST
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  if (instance.isOpen())// USING_OPENCASCADE_TEST
+  {
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
   std::vector<test::DataRecordSingleton::DataMap>& dataCount = instance.getDataP();
   test::DataRecordSingleton::DataMap current;
 
@@ -434,10 +435,9 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   }
   //add current to recordData
   dataCount.push_back(current);
-}
-#else
-void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
-{
+  }
+  else //origin //==============================================================
+  {
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
 
   Init (aPS.Next (5));
@@ -543,10 +543,9 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
+  }
 }
-
-
-#endif// USING_OPENCASCADE_TEST
+//#endif// USING_OPENCASCADE_TEST
 
 
 //=======================================================================
