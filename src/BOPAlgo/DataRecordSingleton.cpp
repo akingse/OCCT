@@ -57,7 +57,7 @@ void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
     ofsFile.close();
 }
 
-std::string DataRecordSingleton::readBinaryData(const std::string& filename)
+std::string DataRecordSingleton::readBinToString(const std::string& filename)
 {
     std::string res;
     std::ifstream file(filename, std::ios::binary);
@@ -73,12 +73,20 @@ std::string DataRecordSingleton::readBinaryData(const std::string& filename)
     if (!file.read(const_cast<char*>(res.data()), fileSize)) 
     {
         std::cerr << "Error reading file: " << filename << std::endl;
-        return {};
+        return res;
     }
     return res;
 }
 
 #ifdef USING_OPENCASCADE_CLASS 
+TopoDS_Shape DataRecordSingleton::readBinToShape(const std::string& filename)
+{
+    TopoDS_Shape Shape;
+    BRep_Builder Builder;
+    BRepTools::Read(Shape, filename.c_str(), Builder);
+    return Shape;
+}
+
 void DataRecordSingleton::writeShapeToFile()
 {
     setName({});
@@ -88,7 +96,8 @@ void DataRecordSingleton::writeShapeToFile()
     {
         const DataMap& data = sm_recordData[i];
         std::string filename = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
-        BRepTools::Write(data.m_shape, filename.c_str());
+        if (data.m_shape != nullptr)
+            BRepTools::Write(*data.m_shape, filename.c_str());
     }
     return;
 }
@@ -104,21 +113,25 @@ std::vector<int> DataRecordSingleton::compareBRepFormat()
     char buffer[MAX_PATH];
     std::string path(_getcwd(buffer, sizeof(buffer)));
     std::vector<std::string> formatRec;
+    std::vector<int> strRes;
     std::vector<int> cmpRes;
     for (int i = 0; i < sm_recordData.size(); i++)
     {
         const DataMap& data = sm_recordData[i];
+        if (data.m_shape == nullptr)
+            continue;
         std::string filenameStd = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
-        std::string strStd = readBinaryData(filenameStd);
-        if (strStd.empty())
+        //compare Shape
+        TopoDS_Shape shapeStd = readBinToShape(filenameStd);
+        if (!data.m_shape->IsEqual(shapeStd))
             cmpRes.push_back(i);
+        //compare string
+        std::string strStd = readBinToString(filenameStd);
         std::string filenameTst = path + "\\binFile\\shape_" + data.m_name + ".txt";
-        if (data.m_shape.IsNull())
-            cmpRes.push_back(i);
-        BRepTools::Write(data.m_shape, filenameTst.c_str());
-        std::string strTst = readBinaryData(filenameTst);
+        BRepTools::Write(*data.m_shape, filenameTst.c_str());
+        std::string strTst = readBinToString(filenameTst);
         if (strStd != strTst)
-            cmpRes.push_back(i);
+            strRes.push_back(i);
     }
     return cmpRes;
 }
@@ -142,7 +155,7 @@ std::vector<string> mapkey2vector(const std::map<std::string, T>& data)
 	return res;
 }
 
-vector<DataRecordSingleton::DataMap> DataRecordSingleton::compare(const vector<DataRecordSingleton::DataMap>& stdDataRead)
+vector<DataRecordSingleton::DataMap> DataRecordSingleton::compareDataMap(const vector<DataRecordSingleton::DataMap>& stdDataRead)
 {
 	if (stdDataRead.size() != sm_recordData.size())
 		return {};

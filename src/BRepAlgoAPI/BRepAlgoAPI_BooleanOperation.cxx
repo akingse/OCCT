@@ -233,7 +233,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
 #ifdef USING_OPENCASCADE_TEST
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
   test::DataRecordSingleton::DataMap& current = instance.getData().back();
-  current.m_shape = myShape;
+  current.m_shape = std::make_shared<TopoDS_Shape>(myShape);
 #endif//USING_OPENCASCADE_TEST
 
   if (aDumpOper.IsDump()) {

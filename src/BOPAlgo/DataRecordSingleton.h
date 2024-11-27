@@ -18,6 +18,10 @@
 #define OPENCASCADE_TEST_API __declspec(dllimport)
 #endif //OPENCASCADE_TEST_EXPORTS
 
+#ifndef USING_OPENCASCADE_CLASS
+class TopoDS_Shape;
+#endif
+
 /*
  //communal
   std::chrono::steady_clock::time_point timestart;
@@ -97,9 +101,8 @@ namespace test
             //to keep order
             std::vector<std::pair<std::string, int>> m_dataItemVct;
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
-#ifdef USING_OPENCASCADE_CLASS //keep same define
-            TopoDS_Shape m_shape;//std::vector<>
-#endif
+//#ifdef USING_OPENCASCADE_CLASS //keep same define
+            std::shared_ptr<TopoDS_Shape> m_shape;//std::vector<>
         };
 
         struct FaceInfo
@@ -143,6 +146,7 @@ namespace test
         static void clear()
         {
             sm_recordData.clear();
+            sm_recordFace.clear();
             //sm_index = 0;
         }
         static std::vector<DataMap>& getDataP() //private only for BOPAlgo
@@ -172,20 +176,12 @@ namespace test
             }
         }
 
-#ifdef USING_OPENCASCADE_CLASS
-        static TopoDS_Shape readBinaryDataToShape(const std::string& filename)
-        {
-            TopoDS_Shape Shape;
-            BRep_Builder Builder;
-            BRepTools::Read(Shape, filename.c_str(), Builder);
-            return Shape;
-        }
-#endif
+        OPENCASCADE_TEST_API static TopoDS_Shape readBinToShape(const std::string& filename);
         OPENCASCADE_TEST_API static void writeShapeToFile();
-        OPENCASCADE_TEST_API static std::string readBinaryData(const std::string& filename);
+        OPENCASCADE_TEST_API static std::string readBinToString(const std::string& filename);
         OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
         OPENCASCADE_TEST_API static std::vector<int> compareBRepFormat();
-        OPENCASCADE_TEST_API static std::vector<DataMap> compare(const std::vector<DataMap>& stdDataRead);
+        OPENCASCADE_TEST_API static std::vector<DataMap> compareDataMap(const std::vector<DataMap>& stdDataRead);
 
     };
 	
