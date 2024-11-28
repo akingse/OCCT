@@ -15,7 +15,10 @@ BRepAlgoAPI_BooleanOperation::Build
             BOPAlgo_Builder::PerformInternal //try-catch
                 BOPAlgo_BOP::PerformInternal1
                 //BOPAlgo\BOPAlgo_BOP.cxx
-                    
+
+添加time-count和check-shape
+BRepAlgoAPI_BooleanOperation();//构造 布尔前
+BRepAlgoAPI_BooleanOperation::Build() //布尔后
 ```
 
 
@@ -69,6 +72,12 @@ class BRep_TVertex : public TopoDS_TVertex
 
 ### Geom_Geometry 几何数据
 
+
+
+![image-20241128175916864](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128175916864.png)
+
+![image-20241128180405066](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128180405066.png)
+
 ```C++
 public Geom_Geometry
 class Geom_Point //geometric points in 3D space
@@ -113,11 +122,11 @@ class Geom_OffsetSurface //an offset surface in 3D
 class GeomPlate_Surface //平板平面
 class ShapeExtend_CompositeSurface //a grid of surfaces
 
-public BRep_CurveRepresentation
+public BRep_CurveRepresentation //包含几何曲线和面上线
     class BRep_CurveOn2Surfaces; //between two surfaces
-    class BRep_GCurve ;//Root class for the geometric curves representation
-        class BRep_Curve3D;
-        class BRep_CurveOnSurface; //
+    class BRep_GCurve ;//Root class for the geometric curves representation 几何曲线
+        class BRep_Curve3D; //持有Geom_Curve handle
+        class BRep_CurveOnSurface; //面上线
             class BRep_CurveOnClosedSurface;
     class BRep_Polygon3D;//a 3D polygon
     class BRep_PolygonOnSurface;//2D polygon in the parametric space of a surface
@@ -127,4 +136,47 @@ public BRep_CurveRepresentation
 
 
 ```
+
+
+
+### 布尔API
+
+```C++
+class BRepBuilderAPI_Command //all commands
+class BRepBuilderAPI_MakeShape //all  shape constructions
+class BRepAlgoAPI_Algo //API algorithms
+    //继承 BOPAlgo_Options
+class BRepAlgoAPI_BuilderAlgo //General Fuse algorithm
+    //myArguments
+class BRepAlgoAPI_BooleanOperation //performing Boolean Operations; arguments分为 *Objects* and *Tools*.
+    //myTools and myOperation
+class BRepAlgoAPI_Cut/BRepAlgoAPI_Common/BRepAlgoAPI_Fuse //布尔接口
+
+class BOPAlgo_PaveFiller //
+    
+
+    
+```
+
+
+
+### MakeShape基本体造型
+
+```C++
+public BRepBuilderAPI_MakeShape //all shape constructions
+class BRepPrimAPI_MakeOneAxis//construct rotational primitives
+    BRepPrimAPI_MakeSphere//球
+    BRepPrimAPI_MakeCone//台
+    BRepPrimAPI_MakeCylinder//柱
+    BRepPrimAPI_MakeTorus//环
+    BRepPrimAPI_MakeRevolution //build revolved shapes，持有BRepPrim_Revolution
+class BRepPrimAPI_MakeBox
+class BRepPrimAPI_MakeSweep
+    BRepOffsetAPI_MakePipe 
+    BRepOffsetAPI_MakePipeShell 
+    BRepPrimAPI_MakePrism //linear swept, called prisms
+    BRepPrimAPI_MakeRevol //revolved sweep topologies，持有BRepSweep_Revol
+```
+
+
 

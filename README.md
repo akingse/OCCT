@@ -60,6 +60,8 @@ fit
 
 [pdf](C:\Users\Aking\source\repos\OCCT\doc\pdf\dev_guides)版本，分为dev_guides和user_guides，user_guides对应User Guides用户指南中，按sln项目模块组织的分类，dev_guides对应overview目录下其他内容，包括specification；
 
+类图[html](C:\Users\Aking\source\repos\OCCT\doc\refman)
+
 
 
 ![image-20241103134553416](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241103134553416.png)
@@ -80,5 +82,18 @@ C:\Users\Aking\source\repos\OCCT\build\inc
 C:\Users\Aking\source\repos\OCCT\build\win64\vc14\lib
 ```
 
-严重性	代码	说明	项目	文件	行	禁止显示状态	详细信息
-错误	C2440	“初始化”: 无法从“TopoDS_Shape”转换为“int”	Modeling	C:\Users\Aking\source\repos\OCCT\samples\mfc\standard\02_Modeling\src\ModelingDoc1.cpp	115		
+OCCT.sln暂未同步
+
+TKBO项目添加DebugTest/DataRecordSingleton，项目配置添加OCC_TEST宏；
+
+Modeling项目添加ModelingDoc1等测试文件，项目配置添加OCC_TEST宏
+
+
+
+### doxygen安装配置
+
+[官网](https://www.doxygen.nl/download.html)
+
+doxywizard
+
+Doxygen 是一个非常灵活和强大的工具，适用于任何规模的项目。通过适当的配置和使用，它可以帮助开发者提高文档的质量和可维护性。

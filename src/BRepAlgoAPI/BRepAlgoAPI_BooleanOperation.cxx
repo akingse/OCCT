@@ -210,6 +210,25 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
     for (TopTools_ListOfShape::Iterator it(myTools); it.More(); it.Next())
       aLArgs.Append(it.Value());
 
+#ifdef USING_OPENCASCADE_TEST
+    test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+    if (instance.isOpenCheck())
+    {
+        BOPAlgo_ListOfCheckResult resultBefore;
+        for (const auto& iter : aLArgs)
+        {
+            BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(iter);
+            Message_ProgressRange rangeBefore;
+            checkBefore.Perform(rangeBefore);
+            BOPAlgo_ListOfCheckResult temp = checkBefore.Result();
+            resultBefore.Append(temp);
+        }
+        test::DataRecordSingleton::DataMap data;
+        data.m_checkBefore = resultBefore;
+        instance.getData().push_back(data);
+    }
+#endif//USING_OPENCASCADE_TEST
+
     // Perform intersection
     IntersectShapes(aLArgs, aPS.Next(70));
     if (HasErrors())

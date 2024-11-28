@@ -36,36 +36,46 @@ class BoolNode
 public:
 	std::shared_ptr<BoolNode> m_leftNode;
 	std::shared_ptr<BoolNode> m_rightNode;
-	BOPAlgo_Operation m_operation; //
+	BOPAlgo_Operation m_operation = BOPAlgo_Operation::BOPAlgo_UNKNOWN; //
 };
 
 class CsgTree
 {
 public:
-	std::vector<TopoDS_Shape> m_shapeVct;
-	std::shared_ptr<BoolNode> m_node;
+	std::vector<TopoDS_Shape> m_shapeVct; //boolean before
+	TopoDS_Shape m_shapeResult;//boolean after
+	std::shared_ptr<BoolNode> m_node = nullptr;
 	CsgTree() = default;
-	CsgTree(const TopoDS_Shape& target, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
+	CsgTree(const TopoDS_Shape& object, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
 	{
-		m_shapeVct.push_back(target);
+		m_shapeVct.push_back(object);
 		m_shapeVct.push_back(tool);
 		m_node = std::make_shared<BoolNode>();
 		m_node->m_operation = operation;
 		TopoDS_Shape result;
 		if (BOPAlgo_Operation::BOPAlgo_COMMON == operation)
-			result = BRepAlgoAPI_Common(target, tool);
+			result = BRepAlgoAPI_Common(object, tool);
 		else if (BOPAlgo_Operation::BOPAlgo_FUSE == operation)
-			result = BRepAlgoAPI_Fuse(target, tool);
+			result = BRepAlgoAPI_Fuse(object, tool);
 		else if (BOPAlgo_Operation::BOPAlgo_CUT == operation)
-			result = BRepAlgoAPI_Cut(target, tool);
-		m_shapeVct.push_back(result);
+			result = BRepAlgoAPI_Cut(object, tool);
+		//m_shapeVct.push_back(result);
+		m_shapeResult = result;
 	}
-
-	TopoDS_Shape getResult() const
+	CsgTree(const TopTools_ListOfShape& objects, const TopTools_ListOfShape& tools, BOPAlgo_Operation operation)
 	{
-		if (m_shapeVct.size() != 3)
-			return {};
-		return m_shapeVct[2];
+		//链表，不支持索引
+        for (const auto& iter : objects) 
+			m_shapeVct.push_back(iter);
+		for (const auto& iter : tools)
+			m_shapeVct.push_back(iter);
+		//doboolean
+		BRepAlgoAPI_BooleanOperation boolOp;
+		boolOp.SetArguments(objects);
+		boolOp.SetTools(tools);
+		boolOp.SetOperation(operation);
+		boolOp.Build();
+		m_shapeResult = boolOp.Shape();
 	}
 
 	void checkTopology() const
@@ -314,19 +324,37 @@ static CsgTree getBooleanTest_05()
 	return csgtree;
 }
 
+//BooleanOperation myArguments 多个shape布尔
+static CsgTree getBooleanTest_06()
+{
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
+    TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
+	TopTools_ListOfShape objects; //只设置objects，result为空
+	objects.Append(theShapeA);
+	objects.Append(theShapeB);
+	TopTools_ListOfShape tools;
+	TopoDS_Shape theShapeC = BRepPrimAPI_MakeBox(3,2,2).Shape();
+	tools.Append(theShapeC);
+
+	//CsgTree csgtree = CsgTree(objects, tools, BOPAlgo_Operation::BOPAlgo_UNKNOWN);
+	//CsgTree csgtree = CsgTree(objects, tools, BOPAlgo_Operation::BOPAlgo_FUSE);
+	//CsgTree csgtree = CsgTree(objects, tools, BOPAlgo_Operation::BOPAlgo_COMMON);
+	CsgTree csgtree = CsgTree(objects, tools, BOPAlgo_Operation::BOPAlgo_CUT);
+	return csgtree;
+}
 
 //验证布尔
 void CModelingDoc::OnTestBoolBefore()
 {
-	//g_csgtree = getBooleanTest_03();
+	g_csgtree = getBooleanTest_04();
 	//clear
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
 	AIS_ListIteratorOfListOfInteractive aListIterator;
 	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
 		myAISContext->Remove(aListIterator.Value(), Standard_False);
-
-	for (int i = 0; i < 2; i++)
+	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeVct;
+	for (int i = 0; i < shapeVct.size(); i++)
 	{
 		int color = rand() % (508 + 1);
 		int material = rand() % (25 + 1);
@@ -350,11 +378,10 @@ void CModelingDoc::OnTestBoolAfter()
 	AIS_ListIteratorOfListOfInteractive aListIterator;
 	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
 		myAISContext->Remove(aListIterator.Value(), Standard_False);
-
 	//draw bool result
 	int color = rand() % (508 + 1);
 	int material = rand() % (25 + 1);
-	Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.getResult());
+	Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.m_shapeResult);
 	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 	myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
 	myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
