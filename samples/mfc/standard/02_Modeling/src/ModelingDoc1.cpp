@@ -4,7 +4,6 @@
 #include "ResultDialog.h"
 #include "State.h"
 //std
-#include <string>
 
 //modeling
 #include <BRepPrimAPI_MakeCylinder.hxx>
@@ -85,11 +84,12 @@ public:
 
 };
 
-std::vector<shared_ptr<BRep_TFace>> brepFaceVct;
-std::vector<shared_ptr<BRep_TEdge>> brepEdgeVct;
-std::vector<shared_ptr<BRep_TVertex>> brepVertexVct;
+std::vector<const BRep_TFace*> brepFaceVct;
+std::vector<const BRep_TEdge*> brepEdgeVct;
+std::vector<const BRep_TVertex*> brepVertexVct;
 std::vector<handle<Geom_Surface>> surfaceVct;
 std::vector<BRep_ListOfCurveRepresentation> curveVct;
+std::vector<gp_Pnt> pointVct;
 
 void TraverseShape(const TopoDS_Shape& shape) 
 {
@@ -121,9 +121,9 @@ void TraverseShape(const TopoDS_Shape& shape)
 			BRep_TFace* brepFace = dynamic_cast<BRep_TFace*>(face.TShape().get());
 			if (brepFace != nullptr)
 			{
-				brepFaceVct.push_back(shared_ptr<BRep_TFace>(brepFace));
-                //Handle(Geom_Surface) surface = BRep_Tool::Surface(face); //same one
+				brepFaceVct.push_back(brepFace);
 				surfaceVct.push_back(brepFace->Surface());
+				//surfaceVct[0].get()->
 			}
 			TraverseShape(face);
 		}
@@ -133,31 +133,32 @@ void TraverseShape(const TopoDS_Shape& shape)
 		}
 		else if (shapeType == TopAbs_EDGE) {
 			const TopoDS_Edge& edge = TopoDS::Edge(subShape);
-			BRep_TEdge* brepEdge= dynamic_cast<BRep_TEdge*>(edge.TShape().get());
-			shared_ptr<BRep_TEdge> ptr = shared_ptr<BRep_TEdge>(brepEdge);
-			//if (brepEdge != nullptr &&
-			//	std::find(brepEdgeVct.begin(), brepEdgeVct.end(), ptr) == brepEdgeVct.end())
-			//{
-			//	brepEdgeVct.push_back(ptr);
-			//	//const BRep_ListOfCurveRepresentation& curves = brepEdge->Curves();
-			//	curveVct.push_back(brepEdge->Curves());
-			//}
+			BRep_TEdge* brepEdge = dynamic_cast<BRep_TEdge*>(edge.TShape().get());
+			//shared_ptr<BRep_TEdge> ptr = shared_ptr<BRep_TEdge>(brepEdge);//cause crash
+			if (brepEdge != nullptr &&
+				std::find(brepEdgeVct.begin(), brepEdgeVct.end(), brepEdge) == brepEdgeVct.end())
+			{
+				brepEdgeVct.push_back(brepEdge);
+				curveVct.push_back(brepEdge->Curves());
+				//curveVct[0].begin;
+			}
 			TraverseShape(edge);
 		}
 		else if (shapeType == TopAbs_VERTEX) {
 			const TopoDS_Vertex& vertex = TopoDS::Vertex(subShape);
 			BRep_TVertex* brepVertex = dynamic_cast<BRep_TVertex*>(vertex.TShape().get());
-            shared_ptr<BRep_TVertex> ptr = shared_ptr<BRep_TVertex>(brepVertex);
-			//if (brepVertex != nullptr &&
-			//	std::find(brepVertexVct.begin(), brepVertexVct.end(), ptr) == brepVertexVct.end())
-			//{
-			//	brepVertexVct.push_back(ptr);
-
-			//}
+            //shared_ptr<const BRep_TVertex> ptr = shared_ptr<const BRep_TVertex>(brepVertex);//cause crash
+			if (brepVertex != nullptr &&
+				std::find(brepVertexVct.begin(), brepVertexVct.end(), brepVertex) == brepVertexVct.end())
+			{
+				brepVertexVct.push_back(brepVertex);
+				pointVct.push_back(brepVertex->Pnt());
+				//pointVct[0].IsEqual()
+			}
 		}
+		//else
 	}
 }
-
 
 //输出耗时信息
 void writeTimeDataToCsv()
