@@ -3,10 +3,12 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <memory>
 #ifdef USING_OPENCASCADE_CLASS
 #include <TopoDS_Shape.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepTools.hxx>
+#include <BRepAlgoAPI_Check.hxx>
 #endif //USING_OPENCASCADE_CLASS
 
 //#define USING_OPENCASCADE_TEST //set in project config
@@ -100,6 +102,8 @@ namespace test
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
 //#ifdef USING_OPENCASCADE_CLASS //keep same define
             std::shared_ptr<TopoDS_Shape> m_shape;//std::vector<>
+            BOPAlgo_ListOfCheckResult m_checkBefore;
+            BOPAlgo_ListOfCheckResult m_checkAfter;
         };
 
         struct FaceInfo
@@ -118,26 +122,25 @@ namespace test
         //static int sm_index;
         static int sm_hasBuild; //to process once MakeBlocks recursion
         static bool sm_isAverage;
-        OPENCASCADE_TEST_API static bool sm_open;// =false
+        OPENCASCADE_TEST_API static bool sm_openTime;// =false
+        OPENCASCADE_TEST_API static bool sm_openCheck;// =false
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
         OPENCASCADE_TEST_API static std::vector<FaceInfo> sm_recordFace;
 
     public:
+#pragma region inline_function
         static DataRecordSingleton& getInstance()
         {
             static DataRecordSingleton instance;
             return instance;
         }
-        static bool isOpen()
-        {
-            return sm_open;
-        }
-        static void open(bool isOpen = true)
-        {
-            sm_open = isOpen;
-        }
         static std::vector<DataMap>& getData()
         {
+            return sm_recordData;
+        }
+        static std::vector<DataMap>& getDataP() //private only for BOPAlgo-PerformInternal
+        {
+            sm_hasBuild++;
             return sm_recordData;
         }
         static void clear()
@@ -146,13 +149,28 @@ namespace test
             sm_recordFace.clear();
             //sm_index = 0;
         }
-        static std::vector<DataMap>& getDataP() //private only for BOPAlgo
+        //xor alternative option
+        static bool isOpenTime() //using time count
         {
-			//if (sm_hasBuild == 0)
-            //     sm_recordData.push_back({});
-            sm_hasBuild++;
-            return sm_recordData;
+            return sm_openTime;
         }
+        static void setOpenTime(bool isOpen = true)
+        {
+            sm_openTime = isOpen;
+            if (sm_openTime)
+                sm_openCheck = false;
+        }
+        static bool isOpenCheck() //using check shape
+        {
+            return sm_openCheck;
+        }
+        static void setOpenCheck(bool isOpen = true)
+        {
+            sm_openCheck = isOpen;
+            if (sm_openCheck)
+                sm_openTime = false;
+        }
+
         static void hasBuild()//private only for BOPAlgo_BOP Build
         {
             if (sm_hasBuild == 3) //when MakeBlocks call recursion
@@ -172,6 +190,7 @@ namespace test
                     sm_recordData[i].m_name = std::to_string(i);
             }
         }
+#pragma endregion
 
         OPENCASCADE_TEST_API static TopoDS_Shape readBinToShape(const std::string& filename);
         OPENCASCADE_TEST_API static void writeShapeToFile();

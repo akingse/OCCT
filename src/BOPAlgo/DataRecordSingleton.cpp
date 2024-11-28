@@ -9,8 +9,9 @@ using namespace test;
 using namespace std;
 //init
 //int DataRecordSingleton::sm_index = 0;
-bool DataRecordSingleton::sm_open = true;
 int DataRecordSingleton::sm_hasBuild = 0;
+bool DataRecordSingleton::sm_openTime = false;
+bool DataRecordSingleton::sm_openCheck = false;
 bool DataRecordSingleton::sm_isAverage = false;
 double DataRecordSingleton::sm_toleDist = 1e-6;
 double DataRecordSingleton::sm_tolerence = 1e-6;

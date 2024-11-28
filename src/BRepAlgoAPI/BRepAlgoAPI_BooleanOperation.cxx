@@ -118,6 +118,19 @@ BRepAlgoAPI_BooleanOperation::BRepAlgoAPI_BooleanOperation
 {
   myArguments.Append(theS1);
   myTools.Append(theS2);
+#ifdef USING_OPENCASCADE_TEST
+  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  if (instance.isOpenCheck())
+  {
+      BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(theS1, theS2, theOp);
+      Message_ProgressRange rangeBefore;
+      checkBefore.Perform(rangeBefore);
+      BOPAlgo_ListOfCheckResult resultBefore = checkBefore.Result();
+      test::DataRecordSingleton::DataMap data;
+      data.m_checkBefore = resultBefore;
+      instance.getData().push_back(data);
+  }
+#endif//USING_OPENCASCADE_TEST
 }
 //=======================================================================
 //function : BRepAlgoAPI_BooleanOperation
@@ -232,8 +245,20 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
   }
 #ifdef USING_OPENCASCADE_TEST
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  test::DataRecordSingleton::DataMap& current = instance.getData().back();
-  current.m_shape = std::make_shared<TopoDS_Shape>(myShape);
+  std::vector<test::DataRecordSingleton::DataMap>& dataMap = instance.getData();
+  BOPAlgo_ListOfCheckResult resultAfter;
+  if (instance.isOpenCheck())
+  {
+      BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(myShape);
+      Message_ProgressRange rangeAfter;
+      checkAfter.Perform(rangeAfter);
+      resultAfter = checkAfter.Result();
+  }
+  if (!dataMap.empty())
+  {
+      dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
+      dataMap.back().m_checkAfter = resultAfter;
+  }
 #endif//USING_OPENCASCADE_TEST
 
   if (aDumpOper.IsDump()) {

@@ -422,7 +422,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  if (instance.isOpen()) 
+  if (instance.isOpenTime())
   {  // USING_OPENCASCADE_TEST
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;

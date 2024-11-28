@@ -265,7 +265,7 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  if (instance.isOpen())// USING_OPENCASCADE_TEST
+  if (instance.isOpenTime())// USING_OPENCASCADE_TEST
   {
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
