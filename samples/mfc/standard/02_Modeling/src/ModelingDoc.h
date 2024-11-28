@@ -52,6 +52,7 @@ protected:
 	afx_msg void OnDraft();
 	afx_msg void OnTestBoolBefore();
 	afx_msg void OnTestBoolAfter();
+	afx_msg void OnTestBoolDetail();
 	afx_msg void OnCut();
 	afx_msg void OnFuse();
 	afx_msg void OnSection();
@@ -86,7 +87,7 @@ protected:
 	afx_msg void OnFillwithtang();
 	afx_msg void OnButtonFill();
 	afx_msg void OnStopStop();
-	afx_msg void clear()
+	afx_msg void clearDisplay()
 	{
 		//clear
 		AIS_ListOfInteractive aList;
