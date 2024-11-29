@@ -3,7 +3,7 @@
 #include "ModelingApp.h"
 #include "ResultDialog.h"
 #include "State.h"
-//std
+#include <direct.h> //_getcwd
 
 //modeling
 #include <BRepPrimAPI_MakeCylinder.hxx>
@@ -24,7 +24,6 @@ std::vector<handle<Geom_Surface>> surfaceVct;
 std::vector<BRep_ListOfCurveRepresentation> curveVct;
 std::vector<gp_Pnt> pointVct;
 
-#include <direct.h> //_getcwd
 inline std::string getExePath()
 {
 	char buffer[MAX_PATH];
@@ -42,14 +41,14 @@ public:
 class CsgTree
 {
 public:
-	std::vector<TopoDS_Shape> m_shapeVct; //boolean before
+	std::vector<TopoDS_Shape> m_shapeArgument; //boolean before
 	TopoDS_Shape m_shapeResult;//boolean after
 	std::shared_ptr<BoolNode> m_node = nullptr;
 	CsgTree() = default;
 	CsgTree(const TopoDS_Shape& object, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
 	{
-		m_shapeVct.push_back(object);
-		m_shapeVct.push_back(tool);
+		m_shapeArgument.push_back(object);
+		m_shapeArgument.push_back(tool);
 		m_node = std::make_shared<BoolNode>();
 		m_node->m_operation = operation;
 		TopoDS_Shape result;
@@ -66,9 +65,9 @@ public:
 	{
 		//链表，不支持索引
         for (const auto& iter : objects) 
-			m_shapeVct.push_back(iter);
+			m_shapeArgument.push_back(iter);
 		for (const auto& iter : tools)
-			m_shapeVct.push_back(iter);
+			m_shapeArgument.push_back(iter);
 		//doboolean
 		BRepAlgoAPI_BooleanOperation boolOp;
 		boolOp.SetArguments(objects);
@@ -83,11 +82,11 @@ public:
 		//close
 		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
 		instance.setOpenTime(false);
-		if (m_shapeVct.empty())
+		if (m_shapeArgument.empty())
 			return;
-        if (m_shapeVct.size() == 3)
+        if (m_shapeArgument.size() == 3)
 		{
-			BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(m_shapeVct[0], m_shapeVct[1]);
+			BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(m_shapeArgument[0], m_shapeArgument[1]);
 			Message_ProgressRange rangeBefore;
 			checkBefore.Perform(rangeBefore);
 			BOPAlgo_ListOfCheckResult resultBefore = checkBefore.Result();
@@ -96,7 +95,7 @@ public:
 			//	std::cout << "Shape is valid." << std::endl;
 			//	//return;
 			//}
-			BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(m_shapeVct[2]);
+			BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(m_shapeArgument[2]);
 			Message_ProgressRange rangeAfter;
 			checkAfter.Perform(rangeAfter);
 			BOPAlgo_ListOfCheckResult resultAfter = checkAfter.Result();
@@ -346,22 +345,27 @@ static CsgTree getBooleanTest_06()
 	return csgtree;
 }
 
+static CsgTree getBooleanTest_07()
+{
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
+	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
+	//CsgTree::TraverseShape(theShapeA);
+	CsgTree::TraverseShape(csgtree.m_shapeResult);
+	return csgtree;
+}
+
 //验证布尔
 void CModelingDoc::OnTestBoolBefore()
 {
-	g_csgtree = getBooleanTest_04();
-	//clear
-	AIS_ListOfInteractive aList;
-	myAISContext->DisplayedObjects(aList);
-	AIS_ListIteratorOfListOfInteractive aListIterator;
-	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
-		myAISContext->Remove(aListIterator.Value(), Standard_False);
-	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeVct;
+	g_csgtree = getBooleanTest_07();
+	clearDisplay();
+	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{
 		int color = rand() % (508 + 1);
 		int material = rand() % (25 + 1);
-		Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.m_shapeVct[i]);
+		Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.m_shapeArgument[i]);
 		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
 		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
@@ -375,12 +379,7 @@ void CModelingDoc::OnTestBoolBefore()
 
 void CModelingDoc::OnTestBoolAfter()
 {
-	//clear
-	AIS_ListOfInteractive aList;
-	myAISContext->DisplayedObjects(aList);
-	AIS_ListIteratorOfListOfInteractive aListIterator;
-	for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
-		myAISContext->Remove(aListIterator.Value(), Standard_False);
+	clearDisplay();
 	//draw bool result
 	int color = rand() % (508 + 1);
 	int material = rand() % (25 + 1);
@@ -395,4 +394,32 @@ void CModelingDoc::OnTestBoolAfter()
 	Fit();
 
 	return;
+}
+
+void CModelingDoc::OnTestBoolDetail()
+{
+	clearDisplay();
+	std::vector<TopoDS_Shape> shapeVct;
+	for (int i = 0; i < brepFaceVct.size(); i++)
+	{
+		if (brepFaceVct[i] == nullptr)
+			continue;
+		TopoDS_Face aFace = BRepBuilderAPI_MakeFace(brepFaceVct[i]->Surface(), Precision::Confusion());
+		shapeVct.push_back(aFace);
+	}
+	for (int i = 0; i < shapeVct.size(); i++)
+	{
+		int color = rand() % (508 + 1);
+		int material = rand() % (25 + 1);
+		Handle(AIS_Shape) aisShape = new AIS_Shape(shapeVct[i]);
+		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+		myAISContext->Display(aisShape, Standard_False);
+		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+		myAISContext->SetSelected(anIOShape, Standard_False);
+	}
+	Fit();
+	return;
+
 }
