@@ -309,6 +309,9 @@ static CsgTree getBooleanTest_04()
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
+
+    TopoDS_Shape theShapeD= BRepPrimAPI_MakeBox(3, 2, 1).Shape();
+	CsgTree::TraverseShape(theShapeD);
 	return csgtree;
 }
 
