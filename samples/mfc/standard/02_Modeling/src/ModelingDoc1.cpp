@@ -19,7 +19,6 @@ using namespace test;
 using opencascade::handle;
 
 TopoInfoRecord g_topoInfo;
-TopoDS_Shape g_extraShape;
 CsgTree g_csgtree;
 
 //输出耗时信息
@@ -193,85 +192,56 @@ static CsgTree getBooleanTest_07()
 	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
 	//CsgTree::TraverseShape(theShapeA);
 	//CsgTree::TraverseShape(csgtree.m_shapeResult);
-	g_topoInfo.clear();
-	//g_extraShape = BRepPrimAPI_MakeBox(3, 2, 1).Shape();
-	g_extraShape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
-	g_topoInfo.TraverseShape(g_extraShape); //write shape data to topoInfo
-	g_topoInfo.getGeomAndShape();
 	return csgtree;
 }
 
+static TopoInfoRecord getTopoInfoTest_01()
+{
+	TopoInfoRecord record;
+	//g_extraShape = BRepPrimAPI_MakeBox(3, 2, 1).Shape();
+	record.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+	record.TraverseShape(record.m_shape); //write shape data to topoInfo
+	record.getGeomAndShape();
+	return record;
+}
+
 //验证布尔
-void CModelingDoc::OnTestBoolBefore()
+void CModelingDoc::OnTestBoolBefore() //using icon -
 {
 	g_csgtree = getBooleanTest_07();
 	clearDisplay();
-	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeArgument;
+	const std::vector<TopoDS_Shape>& shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{
-		int color = rand() % (508 + 1);
-		int material = rand() % (25 + 1);
-		Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.m_shapeArgument[i]);
-		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
-		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
-		myAISContext->Display(aisShape, Standard_False);
-		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
-		myAISContext->SetSelected(anIOShape, Standard_False);
+		oneShapeDisplay(shapeVct[i]);
 	}
 	Fit();
 	return;
 }
 
-void CModelingDoc::OnTestBoolAfter()
+void CModelingDoc::OnTestBoolAfter() //using icon +
 {
 	clearDisplay();
 	//draw bool result
-	int color = rand() % (508 + 1);
-	int material = rand() % (25 + 1);
-	Handle(AIS_Shape) aisShape = new AIS_Shape(g_csgtree.m_shapeResult);
-	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-	myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
-	myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
-	myAISContext->Display(aisShape, Standard_False);
-	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
-	myAISContext->SetSelected(anIOShape, Standard_False);
-	myAISContext->DisplayAll(true); //强制刷新
-	Fit();
+	oneShapeDisplay(g_csgtree.m_shapeResult);
 	return;
 }
 
-void CModelingDoc::OnTestBoolDetail()
+void CModelingDoc::OnTestBoolDetail() //using icon common
 {
 	clearDisplay();
-	for (int i = 0; i < g_topoInfo.m_topoFaceVct.size(); i++)
+	g_topoInfo = getTopoInfoTest_01();
+	for (int i = 0; i < g_topoInfo.m_topoEdgeVct.size(); i++)
 	{
-		int color = rand() % (508 + 1);
-		int material = rand() % (25 + 1);
-		Handle(AIS_Shape) aisShape = new AIS_Shape(g_topoInfo.m_topoFaceVct[i]);
-		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
-		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
-		myAISContext->Display(aisShape, Standard_False);
-		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
-		myAISContext->SetSelected(anIOShape, Standard_False);
+		oneShapeDisplay(g_topoInfo.m_topoEdgeVct[i]);
 	}
-	Fit();
 	return;
 }
 
-void CModelingDoc::OnTestBoolExtra()
+void CModelingDoc::OnTestBoolExtra() //using icon section
 {
 	clearDisplay();
-	int color = rand() % (508 + 1);
-	int material = rand() % (25 + 1);
-	Handle(AIS_Shape) aisShape = new AIS_Shape(g_extraShape);
-	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
-	myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
-	myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
-	myAISContext->Display(aisShape, Standard_False);
-	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
-	myAISContext->SetSelected(anIOShape, Standard_False);
-	Fit();
+	//g_topoInfo = getTopoInfoTest_01();
+	oneShapeDisplay(g_topoInfo.m_shape);
 	return;
 }

@@ -20,6 +20,10 @@ namespace test
 		std::vector<TopoDS_Face> m_topoFaceVct;
 		std::vector<TopoDS_Edge> m_topoEdgeVct;
 		std::vector<TopoDS_Vertex> m_topoVertexVct;
+		//data
+		std::vector<std::string> m_errorMessage;
+		TopoDS_Shape m_shape;
+
 		void clear()
 		{
 			m_brepFaceVct.clear();
@@ -33,8 +37,10 @@ namespace test
 			m_topoVertexVct.clear();
 		}
 
-		void TraverseShape(const TopoDS_Shape& shape)
+        void TraverseShape(const TopoDS_Shape& shape)
 		{
+			//if (shape.IsNull())
+			//	shape = m_shape;
 			for (TopoDS_Iterator it(shape); it.More(); it.Next())
 			{
 				TopoDS_Shape subShape = it.Value();
@@ -80,7 +86,6 @@ namespace test
 						std::find(m_brepEdgeVct.begin(), m_brepEdgeVct.end(), brepEdge) == m_brepEdgeVct.end())
 					{
 						m_brepEdgeVct.push_back(brepEdge);
-						m_curveVct.push_back(brepEdge->Curves());
 					}
 					TraverseShape(edge);
 				}
@@ -92,7 +97,6 @@ namespace test
 						std::find(m_brepVertexVct.begin(), m_brepVertexVct.end(), brepVertex) == m_brepVertexVct.end())
 					{
 						m_brepVertexVct.push_back(brepVertex);
-						m_pointVct.push_back(brepVertex->Pnt());
 					}
 				}
 				//else
@@ -114,13 +118,40 @@ namespace test
 				if (m_brepEdgeVct[i] == nullptr) //dual safe
 					continue;
 				const BRep_ListOfCurveRepresentation& curves = m_brepEdgeVct[i]->Curves();
-				m_curveVct.push_back(curves);
+				if (!curves.IsEmpty())
+					m_curveVct.push_back(curves);
+                handle<Geom_Surface> Surface;
 				for (const auto& iter : curves)
 				{
-
-					//TopoDS_Edge aEdge = BRepBuilderAPI_MakeEdge();
-					//shapeEdgeVct.push_back(aFace);
-
+					try
+					{
+						Surface = iter->Surface();
+						//m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge().Edge());
+					}
+					catch (Standard_Failure error)
+					{
+						m_errorMessage.push_back(error.GetMessageString());
+					}
+					try
+					{
+						const handle<Geom_Curve>& Curve3D = iter->Curve3D();
+						if (!Curve3D.IsNull())
+							m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge(Curve3D).Edge());
+					}
+					catch (Standard_Failure error)
+					{
+						m_errorMessage.push_back(error.GetMessageString());
+					}
+					try
+					{
+						const handle<Geom2d_Curve>& PCurve = iter->PCurve();
+                        if (!PCurve.IsNull() && !Surface.IsNull())
+							m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge(PCurve, Surface).Edge());
+					}
+					catch (Standard_Failure error)
+					{
+						m_errorMessage.push_back(error.GetMessageString());
+					}
 				}
 			}
 			for (int i = 0; i < m_brepVertexVct.size(); i++)

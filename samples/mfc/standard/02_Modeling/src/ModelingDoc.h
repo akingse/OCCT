@@ -88,7 +88,7 @@ protected:
 	afx_msg void OnFillwithtang();
 	afx_msg void OnButtonFill();
 	afx_msg void OnStopStop();
-	afx_msg void clearDisplay()
+	afx_msg inline void clearDisplay()
 	{
 		//clear
 		AIS_ListOfInteractive aList;
@@ -96,6 +96,21 @@ protected:
 		AIS_ListIteratorOfListOfInteractive aListIterator;
 		for (aListIterator.Initialize(aList); aListIterator.More(); aListIterator.Next())
 			myAISContext->Remove(aListIterator.Value(), Standard_False);
+	}
+    afx_msg inline void oneShapeDisplay(const TopoDS_Shape& shape, int color = -1, int material = -1)
+	{
+        if (color == -1)
+			color = rand() % (508 + 1);
+		if (material == -1)
+			material = rand() % (25 + 1);
+		Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+		myAISContext->Display(aisShape, Standard_False);
+		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+		myAISContext->SetSelected(anIOShape, Standard_False);
+		Fit();
 	}
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
