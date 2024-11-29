@@ -103,6 +103,7 @@ protected:
 			color = rand() % (508 + 1);
 		if (material == -1)
 			material = rand() % (25 + 1);
+		//交互式可视化系统（AIS，Application Interactive Service）
 		Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
 		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);

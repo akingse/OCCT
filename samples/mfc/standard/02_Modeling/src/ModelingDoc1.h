@@ -24,7 +24,7 @@ namespace test
 		std::vector<TopoDS_Edge> m_topoEdgeVct;
 		std::vector<TopoDS_Vertex> m_topoVertexVct;
 		//data
-		std::vector<std::string> m_errorMessage;
+		//std::vector<std::string> m_errorMessage;
 		TopoDS_Shape m_shape;
 
 		void clear()
@@ -33,7 +33,9 @@ namespace test
 			m_brepEdgeVct.clear();
 			m_brepVertexVct.clear();
 			m_surfaceVct.clear();
+			m_curveListVct.clear();
 			m_curveVct.clear();
+			m_curveType.clear();
 			m_pointVct.clear();
 			m_topoFaceVct.clear();
 			m_topoEdgeVct.clear();
@@ -159,6 +161,26 @@ namespace test
 			}
 		}
 
+		std::vector<TopoDS_Shape> getShapeVct(TopAbs_ShapeEnum topoType) const
+		{
+			std::vector<TopoDS_Shape> shapeRes;
+			if (TopAbs_ShapeEnum::TopAbs_FACE == topoType)
+			{
+				for (int i = 0; i < m_topoFaceVct.size(); i++)
+					shapeRes.push_back(m_topoFaceVct[i]);
+			}
+			else if (TopAbs_ShapeEnum::TopAbs_EDGE == topoType)
+			{
+				for (int i = 0; i < m_topoEdgeVct.size(); i++)
+					shapeRes.push_back(m_topoEdgeVct[i]);
+			}
+			else if (TopAbs_ShapeEnum::TopAbs_VERTEX == topoType)
+			{
+				for (int i = 0; i < m_topoVertexVct.size(); i++)
+					shapeRes.push_back(m_topoVertexVct[i]);
+			}
+			return shapeRes;
+		}
 	};
 
 	class BoolNode

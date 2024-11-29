@@ -185,24 +185,76 @@ static CsgTree getBooleanTest_06()
 	return csgtree;
 }
 
+//简单布尔
 static CsgTree getBooleanTest_07()
 {
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
 	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
-	//CsgTree::TraverseShape(theShapeA);
-	//CsgTree::TraverseShape(csgtree.m_shapeResult);
+	TopoDS_Shape theShapeR = csgtree.m_shapeResult;
+	//record
+	TopoInfoRecord topoinfo;
+	topoinfo.m_shape = csgtree.m_shapeResult;
+	topoinfo.TraverseShape(topoinfo.m_shape);
+	topoinfo.getGeomAndShape();
 	return csgtree;
 }
 
+//简单布尔
+static CsgTree getBooleanTest_08()
+{
+	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
+	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
+	TopoDS_Shape theShapeR = csgtree.m_shapeResult;
+	//record
+	TopoInfoRecord topoinfo;
+	topoinfo.m_shape = csgtree.m_shapeResult;
+	topoinfo.TraverseShape(topoinfo.m_shape);
+	topoinfo.getGeomAndShape();
+	return csgtree;
+}
+
+//遍历拓扑
 static TopoInfoRecord getTopoInfoTest_01()
 {
 	TopoInfoRecord topoinfo;
 	//g_extraShape = BRepPrimAPI_MakeBox(3, 2, 1).Shape();
-	topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+	//MakeOneAxis
+    //topoinfo.m_shape = BRepPrimAPI_MakeSphere(gp_Pnt(0, 0, 0), 10).Shape();
+	//topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+	//topoinfo.m_shape = BRepPrimAPI_MakeCylinder(1, 5).Shape();
+	topoinfo.m_shape = BRepPrimAPI_MakeTorus(10, 2).Shape();
 	topoinfo.TraverseShape(topoinfo.m_shape); //write shape data to topoInfo
 	topoinfo.getGeomAndShape();
 	return topoinfo;
+}
+
+static TopoInfoRecord getTopoInfoTest_02()
+{
+	TopoInfoRecord topoinfo;
+	return topoinfo;
+}
+
+static std::vector<TopoDS_Shape> getShapeCreate_01()
+{
+	std::vector<TopoDS_Shape> shapeRes;
+	//copy from OnPrism
+	TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200., -200., 0.));
+	TopoDS_Shape S1 = BRepPrimAPI_MakePrism(V1, gp_Vec(0., 0., 100.));
+	TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-150., -150, 0.), gp_Pnt(-50., -50, 0.));
+	TopoDS_Shape S2 = BRepPrimAPI_MakePrism(E, gp_Vec(0., 0., 100.));
+	//wire
+	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
+	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
+	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
+	TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1, E2, E3);
+	TopoDS_Shape S3 = BRepPrimAPI_MakePrism(W, gp_Vec(0., 0., 100.));
+	
+	
+	//copy from OnRevol
+
+	return shapeRes;
 }
 
 //验证布尔
@@ -231,10 +283,12 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 {
 	clearDisplay();
 	g_topoInfo = getTopoInfoTest_01();
-	for (int i = 0; i < g_topoInfo.m_topoFaceVct.size(); i++)
+	std::vector<TopoDS_Shape> shapeVct = g_topoInfo.getShapeVct(TopAbs_ShapeEnum::TopAbs_FACE);
+
+	for (int i = 0; i < shapeVct.size(); i++)
 	{
 		//clearDisplay();
-		oneShapeDisplay(g_topoInfo.m_topoFaceVct[i]);
+		oneShapeDisplay(shapeVct[i]);
 	}
 	Fit();
 	return;
@@ -243,7 +297,7 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 void CModelingDoc::OnTestBoolExtra() //using icon section
 {
 	clearDisplay();
-	//g_topoInfo = getTopoInfoTest_01();
+	g_topoInfo = getTopoInfoTest_01();
 	oneShapeDisplay(g_topoInfo.m_shape);
 	return;
 }
