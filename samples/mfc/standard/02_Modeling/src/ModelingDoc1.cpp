@@ -12,169 +12,14 @@
 #include <BRep_TEdge.hxx>
 #include <TopoDS_Iterator.hxx>
 #include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
+#include "ModelingDoc1.h" //custom class
 
 using namespace std;
 using namespace test;
 using opencascade::handle;
 
-std::vector<const BRep_TFace*> brepFaceVct;
-std::vector<const BRep_TEdge*> brepEdgeVct;
-std::vector<const BRep_TVertex*> brepVertexVct;
-std::vector<handle<Geom_Surface>> surfaceVct;
-std::vector<BRep_ListOfCurveRepresentation> curveVct;
-std::vector<gp_Pnt> pointVct;
-
-inline std::string getExePath()
-{
-	char buffer[MAX_PATH];
-	return std::string(_getcwd(buffer, sizeof(buffer))); //get current work directory
-}
-
-class BoolNode
-{
-public:
-	std::shared_ptr<BoolNode> m_leftNode;
-	std::shared_ptr<BoolNode> m_rightNode;
-	BOPAlgo_Operation m_operation = BOPAlgo_Operation::BOPAlgo_UNKNOWN; //
-};
-
-class CsgTree
-{
-public:
-	std::vector<TopoDS_Shape> m_shapeArgument; //boolean before
-	TopoDS_Shape m_shapeResult;//boolean after
-	std::shared_ptr<BoolNode> m_node = nullptr;
-	CsgTree() = default;
-	CsgTree(const TopoDS_Shape& object, const TopoDS_Shape& tool, BOPAlgo_Operation operation)
-	{
-		m_shapeArgument.push_back(object);
-		m_shapeArgument.push_back(tool);
-		m_node = std::make_shared<BoolNode>();
-		m_node->m_operation = operation;
-		TopoDS_Shape result;
-		if (BOPAlgo_Operation::BOPAlgo_COMMON == operation)
-			result = BRepAlgoAPI_Common(object, tool);
-		else if (BOPAlgo_Operation::BOPAlgo_FUSE == operation)
-			result = BRepAlgoAPI_Fuse(object, tool);
-		else if (BOPAlgo_Operation::BOPAlgo_CUT == operation)
-			result = BRepAlgoAPI_Cut(object, tool);
-		//m_shapeVct.push_back(result);
-		m_shapeResult = result;
-	}
-	CsgTree(const TopTools_ListOfShape& objects, const TopTools_ListOfShape& tools, BOPAlgo_Operation operation)
-	{
-		//链表，不支持索引
-        for (const auto& iter : objects) 
-			m_shapeArgument.push_back(iter);
-		for (const auto& iter : tools)
-			m_shapeArgument.push_back(iter);
-		//doboolean
-		BRepAlgoAPI_BooleanOperation boolOp;
-		boolOp.SetArguments(objects);
-		boolOp.SetTools(tools);
-		boolOp.SetOperation(operation);
-		boolOp.Build();
-		m_shapeResult = boolOp.Shape();
-	}
-
-	void checkTopology() const
-	{
-		//close
-		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-		instance.setOpenTime(false);
-		if (m_shapeArgument.empty())
-			return;
-        if (m_shapeArgument.size() == 3)
-		{
-			BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(m_shapeArgument[0], m_shapeArgument[1]);
-			Message_ProgressRange rangeBefore;
-			checkBefore.Perform(rangeBefore);
-			BOPAlgo_ListOfCheckResult resultBefore = checkBefore.Result();
-			//if (checker.IsValid())
-			//{
-			//	std::cout << "Shape is valid." << std::endl;
-			//	//return;
-			//}
-			BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(m_shapeArgument[2]);
-			Message_ProgressRange rangeAfter;
-			checkAfter.Perform(rangeAfter);
-			BOPAlgo_ListOfCheckResult resultAfter = checkAfter.Result();
-
-		}
-		return;
-	}
-
-	static void TraverseShape(const TopoDS_Shape& shape)
-	{
-		for (TopoDS_Iterator it(shape); it.More(); it.Next())
-		{
-			TopoDS_Shape subShape = it.Value();
-			string typeName;
-			if (!subShape.TShape().IsNull())
-				typeName = typeid(*subShape.TShape()).name();
-			const TopAbs_ShapeEnum shapeType = subShape.ShapeType();
-			//switch-case
-			if (shapeType == TopAbs_COMPOUND) {
-				const TopoDS_Compound& compound = TopoDS::Compound(subShape);
-				TraverseShape(compound);
-			}
-			else if (shapeType == TopAbs_COMPSOLID) {
-				const TopoDS_CompSolid& compsolid = TopoDS::CompSolid(subShape);
-				TraverseShape(compsolid);
-			}
-			else if (shapeType == TopAbs_SOLID) {
-				const TopoDS_Solid& solid = TopoDS::Solid(subShape);
-				TraverseShape(solid);
-			}
-			else if (shapeType == TopAbs_SHELL) {
-				const TopoDS_Shell& shell = TopoDS::Shell(subShape);
-				TraverseShape(shell);
-			}
-			else if (shapeType == TopAbs_FACE) {
-				const TopoDS_Face& face = TopoDS::Face(subShape);
-				BRep_TFace* brepFace = dynamic_cast<BRep_TFace*>(face.TShape().get());
-				if (brepFace != nullptr) //no repeat
-				{
-					brepFaceVct.push_back(brepFace);
-					surfaceVct.push_back(brepFace->Surface());
-					//surfaceVct[0].get()->
-				}
-				TraverseShape(face);
-			}
-			else if (shapeType == TopAbs_WIRE) {
-				const TopoDS_Wire& wire = TopoDS::Wire(subShape);
-				TraverseShape(wire);
-			}
-			else if (shapeType == TopAbs_EDGE) {
-				const TopoDS_Edge& edge = TopoDS::Edge(subShape);
-				BRep_TEdge* brepEdge = dynamic_cast<BRep_TEdge*>(edge.TShape().get());
-				//shared_ptr<BRep_TEdge> ptr = shared_ptr<BRep_TEdge>(brepEdge);//cause crash
-				if (brepEdge != nullptr &&
-					std::find(brepEdgeVct.begin(), brepEdgeVct.end(), brepEdge) == brepEdgeVct.end())
-				{
-					brepEdgeVct.push_back(brepEdge);
-					curveVct.push_back(brepEdge->Curves());
-					//curveVct[0].begin;
-				}
-				TraverseShape(edge);
-			}
-			else if (shapeType == TopAbs_VERTEX) {
-				const TopoDS_Vertex& vertex = TopoDS::Vertex(subShape);
-				BRep_TVertex* brepVertex = dynamic_cast<BRep_TVertex*>(vertex.TShape().get());
-				//shared_ptr<const BRep_TVertex> ptr = shared_ptr<const BRep_TVertex>(brepVertex);//cause crash
-				if (brepVertex != nullptr &&
-					std::find(brepVertexVct.begin(), brepVertexVct.end(), brepVertex) == brepVertexVct.end())
-				{
-					brepVertexVct.push_back(brepVertex);
-					pointVct.push_back(brepVertex->Pnt());
-					//pointVct[0].IsEqual()
-				}
-			}
-			//else
-		}
-	}
-
-};
+TopoInfoRecord g_topoInfo;
+TopoDS_Shape g_extraShape;
 CsgTree g_csgtree;
 
 //输出耗时信息
@@ -225,7 +70,6 @@ void writeShapeDataToTxt()
 	AfxMessageBox(cs);
 	instance.clear();
 }
-
 
 //两个共面立方体-布尔Fuse
 static TopoDS_Shape getBooleanTest_01()
@@ -308,9 +152,6 @@ static CsgTree getBooleanTest_04()
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsf);
 	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
 	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-
-    TopoDS_Shape theShapeD= BRepPrimAPI_MakeBox(3, 2, 1).Shape();
-	CsgTree::TraverseShape(theShapeD);
 	return csgtree;
 }
 
@@ -351,7 +192,12 @@ static CsgTree getBooleanTest_07()
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
 	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
 	//CsgTree::TraverseShape(theShapeA);
-	CsgTree::TraverseShape(csgtree.m_shapeResult);
+	//CsgTree::TraverseShape(csgtree.m_shapeResult);
+	g_topoInfo.clear();
+	//g_extraShape = BRepPrimAPI_MakeBox(3, 2, 1).Shape();
+	g_extraShape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+	g_topoInfo.TraverseShape(g_extraShape); //write shape data to topoInfo
+	g_topoInfo.getGeomAndShape();
 	return csgtree;
 }
 
@@ -392,26 +238,17 @@ void CModelingDoc::OnTestBoolAfter()
 	myAISContext->SetSelected(anIOShape, Standard_False);
 	myAISContext->DisplayAll(true); //强制刷新
 	Fit();
-
 	return;
 }
 
 void CModelingDoc::OnTestBoolDetail()
 {
 	clearDisplay();
-	std::vector<TopoDS_Shape> shapeVct;
-	for (int i = 0; i < brepFaceVct.size(); i++)
-	{
-		if (brepFaceVct[i] == nullptr)
-			continue;
-		TopoDS_Face aFace = BRepBuilderAPI_MakeFace(brepFaceVct[i]->Surface(), Precision::Confusion());
-		shapeVct.push_back(aFace);
-	}
-	for (int i = 0; i < shapeVct.size(); i++)
+	for (int i = 0; i < g_topoInfo.m_topoFaceVct.size(); i++)
 	{
 		int color = rand() % (508 + 1);
 		int material = rand() % (25 + 1);
-		Handle(AIS_Shape) aisShape = new AIS_Shape(shapeVct[i]);
+		Handle(AIS_Shape) aisShape = new AIS_Shape(g_topoInfo.m_topoFaceVct[i]);
 		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
 		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
@@ -421,5 +258,20 @@ void CModelingDoc::OnTestBoolDetail()
 	}
 	Fit();
 	return;
+}
 
+void CModelingDoc::OnTestBoolExtra()
+{
+	clearDisplay();
+	int color = rand() % (508 + 1);
+	int material = rand() % (25 + 1);
+	Handle(AIS_Shape) aisShape = new AIS_Shape(g_extraShape);
+	myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+	myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+	myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+	myAISContext->Display(aisShape, Standard_False);
+	const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+	myAISContext->SetSelected(anIOShape, Standard_False);
+	Fit();
+	return;
 }

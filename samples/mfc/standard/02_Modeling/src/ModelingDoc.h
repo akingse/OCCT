@@ -53,6 +53,7 @@ protected:
 	afx_msg void OnTestBoolBefore();
 	afx_msg void OnTestBoolAfter();
 	afx_msg void OnTestBoolDetail();
+	afx_msg void OnTestBoolExtra();
 	afx_msg void OnCut();
 	afx_msg void OnFuse();
 	afx_msg void OnSection();
