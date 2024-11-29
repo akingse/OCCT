@@ -197,12 +197,12 @@ static CsgTree getBooleanTest_07()
 
 static TopoInfoRecord getTopoInfoTest_01()
 {
-	TopoInfoRecord record;
+	TopoInfoRecord topoinfo;
 	//g_extraShape = BRepPrimAPI_MakeBox(3, 2, 1).Shape();
-	record.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
-	record.TraverseShape(record.m_shape); //write shape data to topoInfo
-	record.getGeomAndShape();
-	return record;
+	topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+	topoinfo.TraverseShape(topoinfo.m_shape); //write shape data to topoInfo
+	topoinfo.getGeomAndShape();
+	return topoinfo;
 }
 
 //ÑéÖ¤²¼¶û
@@ -231,10 +231,12 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 {
 	clearDisplay();
 	g_topoInfo = getTopoInfoTest_01();
-	for (int i = 0; i < g_topoInfo.m_topoEdgeVct.size(); i++)
+	for (int i = 0; i < g_topoInfo.m_topoFaceVct.size(); i++)
 	{
-		oneShapeDisplay(g_topoInfo.m_topoEdgeVct[i]);
+		//clearDisplay();
+		oneShapeDisplay(g_topoInfo.m_topoFaceVct[i]);
 	}
+	Fit();
 	return;
 }
 

@@ -15,7 +15,10 @@ namespace test
 		std::vector<const BRep_TEdge*> m_brepEdgeVct;
 		std::vector<const BRep_TVertex*> m_brepVertexVct;
 		std::vector<handle<Geom_Surface>> m_surfaceVct;
-		std::vector<BRep_ListOfCurveRepresentation> m_curveVct;//vector<BRep_CurveRepresentation>
+		std::vector<BRep_ListOfCurveRepresentation> m_curveListVct;//vector<BRep_CurveRepresentation>
+		//std::set<BRep_CurveRepresentation*> m_curvePtr;
+		std::vector<handle<BRep_CurveRepresentation>> m_curveVct; //remove repeat
+		std::vector<std::string> m_curveType;
 		std::vector<gp_Pnt> m_pointVct;
 		std::vector<TopoDS_Face> m_topoFaceVct;
 		std::vector<TopoDS_Edge> m_topoEdgeVct;
@@ -119,39 +122,31 @@ namespace test
 					continue;
 				const BRep_ListOfCurveRepresentation& curves = m_brepEdgeVct[i]->Curves();
 				if (!curves.IsEmpty())
-					m_curveVct.push_back(curves);
-                handle<Geom_Surface> Surface;
+					m_curveListVct.push_back(curves);
 				for (const auto& iter : curves)
 				{
-					try
-					{
-						Surface = iter->Surface();
-						//m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge().Edge());
-					}
-					catch (Standard_Failure error)
-					{
-						m_errorMessage.push_back(error.GetMessageString());
-					}
-					try
+                    //  if (m_curvePtr.find(iter.get()) != m_curvePtr.end())
+                    if (iter.IsNull() || std::find(m_curveVct.begin(), m_curveVct.end(), iter) != m_curveVct.end())
+						continue;
+					//m_curvePtr.insert(iter.get());
+					m_curveVct.push_back(iter);
+					std::string typeName = typeid(*iter.get()).name();
+					if (typeName == "class BRep_Curve3D")//typeid(BRep_Curve3D))
 					{
 						const handle<Geom_Curve>& Curve3D = iter->Curve3D();
-						if (!Curve3D.IsNull())
-							m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge(Curve3D).Edge());
+						if (Curve3D.IsNull())
+							continue;
+						m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge(Curve3D).Edge());
+						typeName += std::string("-") + typeid(*Curve3D.get()).name();
 					}
-					catch (Standard_Failure error)
+					else if (typeName == "class BRep_CurveOnSurface" || typeName == "class BRep_CurveOnClosedSurface")
 					{
-						m_errorMessage.push_back(error.GetMessageString());
-					}
-					try
-					{
+						const handle<Geom_Surface>& Surface = iter->Surface();
 						const handle<Geom2d_Curve>& PCurve = iter->PCurve();
                         if (!PCurve.IsNull() && !Surface.IsNull())
 							m_topoEdgeVct.push_back(BRepBuilderAPI_MakeEdge(PCurve, Surface).Edge());
 					}
-					catch (Standard_Failure error)
-					{
-						m_errorMessage.push_back(error.GetMessageString());
-					}
+					m_curveType.push_back(typeName);
 				}
 			}
 			for (int i = 0; i < m_brepVertexVct.size(); i++)
