@@ -191,7 +191,7 @@ Standard_Boolean  BRep_CurveRepresentation::IsPolygonOnSurface
 
 const Handle(Geom_Curve)&  BRep_CurveRepresentation::Curve3D()const 
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-Curve3D");
 }
 
 //=======================================================================
@@ -201,7 +201,7 @@ const Handle(Geom_Curve)&  BRep_CurveRepresentation::Curve3D()const
 
 void BRep_CurveRepresentation::Curve3D(const Handle(Geom_Curve)&)
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-Curve3D");
 }
 
 
@@ -215,7 +215,7 @@ void BRep_CurveRepresentation::Curve3D(const Handle(Geom_Curve)&)
 
 const Handle(Geom_Surface)&  BRep_CurveRepresentation::Surface()const 
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-Surface");
 }
 
 
@@ -226,7 +226,7 @@ const Handle(Geom_Surface)&  BRep_CurveRepresentation::Surface()const
 
 const Handle(Geom2d_Curve)&  BRep_CurveRepresentation::PCurve()const 
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-PCurve");
 }
 
 //=======================================================================
@@ -236,7 +236,7 @@ const Handle(Geom2d_Curve)&  BRep_CurveRepresentation::PCurve()const
 
 const Handle(Geom2d_Curve)&  BRep_CurveRepresentation::PCurve2()const 
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-PCurve2");
 }
 
 //=======================================================================
@@ -246,7 +246,7 @@ const Handle(Geom2d_Curve)&  BRep_CurveRepresentation::PCurve2()const
 
 void  BRep_CurveRepresentation::PCurve(const Handle(Geom2d_Curve)&)
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-PCurve");
 }
 
 //=======================================================================
@@ -256,7 +256,7 @@ void  BRep_CurveRepresentation::PCurve(const Handle(Geom2d_Curve)&)
 
 void  BRep_CurveRepresentation::PCurve2(const Handle(Geom2d_Curve)&)
 {
-  throw Standard_DomainError("BRep_CurveRepresentation");
+  throw Standard_DomainError("BRep_CurveRepresentation-PCurve2");
 }
 
 

@@ -39,8 +39,10 @@
 #include <IntTools_Range.hxx>
 #include <IntTools_Tools.hxx>
 #include <Precision.hxx>
-
 #include <algorithm>
+//time consuming
+#include <chrono>
+#include "../BOPAlgo/DataRecordSingleton.h"
 static
   Standard_Boolean IsCoplanar (const BRepAdaptor_Curve&  ,
                                const BRepAdaptor_Surface& );

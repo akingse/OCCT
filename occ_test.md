@@ -25,6 +25,8 @@ BRepAlgoAPI_BooleanOperation::Build() //布尔后
 
 ### TopoDS_Shape 数据结构
 
+![image-20241129143355763](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241129143355763.png)
+
 ```C++
 enum TopAbs_ShapeEnum
 {
@@ -49,10 +51,13 @@ class TopoDS_TShape //topological
   Standard_Integer   myFlags;
 
 //BRep
-class BRep_TFace : public TopoDS_TFace
+class BRep_TFace : public TopoDS_TFace //持有多种类型数据
+  Poly_ListOfTriangulation myTriangulations;
+  Handle(Poly_Triangulation) myActiveTriangulation;
   Handle(Geom_Surface) mySurface;
   TopLoc_Location myLocation;
   Standard_Real myTolerance;
+  Standard_Boolean myNaturalRestriction;
 class BRep_TEdge : public TopoDS_TEdge
   Standard_Real myTolerance;
   Standard_Integer myFlags;
@@ -72,11 +77,11 @@ class BRep_TVertex : public TopoDS_TVertex
 
 ### Geom_Geometry 几何数据
 
-
-
-![image-20241128175916864](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128175916864.png)
+![image-20241129135115037](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241129135115037.png)
 
 ![image-20241128180405066](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128180405066.png)
+
+![image-20241128175916864](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128175916864.png)
 
 ```C++
 public Geom_Geometry
@@ -126,7 +131,7 @@ public BRep_CurveRepresentation //包含几何曲线和面上线
     class BRep_CurveOn2Surfaces; //between two surfaces
     class BRep_GCurve ;//Root class for the geometric curves representation 几何曲线
         class BRep_Curve3D; //持有Geom_Curve handle
-        class BRep_CurveOnSurface; //面上线
+        class BRep_CurveOnSurface; //面上线，持有 Geom2d_Curve handle
             class BRep_CurveOnClosedSurface;
     class BRep_Polygon3D;//a 3D polygon
     class BRep_PolygonOnSurface;//2D polygon in the parametric space of a surface
@@ -134,7 +139,13 @@ public BRep_CurveRepresentation //包含几何曲线和面上线
     class BRep_PolygonOnTriangulation ;//an array of nodes on a triangulation.
         class BRep_PolygonOnClosedTriangulation
 
-
+public BRep_PointRepresentation
+    class BRep_PointOnCurve     
+    class BRep_PointsOnSurface 
+        class BRep_PointOnSurface
+        class BRep_PointOnCurveOnSurface
+            
+public BRep_SurfaceRepresentation  //not exist
 ```
 
 
@@ -179,4 +190,24 @@ class BRepPrimAPI_MakeSweep
 ```
 
 
+
+```
+圆台测试
+	topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
+
+```
+
+
+
+### BRep_CurveOnSurface
+
+```
+用于表示在某个表面上定义的曲线
+  Handle(Geom2d_Curve) myPCurve;
+  Handle(Geom_Surface) mySurface;
+myUV1 是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的起始参数坐标（U、V）。这通常用于定义曲线在表面上的起点位置。
+myUV2 同样是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的结束参数坐标（U、V）。这用于定义曲线在表面上的终点位置。
+
+
+```
 
