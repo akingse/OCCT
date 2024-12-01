@@ -113,6 +113,22 @@ protected:
 		myAISContext->SetSelected(anIOShape, Standard_False);
 		Fit();
 	}
+    afx_msg inline void oneAxisDisplay(const TopoDS_Shape& shape, int color = -1, int material = -1)
+	{
+        if (color == -1)
+			color = rand() % (508 + 1);
+		if (material == -1)
+			material = rand() % (25 + 1);
+		//交互式可视化系统（AIS，Application Interactive Service）
+		Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+		myAISContext->Display(aisShape, Standard_False);
+		const Handle(AIS_InteractiveObject)& anIOShape = aisShape;
+		myAISContext->SetSelected(anIOShape, Standard_False);
+		Fit();
+	}
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

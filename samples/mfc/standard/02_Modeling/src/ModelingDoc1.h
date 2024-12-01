@@ -161,6 +161,7 @@ namespace test
 			}
 		}
 
+		//从中获取指定类型的TopoDS_Shape
 		std::vector<TopoDS_Shape> getShapeVct(TopAbs_ShapeEnum topoType) const
 		{
 			std::vector<TopoDS_Shape> shapeRes;

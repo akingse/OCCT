@@ -71,38 +71,22 @@ void writeShapeDataToTxt()
 }
 
 //两个共面立方体-布尔Fuse
-static TopoDS_Shape getBooleanTest_01()
+static CsgTree getBooleanTest_01()
 {
 	TopoDS_Shape theBox1 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
 	//TopoDS_Shape theBox2 = BRepPrimAPI_MakeBox(10, 10, 10).Shape();
 	gp_Trsf trsf;
 	trsf.SetTranslation(gp_Vec(5, 5, 0));
 	BRepBuilderAPI_Transform theBox2(theBox1, trsf);
-	//Handle(AIS_Shape) ais2 = new AIS_Shape(myBRepTransformation);
-
-	TopoDS_Shape ShapeFuse = BRepAlgoAPI_Fuse(theBox1, theBox2); //共面布尔后合并
-	//遍历数据，只获取数目
-	TopTools_IndexedMapOfShape M_edge;
-	TopTools_IndexedMapOfShape M_face;
-	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_EDGE, M_edge);
-	TopExp::MapShapes(ShapeFuse, TopAbs_ShapeEnum::TopAbs_FACE, M_face);
-
-	return ShapeFuse;
+	CsgTree csgtree = CsgTree(theBox1, theBox2, BOPAlgo_Operation::BOPAlgo_FUSE);
+	return csgtree;
 }
 
-static TopoDS_Shape getBooleanTest_02()
+//创建拉伸体
+static CsgTree getBooleanTest_02()
 {
-	//创建拉伸体
-	//Handle(Geom_BSplineCurve) bsplineCurve = CreateBSplineCurve();
-	//CreateExtrudedShape
-	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
-	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
-	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
-	TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1, E2, E3);
-	gp_Vec direction(0, 0, 5); // 沿 Z 轴拉伸 5 个单位
-	TopoDS_Shape extrudedShape = BRepPrimAPI_MakePrism(W, direction);
-
-	return extrudedShape;
+	CsgTree csgtree;
+	return csgtree;
 }
 
 //OCCT布尔BUG-Torus Cut Cone
@@ -129,7 +113,6 @@ static CsgTree getBooleanTest_03()
 	csgtree.checkTopology();
 	//writeTimeDataToCsv();
 	//writeShapeDataToTxt();
-
 	//CsgTree::TraverseShape(theShapeA);
 	//CsgTree::TraverseShape(theShapeB);
 	//CsgTree::TraverseShape(csgtree.getResult());
@@ -240,19 +223,57 @@ static std::vector<TopoDS_Shape> getShapeCreate_01()
 {
 	std::vector<TopoDS_Shape> shapeRes;
 	//copy from OnPrism
+	//点-线
 	TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200., -200., 0.));
 	TopoDS_Shape S1 = BRepPrimAPI_MakePrism(V1, gp_Vec(0., 0., 100.));
+	//线-面
 	TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-150., -150, 0.), gp_Pnt(-50., -50, 0.));
 	TopoDS_Shape S2 = BRepPrimAPI_MakePrism(E, gp_Vec(0., 0., 100.));
-	//wire
+	//wire-face
+	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
+	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
+	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
+	TopoDS_Wire Wire = BRepBuilderAPI_MakeWire(E1, E2, E3);
+	TopoDS_Face Face = BRepBuilderAPI_MakeFace(Wire);
+	TopoDS_Shape Prism1 = BRepPrimAPI_MakePrism(Wire, gp_Vec(0., 0., 100.)); //拉伸面
+	TopoDS_Shape Prism2 = BRepPrimAPI_MakePrism(Face, gp_Vec(0., 0., 100.)); //拉伸实体
+	//shapeRes = { Prism2 };
+
+	return shapeRes;
+}
+
+static std::vector<TopoDS_Shape> getShapeCreate_02()
+{
+	std::vector<TopoDS_Shape> shapeRes;
+	//copy from OnRevol
+	TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200., -200., 0.));
+	gp_Ax1 axe = gp_Ax1(gp_Pnt(-170., -170., 0.), gp_Dir(0., 0., 1.));
+	Handle(Geom_Axis1Placement) Gax1 = new Geom_Axis1Placement(axe);
+	TopoDS_Shape S1 = BRepPrimAPI_MakeRevol(V1, axe);
+
+	TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-120., -120, 0.), gp_Pnt(-120., -120, 100.));
+	/*gp_Ax1*/ axe = gp_Ax1(gp_Pnt(-100., -100., 0.), gp_Dir(0., 0., 1.));
+	Handle(Geom_Axis1Placement) Gax2 = new Geom_Axis1Placement(axe);
+	TopoDS_Shape S2 = BRepPrimAPI_MakeRevol(E, axe);
+
+	//MakeRevol
 	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0., 0., 0.), gp_Pnt(50., 0., 0.));
 	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
 	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
 	TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1, E2, E3);
-	TopoDS_Shape S3 = BRepPrimAPI_MakePrism(W, gp_Vec(0., 0., 100.));
-	
-	
-	//copy from OnRevol
+	axe = gp_Ax1(gp_Pnt(0., 0., 30.), gp_Dir(0., 1., 0.));
+	Handle(Geom_Axis1Placement) Gax3 = new Geom_Axis1Placement(axe);
+	TopoDS_Shape S3 = BRepPrimAPI_MakeRevol(W, axe, 210. * M_PI / 180);
+
+	gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(200., 200., 0.), gp_Dir(0., 0., 1.)), 80.);
+	TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c);
+	TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec);
+	TopoDS_Face F = BRepBuilderAPI_MakeFace(gp_Pln(gp::XOY()), Wc);
+	axe = gp_Ax1(gp_Pnt(290, 290., 0.), gp_Dir(0., 1, 0.));
+	Handle(Geom_Axis1Placement) Gax4 = new Geom_Axis1Placement(axe);
+	TopoDS_Shape S4 = BRepPrimAPI_MakeRevol(F, axe, 90. * M_PI / 180);
+
+	shapeRes = { S1,S2,S3,S4 };
 
 	return shapeRes;
 }
@@ -260,7 +281,7 @@ static std::vector<TopoDS_Shape> getShapeCreate_01()
 //验证布尔
 void CModelingDoc::OnTestBoolBefore() //using icon -
 {
-	g_csgtree = getBooleanTest_07();
+	g_csgtree = getBooleanTest_01();
 	clearDisplay();
 	const std::vector<TopoDS_Shape>& shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
@@ -283,7 +304,9 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 {
 	clearDisplay();
 	g_topoInfo = getTopoInfoTest_01();
-	std::vector<TopoDS_Shape> shapeVct = g_topoInfo.getShapeVct(TopAbs_ShapeEnum::TopAbs_FACE);
+	//std::vector<TopoDS_Shape> shapeVct = g_topoInfo.getShapeVct(TopAbs_ShapeEnum::TopAbs_FACE);
+	//std::vector<TopoDS_Shape> shapeVct = getShapeCreate_01();
+	std::vector<TopoDS_Shape> shapeVct = getShapeCreate_02();
 
 	for (int i = 0; i < shapeVct.size(); i++)
 	{

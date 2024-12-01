@@ -16,6 +16,7 @@
 
 #ifdef USING_BIMBASE_SLN
 #include "commonOCCUtility.h"
+//move to occt.sln
 using namespace occ;
 #endif
 using namespace std;

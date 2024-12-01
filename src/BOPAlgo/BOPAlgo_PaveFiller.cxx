@@ -245,9 +245,6 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 {
   try {
     OCC_CATCH_SIGNALS
-  //if (test::DataRecordSingleton::getInstance().isOpen())
-  //    PerformInternal1_WithInfo(theFiller, theRange);
-  //else
       PerformInternal (theRange);
   }
   //
@@ -543,6 +540,8 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   if (HasErrors()) {
     return;
   }
+  TopoDS_Shape resultShape = myDS->Shape(0);
+
   }
 }
 //#endif// USING_OPENCASCADE_TEST
