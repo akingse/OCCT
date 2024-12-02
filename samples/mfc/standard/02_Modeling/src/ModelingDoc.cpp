@@ -54,9 +54,9 @@ BEGIN_MESSAGE_MAP(CModelingDoc, OCC_3dBaseDoc)
 	ON_COMMAND(ID_CUT, OnTestBoolBefore) //change the button
 	ON_COMMAND(ID_FUSE, OnTestBoolAfter)
 	ON_COMMAND(ID_COMMON, OnTestBoolDetail)
-	ON_COMMAND(ID_SECTION, OnTestBoolExtra)
-	//ON_COMMAND(ID_SECTION, OnSection)
 	//ON_COMMAND(ID_COMMON, OnCommon)
+	ON_COMMAND(ID_SECTION, OnSection)
+	//ON_COMMAND(ID_SECTION, OnTestBoolExtra)
 	ON_COMMAND(ID_PSECTION, OnPsection)
 	ON_COMMAND(ID_BLEND, OnBlend)
 	ON_COMMAND(ID_CHAMF, OnChamf)
@@ -128,13 +128,13 @@ void CModelingDoc::OnMirror()
 	myAISContext->Display(ais2,Standard_False);
 	Fit();
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_Trsf theTransformation; \n\
-gp_Pnt PntCenterOfTheTransformation(110,60,60); \n\
-theTransformation.SetMirror(PntCenterOfTheTransformation);\n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Pnt PntCenterOfTheTransformation(110,60,60); \n\
+	theTransformation.SetMirror(PntCenterOfTheTransformation);\n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 	PocessTextInDialog("Transform a Shape with Mirror and One point.", Message);
 	
 }
@@ -167,18 +167,17 @@ void CModelingDoc::OnMirroraxis()
 	Fit();
 
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_Trsf theTransformation; \n\
-gp_Ax1 Axis = gp_Ax1(gp_Pnt(110,60,60),gp_Dir(0.,1.,0.)); \n\
-theTransformation.SetMirror(Axis);\n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Ax1 Axis = gp_Ax1(gp_Pnt(110,60,60),gp_Dir(0.,1.,0.)); \n\
+	theTransformation.SetMirror(Axis);\n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 
 	PocessTextInDialog("Transform a Shape with Mirror and One axis.", Message);
 
 }
-
 
 void CModelingDoc::OnRotate() 
 {
@@ -208,13 +207,13 @@ void CModelingDoc::OnRotate()
 	Fit();
 
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_Trsf theTransformation; \n\
-gp_Ax1 Axis = gp_Ax1(gp_Pnt(200,60,60),gp_Dir(0.,1.,0.)); \n\
-theTransformation.SetRotation(Axis,30*PI/180); // Rotation of 30 degrees \n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Ax1 Axis = gp_Ax1(gp_Pnt(200,60,60),gp_Dir(0.,1.,0.)); \n\
+	theTransformation.SetRotation(Axis,30*PI/180); // Rotation of 30 degrees \n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 
 	PocessTextInDialog("Transform a Shape with Rotation.", Message);
 	
@@ -249,20 +248,16 @@ void CModelingDoc::OnScale()
 	Fit();
 
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_Trsf theTransformation; \n\
-gp_Pnt theCenterOfScale(200,60,60); \n\
-theTransformation.SetScale(theCenterOfScale,0.5); // Scale : value = 0.5 \n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Pnt theCenterOfScale(200,60,60); \n\
+	theTransformation.SetScale(theCenterOfScale,0.5); // Scale : value = 0.5 \n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 
 	PocessTextInDialog("Scale a Shape with One point.", Message);
-	
-
 }
-
-
 
 void CModelingDoc::OnTranslation() 
 {
@@ -295,19 +290,18 @@ void CModelingDoc::OnTranslation()
 	Fit();
 
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(6.,10.,8.,2.); \n\
-gp_Trsf theTransformation; \n\
-gp_Vec theVectorOfTranslation(6,6,6); \n\
-theTransformation.SetTranslation(theVectorOfTranslation); \n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(6.,10.,8.,2.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Vec theVectorOfTranslation(6,6,6); \n\
+	theTransformation.SetTranslation(theVectorOfTranslation); \n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 
 	PocessTextInDialog("Translate a Shape with One vector.", Message);
-	
 }
 
-void CModelingDoc::OnDisplacement() 
+void CModelingDoc::OnDisplacement() //SetDisplacement矩阵变换
 {
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
@@ -320,12 +314,12 @@ void CModelingDoc::OnDisplacement()
 	myAISContext->SetColor(ais1,Quantity_NOC_GREEN,Standard_False); 
 	myAISContext->SetMaterial(ais1,Graphic3d_NOM_PLASTIC,Standard_False);   
 	myAISContext->Display(ais1,Standard_False);
-	gp_Trsf theTransformation;
 
+	gp_Trsf theTransformation;
 	gp_Ax3 ax3_1(gp_Pnt(0,0,0),gp_Dir(0,0,1));
 	gp_Ax3 ax3_2(gp_Pnt(60,60,60),gp_Dir(1,1,1));
-
 	theTransformation.SetDisplacement(ax3_1,ax3_2);
+
 	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);
 	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();
 	Handle(AIS_Shape) ais2 = new AIS_Shape(TransformedShape);
@@ -334,22 +328,19 @@ void CModelingDoc::OnDisplacement()
 	myAISContext->Display(ais2,Standard_False);
 	Fit();
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_Trsf theTransformation; \n\
-gp_Ax3 ax3_1(gp_Pnt(0,0,0),gp_Dir(0,0,1)); \n\
-gp_Ax3 ax3_2(gp_Pnt(60,60,60),gp_Dir(1,1,1)); \n\
-theTransformation.SetDisplacement(ax3_1,ax3_2); \n\
-BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_Trsf theTransformation; \n\
+	gp_Ax3 ax3_1(gp_Pnt(0,0,0),gp_Dir(0,0,1)); \n\
+	gp_Ax3 ax3_2(gp_Pnt(60,60,60),gp_Dir(1,1,1)); \n\
+	theTransformation.SetDisplacement(ax3_1,ax3_2); \n\
+	BRepBuilderAPI_Transform myBRepTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepTransformation.Shape();	\n");
 
 	PocessTextInDialog("Displace a Shape with Two coordinate systems.", Message);
-	
-	
 }
 
-
-void CModelingDoc::OnDeform() 
+void CModelingDoc::OnDeform() // gp_GTrsf变形
 {
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
@@ -377,14 +368,14 @@ void CModelingDoc::OnDeform()
 	myAISContext->Display(ais2,Standard_False);
 	Fit();
     TCollection_AsciiString Message ("\
-\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
-gp_GTrsf theTransformation; \n\
-gp_Mat rot(1, 0, 0, 0, 0.5, 0, 0, 0, 1.5); // scaling : 100% on X ; 50% on Y ; 150% on Z . \n\
-theTransformation.SetVectorialPart(rot); \n\
-theTransformation.SetTranslationPart(gp_XYZ(5,5,5)); \n\
-BRepBuilderAPI_GTransform myBRepGTransformation(S,theTransformation);\n\
-TopoDS_Shape TransformedShape = myBRepGTransformation.Shape();	\n");
+	\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeWedge(60.,100.,80.,20.); \n\
+	gp_GTrsf theTransformation; \n\
+	gp_Mat rot(1, 0, 0, 0, 0.5, 0, 0, 0, 1.5); // scaling : 100% on X ; 50% on Y ; 150% on Z . \n\
+	theTransformation.SetVectorialPart(rot); \n\
+	theTransformation.SetTranslationPart(gp_XYZ(5,5,5)); \n\
+	BRepBuilderAPI_GTransform myBRepGTransformation(S,theTransformation);\n\
+	TopoDS_Shape TransformedShape = myBRepGTransformation.Shape();	\n");
 
 	PocessTextInDialog("Deform a Shape with One matrix of deformation and One translation.", Message);
 }
@@ -402,7 +393,7 @@ void CModelingDoc::OnBox()
 	for(aListIterator.Initialize(aList);aListIterator.More();aListIterator.Next()){
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
-  TopoDS_Shape B1 = BRepPrimAPI_MakeBox(200., 150., 100.).Shape();
+	TopoDS_Shape B1 = BRepPrimAPI_MakeBox(200., 150., 100.).Shape();
 	Handle(AIS_Shape) aBox1 = new AIS_Shape(B1);
 	myAISContext->SetMaterial(aBox1,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->SetColor(aBox1,Quantity_NOC_GREEN,Standard_False); 
@@ -417,11 +408,12 @@ void CModelingDoc::OnBox()
 	Fit();
     TCollection_AsciiString Message ("\
 		\n\
-TopoDS_Shape B1 = BRepPrimAPI_MakeBox (200.,150.,100.); \n\
-TopoDS_Shape B2 = BRepPrimAPI_MakeBox (gp_Ax2(gp_Pnt(-200.,-80.,-70.), \n\
+	TopoDS_Shape B1 = BRepPrimAPI_MakeBox (200.,150.,100.); \n\
+	TopoDS_Shape B2 = BRepPrimAPI_MakeBox (gp_Ax2(gp_Pnt(-200.,-80.,-70.), \n\
                                           gp_Dir(1.,2.,1.)), \n\
                                    80.,90.,120.); \n\
 		\n");
+	coordinateSystemDisplay(150);
 	PocessTextInDialog("Make a topological box", Message);
 }
 
@@ -434,7 +426,7 @@ void CModelingDoc::OnCylinder()
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
 
-  TopoDS_Shape C1 = BRepPrimAPI_MakeCylinder(50., 200.).Shape();
+	TopoDS_Shape C1 = BRepPrimAPI_MakeCylinder(50., 200.).Shape();
 	Handle(AIS_Shape) aCyl1 = new AIS_Shape(C1);
 	myAISContext->SetMaterial(aCyl1,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->SetColor(aCyl1,Quantity_NOC_RED,Standard_False); 
@@ -504,33 +496,34 @@ void CModelingDoc::OnSphere()
 	myAISContext->SetColor(ais1,Quantity_NOC_AZURE,Standard_False); 
 	myAISContext->SetMaterial(ais1,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais1,Standard_False);
+
   TopoDS_Shape S2 = BRepPrimAPI_MakeSphere(100., 120.*M_PI / 180).Shape();
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S2);
 	myAISContext->SetColor(ais2,Quantity_NOC_GREEN,Standard_False); 
 	myAISContext->SetMaterial(ais2,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais2,Standard_False);
-	TopoDS_Shape S3 = BRepPrimAPI_MakeSphere(gp_Pnt(200.,250.,0.),100.,
-                                           -60.*M_PI / 180, 60.*M_PI / 180).Shape();
+
+    TopoDS_Shape S3 = BRepPrimAPI_MakeSphere(gp_Pnt(200., 250., 0.), 100., -60. * M_PI / 180, 60. * M_PI / 180).Shape();
 	Handle(AIS_Shape) ais3 = new AIS_Shape(S3);
 	myAISContext->SetColor(ais3,Quantity_NOC_RED,Standard_False); 
 	myAISContext->SetMaterial(ais3,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais3,Standard_False);
-	TopoDS_Shape S4 = BRepPrimAPI_MakeSphere(gp_Pnt(0.,0.,-300.),150.,
-                                           -45.*M_PI / 180, 45.*M_PI / 180, 45.*M_PI / 180).Shape();
+
+    TopoDS_Shape S4 = BRepPrimAPI_MakeSphere(gp_Pnt(400., 500., 0.), 150., -45. * M_PI / 180, 45. * M_PI / 180, 45. * M_PI / 180).Shape();
 	Handle(AIS_Shape) ais4 = new AIS_Shape(S4);
-	myAISContext->SetColor(ais4,Quantity_NOC_MATRABLUE,Standard_False); 
+	myAISContext->SetColor(ais4,Quantity_NOC_BLUE,Standard_False); 
 	myAISContext->SetMaterial(ais4,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais4,Standard_False);
 	Fit();
 
     TCollection_AsciiString Message ("\
 		\n\
-TopoDS_Shape S1 = BRepPrimAPI_MakeSphere(gp_Pnt(-200.,-250.,0.),80.); \n\
-TopoDS_Shape S2 = BRepPrimAPI_MakeSphere(100.,120.*PI180); \n\
-TopoDS_Shape S3 = BRepPrimAPI_MakeSphere(gp_Pnt(200.,250.,0.),100., \n\
-                                     -60.*PI180, 60.*PI180); \n\
-TopoDS_Shape S4 = BRepPrimAPI_MakeSphere(gp_Pnt(0.,0.,-300.),150., \n\
-                                     -45.*PI180, 45.*PI180, 45.*PI180); \n\
+	TopoDS_Shape S1 = BRepPrimAPI_MakeSphere(gp_Pnt(-200.,-250.,0.),80.); \n\
+	TopoDS_Shape S2 = BRepPrimAPI_MakeSphere(100.,120.*PI180); \n\
+	TopoDS_Shape S3 = BRepPrimAPI_MakeSphere(gp_Pnt(200.,250.,0.),100., \n\
+										 -60.*PI180, 60.*PI180); \n\
+	TopoDS_Shape S4 = BRepPrimAPI_MakeSphere(gp_Pnt(0.,0.,-300.),150., \n\
+										 -45.*PI180, 45.*PI180, 45.*PI180); \n\
 		\n");
 	PocessTextInDialog("Make a sphere", Message);
 }
@@ -549,27 +542,29 @@ void CModelingDoc::OnTorus()
 	myAISContext->SetColor(ais1,Quantity_NOC_AZURE,Standard_False); 
 	myAISContext->SetMaterial(ais1,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais1,Standard_False);
+
 	TopoDS_Shape S2 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(1.,1.,1.)),
                                           50., 20., 210.*M_PI / 180).Shape();
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S2);
 	myAISContext->SetColor(ais2,Quantity_NOC_GREEN,Standard_False); 
 	myAISContext->SetMaterial(ais2,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais2,Standard_False);
+	//设定很奇怪
 	TopoDS_Shape S3 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(-200.,-150.,-100),gp_Dir(0.,1.,0.)),
                                           60., 20., -45.*M_PI / 180, 45.*M_PI / 180, 90.*M_PI / 180).Shape();
 	Handle(AIS_Shape) ais3= new AIS_Shape(S3);
-	myAISContext->SetColor(ais3,Quantity_NOC_CORAL,Standard_False); 
+	myAISContext->SetColor(ais3,Quantity_NOC_CORAL,Standard_False); //coral 珊瑚色
 	myAISContext->SetMaterial(ais3,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais3,Standard_False);
 	Fit();
 
     TCollection_AsciiString Message ("\
 		\n\
-TopoDS_Shape S1 = BRepPrimAPI_MakeTorus(60.,20.); \n\
-TopoDS_Shape S2 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(1.,1.,1.)), \n\
-                                    50.,20.,210.*PI180); \n\
-TopoDS_Shape S3 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(-200.,-150.,-100),gp_Dir(0.,1.,0.)), \n\
-                                    60.,20.,-45.*PI180,45.*PI180,90.*PI180); \n\
+	TopoDS_Shape S1 = BRepPrimAPI_MakeTorus(60.,20.); \n\
+	TopoDS_Shape S2 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(1.,1.,1.)), \n\
+										50.,20.,210.*PI180); \n\
+	TopoDS_Shape S3 = BRepPrimAPI_MakeTorus(gp_Ax2(gp_Pnt(-200.,-150.,-100),gp_Dir(0.,1.,0.)), \n\
+										60.,20.,-45.*PI180,45.*PI180,90.*PI180); \n\
 		\n");
 	PocessTextInDialog("Make a torus", Message);
 }
@@ -583,11 +578,12 @@ void CModelingDoc::OnWedge()
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
 
-  TopoDS_Shape S1 = BRepPrimAPI_MakeWedge(60., 100., 80., 20.).Shape();
+    TopoDS_Shape S1 = BRepPrimAPI_MakeWedge(60., 100., 80., 20.).Shape();
 	Handle(AIS_Shape) ais1 = new AIS_Shape(S1);
 	myAISContext->SetColor(ais1,Quantity_NOC_AZURE,Standard_False); 
 	myAISContext->SetMaterial(ais1,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais1,Standard_False);
+
 	TopoDS_Shape S2 = BRepPrimAPI_MakeWedge(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(0.,0.,1.)),
                                           60., 50., 80., 25., -10., 40., 70.).Shape();
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S2);
@@ -598,9 +594,9 @@ void CModelingDoc::OnWedge()
 
     TCollection_AsciiString Message ("\
 		\n\
-TopoDS_Shape S1 = BRepPrimAPI_MakeWedge(60.,100.,80.,20.); \n\
-TopoDS_Shape S2 = BRepPrimAPI_MakeWedge(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(0.,0.,1.)), \n\
-                                    60.,50.,80.,25.,-10.,40.,70.); \n\
+	TopoDS_Shape S1 = BRepPrimAPI_MakeWedge(60.,100.,80.,20.); \n\
+	TopoDS_Shape S2 = BRepPrimAPI_MakeWedge(gp_Ax2(gp_Pnt(100.,100.,0.),gp_Dir(0.,0.,1.)), \n\
+										60.,50.,80.,25.,-10.,40.,70.); \n\
 		\n");
 	PocessTextInDialog("Make a wedge", Message);
 }
@@ -613,7 +609,7 @@ void CModelingDoc::OnPrism()
 	for(aListIterator.Initialize(aList);aListIterator.More();aListIterator.Next()){
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
-
+	//--- Prism a vertex -> result is an edge ---
 	TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200.,-200.,0.));
 	Handle(AIS_Shape) ais1 = new AIS_Shape(V1);
 	myAISContext->Display(ais1,Standard_False);
@@ -621,6 +617,7 @@ void CModelingDoc::OnPrism()
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S1);
 	myAISContext->Display(ais2,Standard_False);
 
+	//--- Prism an edge -> result is a face --- 
 	TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-150.,-150,0.), gp_Pnt(-50.,-50,0.));
 	Handle(AIS_Shape) ais3 = new AIS_Shape(E);
 	myAISContext->Display(ais3,Standard_False);
@@ -630,6 +627,7 @@ void CModelingDoc::OnPrism()
 	myAISContext->SetMaterial(ais4,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais4,Standard_False);
 
+	//--- Prism an wire -> result is a shell --- 
 	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0.,0.,0.), gp_Pnt(50.,0.,0.));
 	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,0.,0.), gp_Pnt(50.,50.,0.));
 	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,50.,0.), gp_Pnt(0.,0.,0.));
@@ -642,6 +640,7 @@ void CModelingDoc::OnPrism()
 	myAISContext->SetMaterial(ais6,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais6,Standard_False);
 
+	//--- Prism a face or a shell -> result is a solid --- 
 	gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(200.,200.,0.),gp_Dir(0.,0.,1.)), 80.);
 	TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c);
 	TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec);
@@ -655,34 +654,7 @@ void CModelingDoc::OnPrism()
 	myAISContext->Display(ais8,Standard_False);
 	Fit();
 
-    TCollection_AsciiString Message ("\
-		\n\
---- Prism a vertex -> result is an edge --- \n\
-\n\
-TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200.,-200.,0.)); \n\
-TopoDS_Shape S1 = BRepBuilderAPI_MakePrism(V1,gp_Vec(0.,0.,100.)); \n\
-\n\
---- Prism an edge -> result is a face --- \n\
-\n\
-TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-150.,-150,0.), gp_Pnt(-50.,-50,0.)); \n\
-TopoDS_Shape S2 = BRepPrimAPI_MakePrism(E,gp_Vec(0.,0.,100.)); \n\
-\n\
---- Prism an wire -> result is a shell --- \n\
-\n\
-TopoDS_Edge E1 = BREpBuilderAPI_MakeEdge(gp_Pnt(0.,0.,0.), gp_Pnt(50.,0.,0.)); \n\
-TopoDS_Edge E2 = BREpBuilderAPI_MakeEdge(gp_Pnt(50.,0.,0.), gp_Pnt(50.,50.,0.)); \n\
-TopoDS_Edge E3 = BREpBuilderAPI_MakeEdge(gp_Pnt(50.,50.,0.), gp_Pnt(0.,0.,0.)); \n\
-TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1,E2,E3); \n\
-TopoDS_Shape S3 = BRepPrimAPI_MakePrism(W,gp_Vec(0.,0.,100.)); \n\
-\n\
---- Prism a face or a shell -> result is a solid --- \n\
-\n\
-gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(200.,200.,0.gp_Dir(0.,0.,1.)), 80.); \n\
-TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c); \n\
-TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec); \n\
-TopoDS_Face F = BRepBuilderAPI_MakeFace(gp::XOY(),Wc); \n\
-TopoDS_Shape S4 = BRepBuilderAPI_MakePrism(F,gp_Vec(0.,0.,100.)); \n\
-		\n");
+	TCollection_AsciiString Message;
 	PocessTextInDialog("Make a prism", Message);
 }
 
@@ -695,6 +667,7 @@ void CModelingDoc::OnRevol()
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
 
+	//--- Revol of a vertex -> result is an edge --- //额外绘制旋转轴 Geom_Axis1
 	TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200.,-200.,0.));
 	Handle(AIS_Shape) ais1 = new AIS_Shape(V1);
 	myAISContext->Display(ais1,Standard_False);
@@ -705,7 +678,8 @@ void CModelingDoc::OnRevol()
 	TopoDS_Shape S1 = BRepPrimAPI_MakeRevol(V1,axe);
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S1);
 	myAISContext->Display(ais2,Standard_False);
-
+	
+	//--- Revol of an edge -> result is a face --- 
 	TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-120.,-120,0.), gp_Pnt(-120.,-120,100.));
 	Handle(AIS_Shape) ais3 = new AIS_Shape(E);
 	myAISContext->Display(ais3,Standard_False);
@@ -719,6 +693,7 @@ void CModelingDoc::OnRevol()
 	myAISContext->SetMaterial(ais4,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais4,Standard_False);
 
+	//--- Revol of a wire -> result is a shell ---
 	TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0.,0.,0.), gp_Pnt(50.,0.,0.));
 	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,0.,0.), gp_Pnt(50.,50.,0.));
 	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,50.,0.), gp_Pnt(0.,0.,0.));
@@ -735,6 +710,7 @@ void CModelingDoc::OnRevol()
 	myAISContext->SetMaterial(ais6,Graphic3d_NOM_PLASTIC,Standard_False);    
 	myAISContext->Display(ais6,Standard_False);
 
+	//--- Revol of a face -> result is a solid ---
 	gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(200.,200.,0.),gp_Dir(0.,0.,1.)), 80.);
 	TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c);
 	TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec);
@@ -750,39 +726,8 @@ void CModelingDoc::OnRevol()
 	myAISContext->Display(ais8,Standard_False);
 	Fit();
 
-	TCollection_AsciiString Message ("\
-		\n\
---- Revol of a vertex -> result is an edge --- \n\
-\n\
-TopoDS_Vertex V1 = BRepBuilderAPI_MakeVertex(gp_Pnt(-200.,-200.,0.)); \n\
-gp_Ax1 axe = gp_Ax1(gp_Pnt(-170.,-170.,0.),gp_Dir(0.,0.,1.)); \n\
-TopoDS_Shape S1 = BRepPrimAPI_MakeRevol(V1,axe); \n\
-\n\
---- Revol of an edge -> result is a face --- \n\
-\n\
-TopoDS_Edge E = BRepBuilderAPI_MakeEdge(gp_Pnt(-120.,-120,0.), gp_Pnt(-120.,-120,100.)); \n\
-axe = gp_Ax1(gp_Pnt(-100.,-100.,0.),gp_Dir(0.,0.,1.)); \n\
-TopoDS_Shape S2 = BRepPrimAPI_MakeRevol(E,axe); \n\
-\n\
---- Revol of a wire -> result is a shell --- \n\
-\n\
-TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0.,0.,0.), gp_Pnt(50.,0.,0.)); \n\
-TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,0.,0.), gp_Pnt(50.,50.,0.)); \n\
-TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50.,50.,0.), gp_Pnt(0.,0.,0.)); \n\
-TopoDS_Wire W = BRepBuilderAPI_MakeWire(E1,E2,E3); \n\
-axe = gp_Ax1(gp_Pnt(0.,0.,30.),gp_Dir(0.,1.,0.)); \n\
-TopoDS_Shape S3 = BRepPrimAPI_MakeRevol(W,axe, 210.*PI180); \n\
-\n\
---- Revol of a face -> result is a solid --- \n\
-\n\
-gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(200.,200.,0.),gp_Dir(0.,0.,1.)), 80.); \n\
-TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c); \n\
-TopoDS_Wire Wc = BRepBuilderPI_MakeWire(Ec); \n\
-TopoDS_Face F = BRepBuilderAPI_MakeFace(gp_Pln(gp::XOY()),Wc); \n\
-axe = gp_Ax1(gp_Pnt(290,290.,0.),gp_Dir(0.,1,0.)); \n\
-TopoDS_Shape S4 = BRepPrimAPI_MakeRevol(F,axe, 90.*PI180); \n\
-		\n");
-  PocessTextInDialog("Make a revol", Message);
+	TCollection_AsciiString Message;
+	PocessTextInDialog("Make a revol", Message);
 }
 
 void CModelingDoc::OnPipe() 
@@ -808,14 +753,17 @@ void CModelingDoc::OnPipe()
 	TopoDS_Wire W = BRepBuilderAPI_MakeWire(E);
 	Handle(AIS_Shape) ais1 = new AIS_Shape(W);
 	myAISContext->Display(ais1,Standard_False);
-	Fit();
-	Sleep(500);
+
 	gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(0.,0.,0.),gp_Dir(0.,1.,0.)),10.);
 	TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c);
 	TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec);
+	TopoDS_Face F = BRepBuilderAPI_MakeFace(gp_Pln(gp::ZOX()),Wc);
 	Handle(AIS_Shape) ais3 = new AIS_Shape(Wc);
 	myAISContext->Display(ais3,Standard_False);
-	TopoDS_Face F = BRepBuilderAPI_MakeFace(gp_Pln(gp::ZOX()),Wc);
+	Fit();
+	Sleep(500);
+
+	//Sweep的一种，使用spine脊线和profile轮廓构建管道
 	TopoDS_Shape S = BRepOffsetAPI_MakePipe(W,F);
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S);
 	myAISContext->SetColor(ais2,Quantity_NOC_MATRABLUE,Standard_False); 
@@ -823,31 +771,11 @@ void CModelingDoc::OnPipe()
 	myAISContext->Display(ais2,Standard_False);
 	Fit();
 
-	TCollection_AsciiString Message ("\
-		\n\
-TColgp_Array1OfPnt CurvePoles(1,6);\n\
-gp_Pnt pt = gp_Pnt(0.,0.,0.);\n\
-CurvePoles(1) = pt;\n\
-pt = gp_Pnt(20.,50.,0.);\n\
-CurvePoles(2) = pt;\n\
-pt = gp_Pnt(60.,100.,0.);\n\
-CurvePoles(3) = pt;\n\
-pt = gp_Pnt(150.,0.,0.);\n\
-CurvePoles(4) = pt;\n\
-Handle(Geom_BezierCurve) curve = new Geom_BezierCurve(CurvePoles);\n\
-TopoDS_Edge E = BRepBuilderAPI_MakeEdge(curve);\n\
-TopoDS_Wire W = BRepBuilderAPI_MakeWire(E);\n\
-gp_Circ c = gp_Circ(gp_Ax2(gp_Pnt(0.,0.,0.),gp_Dir(0.,1.,0.)),10.);\n\
-TopoDS_Edge Ec = BRepBuilderAPI_MakeEdge(c);\n\
-TopoDS_Wire Wc = BRepBuilderAPI_MakeWire(Ec);\n\
-TopoDS_Face F = BRepBuilderAPI_MakeFace(gp_Pln(gp::ZOX()),Wc);\n\
-TopoDS_Shape S = BRepBuilderAPI_MakePipe(W,F);\n\
-		\n");
-  PocessTextInDialog("Make a pipe", Message);
-
+	TCollection_AsciiString Message;
+	PocessTextInDialog("Make a pipe", Message);
 }
 
-void CModelingDoc::OnThru() 
+void CModelingDoc::OnThru() //loftbody //through
 {
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
@@ -876,13 +804,14 @@ void CModelingDoc::OnThru()
 	TopoDS_Wire W4 = BRepBuilderAPI_MakeWire(E4);
 	Handle(AIS_Shape) sec4 = new AIS_Shape(W4);
 	myAISContext->Display(sec4,Standard_False);
-	BRepOffsetAPI_ThruSections generator(Standard_False,Standard_True);
-	generator.AddWire(W1);
-	generator.AddWire(W2);
-	generator.AddWire(W3);
-	generator.AddWire(W4);
-	generator.Build();
-	TopoDS_Shape S1 = generator.Shape();
+	//
+	BRepOffsetAPI_ThruSections generator1(Standard_False,false);
+	generator1.AddWire(W1);
+	generator1.AddWire(W2);
+	generator1.AddWire(W3);
+	generator1.AddWire(W4);
+	generator1.Build();
+	TopoDS_Shape S1 = generator1.Shape();
 	Handle(AIS_Shape) ais1 = new AIS_Shape(S1);
 	myAISContext->SetColor(ais1,Quantity_NOC_MATRABLUE,Standard_False); 
 	myAISContext->SetMaterial(ais1,Graphic3d_NOM_PLASTIC,Standard_False);   
@@ -908,69 +837,21 @@ void CModelingDoc::OnThru()
 	TopoDS_Wire W4b = BRepBuilderAPI_MakeWire(E4b);
 	Handle(AIS_Shape) sec4b = new AIS_Shape(W4b);
 	myAISContext->Display(sec4b,Standard_False);
-	BRepOffsetAPI_ThruSections generatorb(Standard_True,Standard_False);
-	generatorb.AddWire(W1b);
-	generatorb.AddWire(W2b);
-	generatorb.AddWire(W3b);
-	generatorb.AddWire(W4b);
-	generatorb.Build();
-	TopoDS_Shape S2 = generatorb.Shape();
+	BRepOffsetAPI_ThruSections generator2(Standard_True,true);
+	generator2.AddWire(W1b);
+	generator2.AddWire(W2b);
+	generator2.AddWire(W3b);
+	generator2.AddWire(W4b);
+	generator2.Build();
+	TopoDS_Shape S2 = generator2.Shape();
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S2);
 	myAISContext->SetColor(ais2,Quantity_NOC_ALICEBLUE,Standard_False); 
 	myAISContext->SetMaterial(ais2,Graphic3d_NOM_PLASTIC,Standard_False);   
 	myAISContext->Display(ais2,Standard_False);
 	Fit();
 
-	TCollection_AsciiString Message ("\
-		\n\
----------- ruled -------------- \n\
-\n\
-gp_Circ c1 = gp_Circ(gp_Ax2(gp_Pnt(-100.,0.,-100.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(c1);\n\
-TopoDS_Wire W1 = BRepBuilderAPI_MakeWire(E1);\n\
-gp_Circ c2 = gp_Circ(gp_Ax2(gp_Pnt(-10.,0.,-0.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(c2);\n\
-TopoDS_Wire W2 = BRepBuilderAPI_MakeWire(E2);\n\
-gp_Circ c3 = gp_Circ(gp_Ax2(gp_Pnt(-75.,0.,100.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(c3);\n\
-TopoDS_Wire W3 = BRepBuilderAPI_MakeWire(E3);\n\
-gp_Circ c4= gp_Circ(gp_Ax2(gp_Pnt(0.,0.,200.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E4 = BRep>BuilderAPI_MakeEdge(c4);\n\
-TopoDS_Edge E4 = BRepBuilderAPI_MakeEdge(c4);\n\
-TopoDS_Edge E4 = BRepBuilderAPI_MakeEdge(c4);\n\
-TopoDS_Wire W4 = BRepBuilderAPI_MakeWire(E4);\n\
-BRepOffsetAPI_ThruSections generator(Standard_False,Standard_True);\n\
-generator.AddWire(W1);\n\
-generator.AddWire(W2);\n\
-generator.AddWire(W3);\n\
-generator.AddWire(W4);\n\
-generator.Build();\n\
-TopoDS_Shape S1 = generator.Shape();\n\
-\n\
----------- smooth -------------- \n\
-\n\
-gp_Circ c1b = gp_Circ(gp_Ax2(gp_Pnt(100.,0.,-100.),gp_Dir(0.,0.,1.)),40.); \n\
-TopoDS_Edge E1b = BRepBuilderAPI_MakeEdge(c1b); \n\
-TopoDS_Wire W1b = BRepBuilderAPI_MakeWire(E1b); \n\
-gp_Circ c2b = gp_Circ(gp_Ax2(gp_Pnt(210.,0.,-0.),gp_Dir(0.,0.,1.)),40.); \n\
-TopoDS_Edge E2b = BRepBuilderAPI_MakeEdge(c2b);\n\
-TopoDS_Wire W2b = BRepBuilderAPI_MakeWire(E2b); \n\
-gp_Circ c3b = gp_Circ(gp_Ax2(gp_Pnt(275.,0.,100.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E3b = BRepBuilderAPI_MakeEdge(c3b);\n\
-TopoDS_Wire W3b = BRepBuilderAPI_MakeWire(E3b);\n\
-gp_Circ c4b= gp_Circ(gp_Ax2(gp_Pnt(200.,0.,200.),gp_Dir(0.,0.,1.)),40.);\n\
-TopoDS_Edge E4b = BRepBuilderAPI_MakeEdge(c4b);\n\
-TopoDS_Wire W4b = BRepBuilderAPI_MakeWire(E4b);\n\
-BRepOffsetAPI_ThruSections generatorb(Standard_True,Standard_False);\n\
-generatorb.AddWire(W1b);\n\
-generatorb.AddWire(W2b);\n\
-generatorb.AddWire(W3b);\n\
-generatorb.AddWire(W4b);\n\
-generatorb.Build();\n\
-TopoDS_Shape S2 = generatorb.Shape();\n\
-		\n");
-  PocessTextInDialog("Make a Thru sections", Message);
-
+	TCollection_AsciiString Message;
+	PocessTextInDialog("Make a Thru sections", Message);
 }
 
 void CModelingDoc::OnEvolved() 
@@ -988,19 +869,18 @@ void CModelingDoc::OnEvolved()
 	P.Add(gp_Pnt(200.,200.,0.));
 	P.Add(gp_Pnt(0.,200.,0.));
 	P.Add(gp_Pnt(0.,0.,0.));
-	TopoDS_Wire W = P.Wire();
+	TopoDS_Wire Spine = P.Wire();
 	
-	Handle(AIS_Shape) ais1 = new AIS_Shape(W);
+	Handle(AIS_Shape) ais1 = new AIS_Shape(Spine);
 	myAISContext->Display(ais1,Standard_False);
 	
-	TopoDS_Wire wprof = BRepBuilderAPI_MakePolygon(gp_Pnt(0.,0.,0.),gp_Pnt(-60.,-60.,-200.));
-	
-	Handle(AIS_Shape) ais3 = new AIS_Shape(wprof);
+	TopoDS_Wire Profil = BRepBuilderAPI_MakePolygon(gp_Pnt(0.,0.,0.),gp_Pnt(-60.,-60.,-200.));
+	Handle(AIS_Shape) ais3 = new AIS_Shape(Profil);
 	myAISContext->Display(ais3,Standard_False);
 	Fit();
 	Sleep(500);
-	TopoDS_Shape S = BRepOffsetAPI_MakeEvolved(W,wprof,GeomAbs_Arc,Standard_True,Standard_False,Standard_True,0.0001);
 	
+	TopoDS_Shape S = BRepOffsetAPI_MakeEvolved(Spine, Profil,GeomAbs_Arc,Standard_True,Standard_False,Standard_True,0.0001);
 	Handle(AIS_Shape) ais2 = new AIS_Shape(S);
 	myAISContext->SetColor(ais2,Quantity_NOC_MATRABLUE,Standard_False); 
 	myAISContext->SetMaterial(ais2,Graphic3d_NOM_PLASTIC,Standard_False);   
@@ -1009,20 +889,19 @@ void CModelingDoc::OnEvolved()
 	
 	TCollection_AsciiString Message ("\
 		\n\
----------- Evolved shape -------------- \n\
-\n\
-BRepBuilderAPI_MakePolygon P;\n\
-P.Add(gp_Pnt(0.,0.,0.));\n\
-P.Add(gp_Pnt(200.,0.,0.));\n\
-P.Add(gp_Pnt(200.,200.,0.));\n\
-P.Add(gp_Pnt(0.,200.,0.));\n\
-P.Add(gp_Pnt(0.,0.,0.));\n\
-TopoDS_Wire W = P.Wire();\n\
-TopoDS_Wire wprof = BRepBuilderAPI_MakePolygon(gp_Pnt(0.,0.,0.),gp_Pnt(-60.,-60.,-200.));\n\
-TopoDS_Shape S = BRepBuilderAPI_MakeEvolved(W,wprof,GeomAbs_Arc,Standard_True,Standard_False,Standard_True,0.0001);\n\
+	---------- Evolved shape -------------- \n\
+	\n\
+	BRepBuilderAPI_MakePolygon P;\n\
+	P.Add(gp_Pnt(0.,0.,0.));\n\
+	P.Add(gp_Pnt(200.,0.,0.));\n\
+	P.Add(gp_Pnt(200.,200.,0.));\n\
+	P.Add(gp_Pnt(0.,200.,0.));\n\
+	P.Add(gp_Pnt(0.,0.,0.));\n\
+	TopoDS_Wire W = P.Wire();\n\
+	TopoDS_Wire wprof = BRepBuilderAPI_MakePolygon(gp_Pnt(0.,0.,0.),gp_Pnt(-60.,-60.,-200.));\n\
+	TopoDS_Shape S = BRepBuilderAPI_MakeEvolved(W,wprof,GeomAbs_Arc,Standard_True,Standard_False,Standard_True,0.0001);\n\
 		\n");
-  PocessTextInDialog("Make an evolved shape", Message);
-
+	PocessTextInDialog("Make an evolved shape", Message);
 }
 
 void CModelingDoc::OnDraft() 
@@ -1042,8 +921,10 @@ void CModelingDoc::OnDraft()
 	Fit();
 	Sleep(500);
 	BRepOffsetAPI_DraftAngle adraft(S);
-	TopExp_Explorer Ex;
-	for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {
+	//遍历盒体的面
+	TopExp_Explorer Ex;//使用 TopExp_Explorer 类初始化探索器 Ex
+	for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) 
+	{
 		TopoDS_Face F = TopoDS::Face(Ex.Current());
 		Handle(Geom_Plane) surf = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(F));
 		gp_Pln apln = surf->Pln();
@@ -1055,24 +936,8 @@ void CModelingDoc::OnDraft()
 	myAISContext->Redisplay(ais1,Standard_False);
 	Fit();
 
-	TCollection_AsciiString Message ("\
-		\n\
----------- Tapered shape -------------- \n\
-\n\
-TopoDS_Shape S = BRepPrimAPI_MakeBox(200.,300.,150.);\n\
-BRepOffsetAPI_DraftAngle adraft(S);\n\
-TopExp_Explorer Ex;\n\
-for (Ex.Init(S,TopAbs_FACE); Ex.More(); Ex.Next()) {\n\
-	TopoDS_Face F = TopoDS::Face(Ex.Current());\n\
-	Handle(Geom_Plane) surf = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(F));\n\
-	gp_Pln apln = surf->Pln();\n\
-	gp_Dir dirF = apln.Axis().Direction();\n\
-	if (dirF.IsNormal(gp_Dir(0.,0.,1.),Precision::Angular()))\n\
-		adraft.Add(F, gp_Dir(0.,0.,1.), 15.*PI180, gp_Pln(gp::XOY()));\n\
-}\n\
-		\n");
-  PocessTextInDialog("Make a tapered shape", Message);
-
+	TCollection_AsciiString Message;
+	PocessTextInDialog("Make a tapered shape", Message);
 }
 
 /* =================================================================================
@@ -1257,7 +1122,6 @@ TopoDS_Shape theCommonSurface = BRepAlgoAPI_Common(theBox,theWedge); \n\
 
 }
 
-
 void CModelingDoc::OnSection() 
 {
 
@@ -1268,8 +1132,7 @@ void CModelingDoc::OnSection()
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
 
-  TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120, 20).Shape();
-
+	TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120, 20).Shape();
     Handle(AIS_Shape) ashape=new AIS_Shape(atorus);
     myAISContext->SetColor(ashape,Quantity_NOC_RED,Standard_False);
     myAISContext->SetMaterial(ashape,Graphic3d_NOM_PLASTIC,Standard_False);    
@@ -1277,43 +1140,44 @@ void CModelingDoc::OnSection()
 	myAISContext->SetTransparency(ashape,0.1,Standard_False);
     myAISContext->Display(ashape,Standard_False);
 
-gp_Vec V1(1,1,1);
-Standard_Real radius = 120;
-Standard_Integer i=-3;
+    gp_Vec V1(1, 1, 1);
+    Standard_Real radius = 120;
+    Standard_Integer i = -3;
 
-for(i;i<=3;i++) {
-    TopoDS_Shape asphere = BRepPrimAPI_MakeSphere(gp_Pnt(26 * 3 * i, 0, 0), radius).Shape();
+    for (i; i <= 3; i++)
+	{
+		TopoDS_Shape asphere = BRepPrimAPI_MakeSphere(gp_Pnt(26 * 3 * i, 0, 0), radius).Shape();
 
-    Handle (AIS_Shape) theShape=new AIS_Shape (asphere);
-    myAISContext->SetTransparency(theShape,0.1,Standard_False);
-    myAISContext->SetColor(theShape,Quantity_NOC_WHITE,Standard_False);
-    myAISContext->SetDisplayMode(theShape,1,Standard_False);
-    myAISContext->Display(theShape,Standard_False);
-	Fit();
+		Handle (AIS_Shape) theShape=new AIS_Shape (asphere);
+		myAISContext->SetTransparency(theShape,0.1,Standard_False);
+		myAISContext->SetColor(theShape,Quantity_NOC_WHITE,Standard_False);
+		myAISContext->SetDisplayMode(theShape,1,Standard_False);
+		myAISContext->Display(theShape,Standard_False);
+		Fit();
 
-    Standard_Boolean PerformNow=Standard_False; 
+		Standard_Boolean PerformNow=Standard_False; 
+		BRepAlgoAPI_Section section(atorus,asphere,PerformNow);
+		section.ComputePCurveOn1(Standard_True);
+		section.Approximation(TopOpeBRepTool_APPROX);
+		section.Build();
 
-    BRepAlgoAPI_Section section(atorus,asphere,PerformNow);
-    section.ComputePCurveOn1(Standard_True);
-    section.Approximation(TopOpeBRepTool_APPROX);
-    section.Build();
-
-    Handle(AIS_Shape) asection=new AIS_Shape(section.Shape());
-    myAISContext->SetDisplayMode (asection, 0, Standard_False);
-    myAISContext->SetColor (asection, Quantity_NOC_WHITE, Standard_False);
-    myAISContext->Display (asection, Standard_False);
-    if(i<3) {
-    myAISContext->Remove (theShape, Standard_False);
-	}
-}
-  myAISContext->UpdateCurrentViewer();
-   TCollection_AsciiString Message ("\
+		Handle(AIS_Shape) asection=new AIS_Shape(section.Shape());
+		myAISContext->SetDisplayMode (asection, 0, Standard_False);
+		myAISContext->SetColor (asection, Quantity_NOC_WHITE, Standard_False);
+		myAISContext->Display (asection, Standard_False);
+		if (i < 3)
+		{
+			myAISContext->Remove(theShape, Standard_False);
+		}
+    }
+    myAISContext->UpdateCurrentViewer();
+    TCollection_AsciiString Message("\
 		\n\
-TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120,20); \n\
-gp_Vec V1(1,1,1); \n\
-Standard_Real radius = 120; \n\
-Standard_Integer i=-3; \n\
-for(i;i<=3;i++) { \n\
+	TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120,20); \n\
+	gp_Vec V1(1,1,1); \n\
+	Standard_Real radius = 120; \n\
+	Standard_Integer i=-3; \n\
+	for(i;i<=3;i++) { \n\
     TopoDS_Shape asphere = BRepPrimAPI_MakeSphere(gp_Pnt(78*i,0,0),radius); \n\
     Standard_Boolean PerformNow=Standard_False; \n\
     BRepAlgoAPI_Section section(atorus,asphere,PerformNow); \n\
@@ -1321,11 +1185,10 @@ for(i;i<=3;i++) { \n\
     section.Approximation(TopOpeBRepTool_APPROX); \n\
     section.Build(); \n\
 	\n");
-
 	PocessTextInDialog("Compute the sections ", Message);
-
 }
 
+//plane with section
 void CModelingDoc::OnPsection() 
 {
 	AIS_ListOfInteractive aList;
@@ -1335,48 +1198,46 @@ void CModelingDoc::OnPsection()
 		myAISContext->Remove (aListIterator.Value(), Standard_False);
 	}
 
-TopoDS_Shape theTorus = BRepPrimAPI_MakeTorus(35, 8).Shape();
-Handle(AIS_Shape) atorus = new AIS_Shape(theTorus);
-myAISContext->SetColor(atorus,Quantity_NOC_YELLOW,Standard_False); 
-myAISContext->SetMaterial(atorus,Graphic3d_NOM_PLASTIC,Standard_False);
-myAISContext->SetTransparency(atorus,0.1,Standard_False);
-myAISContext->Display(atorus,Standard_False);
-const Handle(AIS_InteractiveObject)& anIOTorus = atorus;
-myAISContext->SetSelected (anIOTorus, Standard_False);
-Fit();
-Sleep(500);
+	TopoDS_Shape theTorus = BRepPrimAPI_MakeTorus(35, 8).Shape();
+	Handle(AIS_Shape) atorus = new AIS_Shape(theTorus);
+	myAISContext->SetColor(atorus,Quantity_NOC_YELLOW,Standard_False); 
+	myAISContext->SetMaterial(atorus,Graphic3d_NOM_PLASTIC,Standard_False);
+	myAISContext->SetTransparency(atorus,0.1,Standard_False);
+	myAISContext->Display(atorus,Standard_False);
+	const Handle(AIS_InteractiveObject)& anIOTorus = atorus;
+	myAISContext->SetSelected (anIOTorus, Standard_False);
+	Fit();
+	Sleep(500);
 
-gp_Pln aplane(1,0.25,3,4);
-Handle (Geom_Plane) thePlane = new Geom_Plane(aplane);
-Handle (AIS_Plane) ais1 = new AIS_Plane(thePlane);
-myAISContext->Display(ais1,Standard_False);
-const Handle(AIS_InteractiveObject)& anIO1 = ais1;
-myAISContext->SetSelected (anIO1, Standard_False);
-Fit();
-Sleep(300);
+	gp_Pln aplane(1,0.25,3,4);
+	Handle (Geom_Plane) thePlane = new Geom_Plane(aplane);
+	Handle (AIS_Plane) ais1 = new AIS_Plane(thePlane);
+	myAISContext->Display(ais1,Standard_False);
+	const Handle(AIS_InteractiveObject)& anIO1 = ais1;
+	myAISContext->SetSelected (anIO1, Standard_False);
+	Fit();
+	Sleep(300);
 
-BRepAlgoAPI_Section section(theTorus,thePlane,Standard_False);
-section.ComputePCurveOn1(Standard_True);
-section.Approximation(TopOpeBRepTool_APPROX);
-section.Build();
+	BRepAlgoAPI_Section section(theTorus,thePlane,Standard_False);
+	section.ComputePCurveOn1(Standard_True);
+	section.Approximation(TopOpeBRepTool_APPROX);
+	section.Build();
 
-Handle(AIS_Shape) asection=new AIS_Shape(section.Shape());
-myAISContext->SetDisplayMode(asection ,0,Standard_False);
-myAISContext->SetColor(asection,Quantity_NOC_WHITE,Standard_False); 
-myAISContext->Display(asection,Standard_False);
-Fit();
+	Handle(AIS_Shape) asection=new AIS_Shape(section.Shape());
+	myAISContext->SetDisplayMode(asection ,0,Standard_False);
+	myAISContext->SetColor(asection,Quantity_NOC_WHITE,Standard_False); 
+	myAISContext->Display(asection,Standard_False);
+	Fit();
 
-   TCollection_AsciiString Message ("\
-		\n\
-TopoDS_Shape theTorus = BRepPrimAPI_MakeTorus(60.,20.); \n\
- \n\
-gp_Pln P(1,2,1,-15); \n\
- \n\
-TopoDS_Shape Psection = BRepAlgoAPI_Section(theTorus,P);  \n\
-\n");
-
+    TCollection_AsciiString Message ("\
+	\n\
+	TopoDS_Shape theTorus = BRepPrimAPI_MakeTorus(60.,20.); \n\
+	 \n\
+	gp_Pln P(1,2,1,-15); \n\
+	 \n\
+	TopoDS_Shape Psection = BRepAlgoAPI_Section(theTorus,P);  \n\
+	\n");
 	PocessTextInDialog("Compute the plane section ", Message);
-
 }
 
 void CModelingDoc::OnBlend() 
@@ -1929,9 +1790,6 @@ TopoDS_Shape res2 = MKP2.Shape();\n\
 	PocessTextInDialog("Make an extrusion or a protrusion", Message);
 }
 
-//
-// BRepFeat_MakeDPrism
-//
 void CModelingDoc::OnDprismLocal() 
 {
 	AIS_ListOfInteractive aList;
@@ -2278,7 +2136,6 @@ TopoDS_Shape res2 = glue2.Shape();\n\
   PocessTextInDialog("Glue two solids", Message);
 }
 
-
 void CModelingDoc::OnPipeLocal() 
 {
 	AIS_ListOfInteractive aList;
@@ -2386,7 +2243,6 @@ TopoDS_Shape res1 = MKPipe.Shape();\n\
   PocessTextInDialog("Make a local pipe", Message);
 }
 
-
 void CModelingDoc::OnLinearLocal() 
 {
 	AIS_ListOfInteractive aList;
@@ -2471,7 +2327,6 @@ TopoDS_Shape res = aform.Shape();\n\
 	\n");
   PocessTextInDialog("Make a rib", Message);
 }
-
 
 void CModelingDoc::OnSplitLocal() 
 {
@@ -2558,7 +2413,6 @@ TopoDS_Shape Result = asplit.Shape();	\n\
 
 PocessTextInDialog("Split a shape", Message);
 }
-
 
 void CModelingDoc::OnThickLocal() 
 {
@@ -3483,48 +3337,8 @@ void CModelingDoc::OnSewing()
 
 	Fit();
 
-   TCollection_AsciiString Message ("\
-	\n\
-///////The first shape \n\
- \n\
-gp_Pnt P(0,0,0);	\n\
-gp_Vec V(0,0,1);	\n\
-Handle(Geom_Plane) Pi=new Geom_Plane(P,V);	\n\
-Handle(Geom_RectangularTrimmedSurface) GeometricSurface=new Geom_RectangularTrimmedSurface(Pi,0.,100.,0.,100.);	\n\
-TopoDS_Shape FirstShape = BRepBuilderAPI_MakeFace(GeometricSurface);	\n\
-	\n\
-///////The second shape \n\
- \n\
-gp_Pnt P1(0,0,0);	\n\
-gp_Pnt P2(50,0,0);	\n\
-gp_Pnt P3(100,0,0);	\n\
-gp_Pnt P4(25,12,85);	\n\
-gp_Pnt P5(100,0,80);	\n\
-gp_Pnt P6(135,-12,85);	\n\
-\n\
-TColgp_Array2OfPnt Array(1,3,1,2);	\n\
-Array.SetValue(1,1,P1);	\n\
-Array.SetValue(2,1,P2);	\n\
-Array.SetValue(3,1,P3);	\n\
-Array.SetValue(1,2,P4);	\n\
-Array.SetValue(2,2,P5);	\n\
-Array.SetValue(3,2,P6);	\n\
-\n\
-Handle (Geom_BSplineSurface) aSurf = GeomAPI_PointsToBSplineSurface(Array,3,8,GeomAbs_C2,0.00001);	\n\
-TopoDS_Shape SecondShape = BRepBuilderAPI_MakeFace(aSurf);	\n\
-	\n\
-BRepOffsetAPI_Sewing aMethod;	\n\
-aMethod.Add(FirstShape);		\n\
-aMethod.Add(SecondShape);	\n\
-\n\
-aMethod.Perform();	\n\
-\n\
-TopoDS_Shape sewedShape = aMethod.SewedShape();	\n\
-	\n\
-\n");
-
+	TCollection_AsciiString Message;
 	PocessTextInDialog("Sew faces ", Message);
-
 }
 
 void CModelingDoc::OnBuilder() 
@@ -4293,7 +4107,7 @@ else\n\
   MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, theShapeIsValid ? L"The Shape Is Valid !! " : L"The Shape Is NOT Valid !! ", L"Checking Shape", MB_OK);
 }
 
-void CModelingDoc::OnLinear() 
+void CModelingDoc::OnLinear() //LinearProperties
 {
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);
@@ -4389,7 +4203,7 @@ gp_Mat I = System.MatrixOfInertia();\n\
 	MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, string.ToWideString(), L"Linear Properties", MB_OK);
 }
 
-void CModelingDoc::OnSurface() 
+void CModelingDoc::OnSurface() //SurfaceProperties
 {
 	AIS_ListOfInteractive aList;
 	myAISContext->DisplayedObjects(aList);

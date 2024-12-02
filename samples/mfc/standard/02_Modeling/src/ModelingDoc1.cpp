@@ -219,6 +219,17 @@ static TopoInfoRecord getTopoInfoTest_01()
 
 static TopoInfoRecord getTopoInfoTest_02()
 {
+	TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120, 20).Shape();
+	Standard_Real radius = 120;
+	Standard_Integer i = -3;
+	TopoDS_Shape asphere = BRepPrimAPI_MakeSphere(gp_Pnt(26 * 3 * i, 0, 0), radius).Shape();
+	Standard_Boolean PerformNow = Standard_False;
+	BRepAlgoAPI_Section section(atorus, asphere, PerformNow);
+	section.ComputePCurveOn1(Standard_True);
+	section.Approximation(TopOpeBRepTool_APPROX);
+	section.Build();
+	g_shapeVct = { section.Shape() };
+
 	TopoInfoRecord topoinfo;
 	return topoinfo;
 }
@@ -239,11 +250,12 @@ static void getShapeCreate_01()
 	TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 0., 0.), gp_Pnt(50., 50., 0.));
 	TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(50., 50., 0.), gp_Pnt(0., 0., 0.));
 	TopoDS_Wire Wire = BRepBuilderAPI_MakeWire(E1, E2, E3);
-	TopoDS_Face Face = BRepBuilderAPI_MakeFace(Wire);
+	TopoDS_Face Face = occ::trans(100, 100) * BRepBuilderAPI_MakeFace(Wire).Face();
 	TopoDS_Shape Prism1 = BRepPrimAPI_MakePrism(Wire, gp_Vec(0., 0., 100.)); //拉伸面
 	TopoDS_Shape Prism2 = BRepPrimAPI_MakePrism(Face, gp_Vec(0., 0., 100.)); //拉伸实体
 	//shapeRes = { Prism2 };
-	g_shapeVct = { S1,S2,Prism1, occ::trans(100,0) * Prism2 };
+	g_shapeVct = { V1,E,Wire,Face };
+	//g_shapeVct = { S1,S2,Prism1, Prism2 };
 
 }
 
@@ -280,14 +292,12 @@ static void getShapeCreate_02()
 
 	//无限几何
 	g_GeomVct = { Gax1,Gax2,Gax3,Gax4 };
-
+	gp_GTrsf GTrsf;
 }
 
 static void getShapeCreate_03()
 {
-	BRepOffsetAPI_MakeThickSolid();
-	BRepOffsetAPI_ThruSections();
-	// 定义截面1（线圈）
+
 	gp_Elips Elips(gp_Ax2(gp_Pnt(10, 0, 0), gp_Dir(0, 0, 1)), 10, 5);
 	gp_Circ circle(gp_Ax2(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1)), 1);
 	circle.Transform(trans(0, 0.5) * rotz(M_PI_2) * scale(0.5));
@@ -296,6 +306,11 @@ static void getShapeCreate_03()
 	//g_shapeVct = { Edge1,Edge2 };
 
 	//loft放样体
+	//isSolid：布尔值参数，指定构建的形状是实体（solid）还是壳体（shell）。
+	// 如果设置为 true,则算法将生成一个闭合的三维实体；如果设置为 false（默认值），则生成一个壳体，即一个开放的表面。
+	//ruled：布尔值参数，指定在两个连续线框之间生成的面是否为规则曲面。
+	// 如果设置为 true，则生成的面将是规则面；如果设置为 false（默认值），则生成的面将通过近似平滑处理，通常用于生成更复杂的形状。
+
 	BRepOffsetAPI_ThruSections loftMaker(true);
 	TopoDS_Wire wire1 = BRepBuilderAPI_MakeWire(
 		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 0, 0), gp_Pnt(1, 0, 0)).Edge(),
@@ -304,8 +319,6 @@ static void getShapeCreate_03()
 		Edge2 //BRepBuilderAPI_MakeEdge(gp_Pnt(0, 1, 0), gp_Pnt(0, 0, 0)).Edge()
 	);
     loftMaker.AddWire(scale(2) * wire1);
-
-	// 定义截面2（另一个线圈）
 	TopoDS_Wire wire2 = BRepBuilderAPI_MakeWire(
 		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 0, 5), gp_Pnt(1, 0, 5)).Edge(),
 		BRepBuilderAPI_MakeEdge(gp_Pnt(1, 0, 5), gp_Pnt(1, 1, 5)).Edge(),
@@ -313,11 +326,21 @@ static void getShapeCreate_03()
 		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 1, 5), gp_Pnt(0, 0, 5)).Edge()
 	);
 	loftMaker.AddWire(wire2);
-
 	// 构建放样体
 	loftMaker.Build();
 	g_shapeVct = { loftMaker.Shape() };
 
+	//dx：楔形体的宽度。
+	//dy：楔形体的深度。
+	//dz：楔形体的高度。
+	//angle：楔形体的倾斜角度。
+	TopoDS_Shape Wedge = BRepPrimAPI_MakeWedge(60., 50., 100., 30.).Shape();
+	g_shapeVct = { Wedge };
+	gp_Ax2 ax2 = gp_Ax2(gp_Pnt(), gp_Dir(0., 0., 1.));//default
+	//
+	TopoDS_Shape Torus1 = BRepPrimAPI_MakeTorus(ax2, 60., 20., M_PI / 2).Shape();
+	TopoDS_Shape Torus2 = BRepPrimAPI_MakeTorus(ax2, 60., 20., -M_PI / 4, M_PI / 4, M_PI / 2).Shape();
+	g_shapeVct = { Torus1,Torus2 };
 
 }
 
@@ -347,12 +370,14 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 {
 	clearDisplay();
 	g_topoInfo = getTopoInfoTest_01();
+	g_topoInfo = getTopoInfoTest_02();
 	//std::vector<TopoDS_Shape> shapeVct = g_topoInfo.getShapeVct(TopAbs_ShapeEnum::TopAbs_FACE);
 	//std::vector<TopoDS_Shape> shapeVct = getShapeCreate_01();
 
 	//getShapeCreate_01();
 	//getShapeCreate_02();
-	getShapeCreate_03();
+	//getShapeCreate_03();
+
 	for (int i = 0; i < g_shapeVct.size(); i++)
 	{
 		//clearDisplay();
@@ -363,6 +388,7 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 		//clearDisplay();
 		oneGeomDisplay(g_GeomVct[i]);
 	}
+	coordinateSystemDisplay(150);
 	Fit();
 	return;
 }

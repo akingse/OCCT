@@ -177,6 +177,16 @@ protected:
 		Fit();
 	}
 
+    afx_msg inline void coordinateSystemDisplay(double k = 1)
+	{
+		Handle(ISession_Direction) aDirectionX = new ISession_Direction(gp_Pnt(0, 0, 0), gp_Vec(k, 0, 0));
+		Handle(ISession_Direction) aDirectionY = new ISession_Direction(gp_Pnt(0, 0, 0), gp_Vec(0, k, 0));
+        Handle(ISession_Direction) aDirectionZ = new ISession_Direction(gp_Pnt(0, 0, 0), gp_Vec(0, 0, 0.618 * k));
+		myAISContext->Display(aDirectionX, Standard_False);
+		myAISContext->Display(aDirectionY, Standard_False);
+		myAISContext->Display(aDirectionZ, Standard_False);
+	}
+
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
