@@ -9,6 +9,7 @@
 #include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepAlgoAPI_Check.hxx>
+#include <TopExp_Explorer.hxx>
 #include <BRep_TEdge.hxx>
 #include <TopoDS_Iterator.hxx>
 #include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
@@ -178,7 +179,8 @@ static CsgTree getBooleanTest_07()
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
 	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
-	TopoDS_Shape theShapeR = csgtree.m_shapeResult;
+	//TopoDS_Shape theShapeR = csgtree.m_shapeResult;
+	// 
 	//record
 	TopoInfoRecord topoinfo;
 	topoinfo.m_shape = csgtree.m_shapeResult;
@@ -190,10 +192,9 @@ static CsgTree getBooleanTest_07()
 //简单布尔
 static CsgTree getBooleanTest_08()
 {
-	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
-	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(1, 0, 0), 2).Shape();
-	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
-	TopoDS_Shape theShapeR = csgtree.m_shapeResult;
+    TopoDS_Shape theShapeA = BRepPrimAPI_MakeBox(30, 20, 10).Shape();
+	TopoDS_Shape theShapeB = BRepPrimAPI_MakeSphere(gp_Pnt(15, 10, 0), 2).Shape();
+	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_CUT);
 	//record
 	TopoInfoRecord topoinfo;
 	topoinfo.m_shape = csgtree.m_shapeResult;
@@ -210,13 +211,27 @@ static TopoInfoRecord getTopoInfoTest_01()
 	//MakeOneAxis
     //topoinfo.m_shape = BRepPrimAPI_MakeSphere(gp_Pnt(0, 0, 0), 10).Shape();
 	//topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
-	//topoinfo.m_shape = BRepPrimAPI_MakeCylinder(1, 5).Shape();
-	topoinfo.m_shape = BRepPrimAPI_MakeTorus(10, 2).Shape();
+	topoinfo.m_shape = BRepPrimAPI_MakeCylinder(1, 5).Shape();
+	//topoinfo.m_shape = BRepPrimAPI_MakeTorus(10, 2).Shape();
 	topoinfo.TraverseShape(topoinfo.m_shape); //write shape data to topoInfo
 	topoinfo.getGeomAndShape();
+
+	std::vector<const BRep_TFace*> brepFaceVct;
+	for (TopExp_Explorer exp(topoinfo.m_shape, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aCurrentFace = TopoDS::Face(exp.Current());
+		BRep_TFace* brepFace = dynamic_cast<BRep_TFace*>(aCurrentFace.TShape().get());
+		if (brepFace != nullptr) //no repeat
+			brepFaceVct.push_back(brepFace);
+		
+	}
+
+
 	return topoinfo;
 }
 
+
+//测试 BRepAlgoAPI_Section
 static TopoInfoRecord getTopoInfoTest_02()
 {
 	TopoDS_Shape atorus = BRepPrimAPI_MakeTorus(120, 20).Shape();
@@ -347,7 +362,7 @@ static void getShapeCreate_03()
 //验证布尔
 void CModelingDoc::OnTestBoolBefore() //using icon -
 {
-	g_csgtree = getBooleanTest_01();
+	g_csgtree = getBooleanTest_08();
 	clearDisplay();
 	const std::vector<TopoDS_Shape>& shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
