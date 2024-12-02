@@ -21,6 +21,8 @@ BRepAlgoAPI_BooleanOperation();//构造 布尔前
 BRepAlgoAPI_BooleanOperation::Build() //布尔后
 ```
 
+![image-20241202143329733](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241202143329733.png)
+
 
 
 ### TopoDS_Shape 数据结构
@@ -168,6 +170,26 @@ class BOPAlgo_PaveFiller //
 
     
 ```
+
+### BRepBuilderAPI_Command 造型API
+
+```
+//布尔操作
+
+
+//拓扑创建
+BRepBuilderAPI_MakeVertex
+BRepBuilderAPI_MakeEdge
+BRepBuilderAPI_MakeWire
+BRepBuilderAPI_MakeFace
+BRepBuilderAPI_MakeSolid
+
+//造型创建
+//BRepBuilderAPI_MakeShape
+
+```
+
+![image-20241202112102345](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241202112102345.png)
 
 
 

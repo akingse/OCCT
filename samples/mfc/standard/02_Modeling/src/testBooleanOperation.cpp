@@ -12,7 +12,7 @@
 //add
 #include "GC_MakeSegment.hxx"
 #include "BRepBuilderAPI_MakeEdge.hxx"
-#pragma comment(lib,"TKPrim.lib")
+//#pragma comment(lib,"TKPrim.lib")
 
 #ifdef USING_BIMBASE_SLN
 #include "commonOCCUtility.h"

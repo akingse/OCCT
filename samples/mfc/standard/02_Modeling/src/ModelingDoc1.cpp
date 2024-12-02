@@ -13,13 +13,17 @@
 #include <TopoDS_Iterator.hxx>
 #include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
 #include "ModelingDoc1.h" //custom class
+#include "commonOCCUtility.h" 
 
 using namespace std;
+using namespace occ;
 using namespace test;
 using opencascade::handle;
 
-TopoInfoRecord g_topoInfo;
 CsgTree g_csgtree;
+TopoInfoRecord g_topoInfo;
+std::vector<TopoDS_Shape> g_shapeVct;
+std::vector<handle<Geom_Geometry>> g_GeomVct;
 
 //输出耗时信息
 void writeTimeDataToCsv()
@@ -219,7 +223,8 @@ static TopoInfoRecord getTopoInfoTest_02()
 	return topoinfo;
 }
 
-static std::vector<TopoDS_Shape> getShapeCreate_01()
+//点线面-拉伸
+static void getShapeCreate_01()
 {
 	std::vector<TopoDS_Shape> shapeRes;
 	//copy from OnPrism
@@ -238,11 +243,11 @@ static std::vector<TopoDS_Shape> getShapeCreate_01()
 	TopoDS_Shape Prism1 = BRepPrimAPI_MakePrism(Wire, gp_Vec(0., 0., 100.)); //拉伸面
 	TopoDS_Shape Prism2 = BRepPrimAPI_MakePrism(Face, gp_Vec(0., 0., 100.)); //拉伸实体
 	//shapeRes = { Prism2 };
+	g_shapeVct = { S1,S2,Prism1, occ::trans(100,0) * Prism2 };
 
-	return shapeRes;
 }
 
-static std::vector<TopoDS_Shape> getShapeCreate_02()
+static void getShapeCreate_02()
 {
 	std::vector<TopoDS_Shape> shapeRes;
 	//copy from OnRevol
@@ -273,9 +278,47 @@ static std::vector<TopoDS_Shape> getShapeCreate_02()
 	Handle(Geom_Axis1Placement) Gax4 = new Geom_Axis1Placement(axe);
 	TopoDS_Shape S4 = BRepPrimAPI_MakeRevol(F, axe, 90. * M_PI / 180);
 
-	shapeRes = { S1,S2,S3,S4 };
+	//无限几何
+	g_GeomVct = { Gax1,Gax2,Gax3,Gax4 };
 
-	return shapeRes;
+}
+
+static void getShapeCreate_03()
+{
+	BRepOffsetAPI_MakeThickSolid();
+	BRepOffsetAPI_ThruSections();
+	// 定义截面1（线圈）
+	gp_Elips Elips(gp_Ax2(gp_Pnt(10, 0, 0), gp_Dir(0, 0, 1)), 10, 5);
+	gp_Circ circle(gp_Ax2(gp_Pnt(0, 0, 0), gp_Dir(0, 0, 1)), 1);
+	circle.Transform(trans(0, 0.5) * rotz(M_PI_2) * scale(0.5));
+	TopoDS_Edge Edge1 = BRepBuilderAPI_MakeEdge(Elips, 0, M_PI);
+	TopoDS_Edge Edge2 = BRepBuilderAPI_MakeEdge(circle, 0, M_PI);
+	//g_shapeVct = { Edge1,Edge2 };
+
+	//loft放样体
+	BRepOffsetAPI_ThruSections loftMaker(true);
+	TopoDS_Wire wire1 = BRepBuilderAPI_MakeWire(
+		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 0, 0), gp_Pnt(1, 0, 0)).Edge(),
+		BRepBuilderAPI_MakeEdge(gp_Pnt(1, 0, 0), gp_Pnt(1, 1, 0)).Edge(),
+		BRepBuilderAPI_MakeEdge(gp_Pnt(1, 1, 0), gp_Pnt(0, 1, 0)).Edge(),
+		Edge2 //BRepBuilderAPI_MakeEdge(gp_Pnt(0, 1, 0), gp_Pnt(0, 0, 0)).Edge()
+	);
+    loftMaker.AddWire(scale(2) * wire1);
+
+	// 定义截面2（另一个线圈）
+	TopoDS_Wire wire2 = BRepBuilderAPI_MakeWire(
+		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 0, 5), gp_Pnt(1, 0, 5)).Edge(),
+		BRepBuilderAPI_MakeEdge(gp_Pnt(1, 0, 5), gp_Pnt(1, 1, 5)).Edge(),
+		BRepBuilderAPI_MakeEdge(gp_Pnt(1, 1, 5), gp_Pnt(0, 1, 5)).Edge(),
+		BRepBuilderAPI_MakeEdge(gp_Pnt(0, 1, 5), gp_Pnt(0, 0, 5)).Edge()
+	);
+	loftMaker.AddWire(wire2);
+
+	// 构建放样体
+	loftMaker.Build();
+	g_shapeVct = { loftMaker.Shape() };
+
+
 }
 
 //验证布尔
@@ -306,12 +349,19 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 	g_topoInfo = getTopoInfoTest_01();
 	//std::vector<TopoDS_Shape> shapeVct = g_topoInfo.getShapeVct(TopAbs_ShapeEnum::TopAbs_FACE);
 	//std::vector<TopoDS_Shape> shapeVct = getShapeCreate_01();
-	std::vector<TopoDS_Shape> shapeVct = getShapeCreate_02();
 
-	for (int i = 0; i < shapeVct.size(); i++)
+	//getShapeCreate_01();
+	//getShapeCreate_02();
+	getShapeCreate_03();
+	for (int i = 0; i < g_shapeVct.size(); i++)
 	{
 		//clearDisplay();
-		oneShapeDisplay(shapeVct[i]);
+		oneShapeDisplay(g_shapeVct[i]);
+	}
+	for (int i = 0; i < g_GeomVct.size(); i++)
+	{
+		//clearDisplay();
+		oneGeomDisplay(g_GeomVct[i]);
 	}
 	Fit();
 	return;
@@ -321,6 +371,6 @@ void CModelingDoc::OnTestBoolExtra() //using icon section
 {
 	clearDisplay();
 	g_topoInfo = getTopoInfoTest_01();
-	oneShapeDisplay(g_topoInfo.m_shape);
+	//oneShapeDisplay(g_topoInfo.m_shape);
 	return;
 }

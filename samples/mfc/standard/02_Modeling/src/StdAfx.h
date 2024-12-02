@@ -49,8 +49,11 @@
 #include <Geom_Axis1Placement.hxx>
 #include <Geom_BezierCurve.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_Axis1Placement.hxx>
+#include <Geom_Axis2Placement.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
+#include <Geom_Plane.hxx>
 #include <Geom_Transformation.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>

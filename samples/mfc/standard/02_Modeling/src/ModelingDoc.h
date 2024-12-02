@@ -113,14 +113,45 @@ protected:
 		myAISContext->SetSelected(anIOShape, Standard_False);
 		Fit();
 	}
-    afx_msg inline void oneAxisDisplay(const TopoDS_Shape& shape, int color = -1, int material = -1)
+	//纯几何类型的子类，几何继承自Geom_Geometry，AIS继承自AIS_InteractiveObject
+	afx_msg inline void oneGeomDisplay(const Handle(Geom_Geometry)& aisGeom, int color = -1, int material = -1)
 	{
-        if (color == -1)
+		if (color == -1)
 			color = rand() % (508 + 1);
 		if (material == -1)
 			material = rand() % (25 + 1);
-		//交互式可视化系统（AIS，Application Interactive Service）
-		Handle(AIS_Shape) aisShape = new AIS_Shape(shape);
+		if (aisGeom.IsNull())
+			return;
+		/*
+		AIS_Axis (Geom_Line,Geom_Axis2,Geom_Axis1)
+		AIS_Circle (Geom_Circle )
+		AIS_Line (Geom_Line )
+		AIS_Plane (Geom_Plane)
+		*/
+		Handle(AIS_InteractiveObject) aisShape = nullptr;
+        if (typeid(*aisGeom.get()) == typeid(Geom_Plane))
+		{
+			//aisShape = new AIS_Plane(opencascade::handle<Geom_Plane>(aisGeom.get()));
+			Handle(Geom_Plane) ptr = dynamic_cast<Geom_Plane*>(aisGeom.get());
+			aisShape = new AIS_Plane(ptr);
+		}
+		else if (typeid(*aisGeom.get()) == typeid(Geom_Line))
+		{
+			Handle(Geom_Line) ptr = dynamic_cast<Geom_Line*>(aisGeom.get());
+			aisShape = new AIS_Line(ptr);
+		}
+		else if (typeid(*aisGeom.get()) == typeid(Geom_Axis1Placement))
+		{
+			Handle(Geom_Axis1Placement) ptr = dynamic_cast<Geom_Axis1Placement*>(aisGeom.get());
+			aisShape = new AIS_Axis(ptr);
+		}
+		else if (typeid(*aisGeom.get()) == typeid(Geom_Axis2Placement))
+		{
+			Handle(Geom_Axis2Placement) ptr = dynamic_cast<Geom_Axis2Placement*>(aisGeom.get());
+			aisShape = new AIS_Axis(ptr, AIS_TypeOfAxis::AIS_TOAX_XAxis);
+		}
+		if (aisShape.IsNull())
+			return;
 		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
 		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
 		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
@@ -129,6 +160,23 @@ protected:
 		myAISContext->SetSelected(anIOShape, Standard_False);
 		Fit();
 	}
+	//handle指针可以使AIS_IO隐式转换
+    afx_msg inline void oneAisDisplay(const Handle(AIS_InteractiveObject)& aisShape, int color = -1, int material = -1)
+	{
+        if (color == -1)
+			color = rand() % (508 + 1);
+		if (material == -1)
+			material = rand() % (25 + 1);
+		if (aisShape.IsNull())
+			return;
+		myAISContext->SetDisplayMode(aisShape, 1, Standard_False);
+		myAISContext->SetColor(aisShape, Quantity_NameOfColor(color), Standard_False);
+		myAISContext->SetMaterial(aisShape, Graphic3d_NameOfMaterial(material), Standard_False);
+		myAISContext->Display(aisShape, Standard_False);
+		myAISContext->SetSelected(aisShape, Standard_False);
+		Fit();
+	}
+
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
