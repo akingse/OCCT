@@ -75,6 +75,7 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopTools_DataMapOfShapeInteger.hxx>
 #include <TopTools_ListOfShape.hxx>
+#include "BRepBuilderAPI_MakeEdge.hxx"
 
 //
 static Standard_Real ToleranceFF(const BRepAdaptor_Surface& aBAS1,
@@ -515,6 +516,29 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
       const IntTools_Curve& aIC = aCvsX(i);
       Standard_Boolean bIsValid = IntTools_Tools::CheckCurve(aIC, aBox);
       if (bIsValid) {
+#ifdef USING_OPENCASCADE_TEST
+        //add Shape
+        TopoDS_Edge topoedge = BRepBuilderAPI_MakeEdge(aIC.Curve());
+        BOPDS_ShapeInfo shapeinfo;
+        shapeinfo.SetShape(topoedge);
+        Standard_Integer index = myDS->Append(shapeinfo);
+        //FaceInfo
+        Handle(BOPDS_PaveBlock) paveblock = new BOPDS_PaveBlock;
+        paveblock->SetEdge(index);
+        BOPDS_FaceInfo faceinfo1;
+        BOPDS_FaceInfo faceinfo2;
+        faceinfo1.SetIndex(nF1);
+        faceinfo2.SetIndex(nF2);
+        faceinfo1.ChangePaveBlocksSc().Add(paveblock);
+        faceinfo2.ChangePaveBlocksSc().Add(paveblock);
+        BOPDS_ShapeInfo& shapeinfo1 = myDS->ChangeShapeInfo(nF1);
+        BOPDS_ShapeInfo& shapeinfo2 = myDS->ChangeShapeInfo(nF2);
+        myDS->myFaceInfoPoolCopy.Append(faceinfo1);
+        shapeinfo1.myReferenceCopy = myDS->myFaceInfoPoolCopy.Size() - 1;
+        myDS->myFaceInfoPoolCopy.Append(faceinfo2);
+        shapeinfo2.myReferenceCopy = myDS->myFaceInfoPoolCopy.Size() - 1;
+#endif//USING_OPENCASCADE_TEST
+
         BOPDS_Curve& aNC = aVNC.Appended();
         aNC.SetCurve(aIC);
         // make sure that the bounding box has the maximal gap

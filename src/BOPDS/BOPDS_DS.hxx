@@ -516,7 +516,10 @@ protected:
   BOPDS_VectorOfInterfFZ myInterfFZ;
   BOPDS_VectorOfInterfZZ myInterfZZ;
   TColStd_MapOfInteger myInterfered;
-
+#ifdef USING_OPENCASCADE_TEST
+public:
+  BOPDS_VectorOfFaceInfo myFaceInfoPoolCopy;
+#endif
 
 private:
 

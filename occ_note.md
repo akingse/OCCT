@@ -52,6 +52,22 @@ Param代表的参数方程曲面，Geom代表的代数方程曲面
 
 
 
+### handle
+
+```
+handle 类是 Open CASCADE Technology (OCC) 中实现的一种智能指针，旨在与 Standard_Transient 类及其派生类一起使用
+handle 类实现了一种强引用计数机制。这意味着多个 handle 对象可以指向同一个 Standard_Transient 对象，并共享这一个引用计数。
+由于引用计数器是嵌套在 Standard_Transient 类中，因此创建 handle 时不需为引用计数分配额外内存。这使得 handle 对象非常高效，能够节省内存和处理时间。
+handle 提供了类型转换运算符，可以方便地将其转换为基本类的常量引用。这使其适用于需要传递基类句柄的情况，而无需复制句柄对象，这样有助于提高性能。
+
+
+
+```
+
+
+
+
+
 ---
 
 

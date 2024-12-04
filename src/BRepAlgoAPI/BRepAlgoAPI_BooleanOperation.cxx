@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include "../BOPAlgo/DataRecordSingleton.h"
+#include "../BOPDS/BOPDS_DS.hxx"
 
 //=======================================================================
 //class : BRepAlgoAPI_DumpOper
@@ -278,6 +279,25 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
       dataMap.back().m_checkAfter = resultAfter;
   }
+  //
+  BOPDS_VectorOfFaceInfo faceinfoVct = myDSFiller->DS().myFaceInfoPoolCopy;
+  for (auto iter = faceinfoVct.begin(); iter != faceinfoVct.end(); iter++)
+  {
+      BOPDS_FaceInfo faceinfo = *iter;
+  }
+  for (int i = 0; i < faceinfoVct.Size(); i++)
+  {
+      BOPDS_FaceInfo faceinfo = faceinfoVct[i];
+      NCollection_IndexedMap<Handle(BOPDS_PaveBlock)> paveblocks = faceinfo.PaveBlocksSc();
+      //int index= faceinfo.
+      for (auto itPB = paveblocks.cbegin(); itPB != paveblocks.cend(); itPB++)
+      {
+          Handle(BOPDS_PaveBlock) paveblock = *itPB;
+
+      }
+
+  }
+
 #endif//USING_OPENCASCADE_TEST
 
   if (aDumpOper.IsDump()) {

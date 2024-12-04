@@ -155,6 +155,10 @@ protected:
   Standard_Integer myReference;
   Standard_Integer myFlag;
 
+#ifdef USING_OPENCASCADE_TEST
+public:
+  Standard_Integer myReferenceCopy;
+#endif
 
 private:
 
