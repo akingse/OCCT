@@ -279,21 +279,31 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
       dataMap.back().m_checkAfter = resultAfter;
   }
-  //
+  // get intersect detail
+  std::vector<test::DataRecordSingleton::FaceDetail> faceDetailVct;
+  const BOPDS_DS& datastruct = myDSFiller->DS();
   BOPDS_VectorOfFaceInfo faceinfoVct = myDSFiller->DS().myFaceInfoPoolCopy;
   for (auto iter = faceinfoVct.begin(); iter != faceinfoVct.end(); iter++)
   {
       BOPDS_FaceInfo faceinfo = *iter;
   }
+  test::DataRecordSingleton::FaceDetail faceDetail;
+
   for (int i = 0; i < faceinfoVct.Size(); i++)
   {
       BOPDS_FaceInfo faceinfo = faceinfoVct[i];
       NCollection_IndexedMap<Handle(BOPDS_PaveBlock)> paveblocks = faceinfo.PaveBlocksSc();
-      //int index= faceinfo.
+      const BOPDS_ShapeInfo& shapeinfo = datastruct.ShapeInfo(faceinfo.Index());
+      if (i == 0)
+          faceDetail.m_faceObject = shapeinfo.Shape();
+      else
+          faceDetail.m_faceTool = shapeinfo.Shape();
+
       for (auto itPB = paveblocks.cbegin(); itPB != paveblocks.cend(); itPB++)
       {
           Handle(BOPDS_PaveBlock) paveblock = *itPB;
-
+          const TopoDS_Shape& shapeEdge = datastruct.Shape(paveblock->Edge());
+          faceDetail.m_edgeIntersect = shapeEdge;
       }
 
   }

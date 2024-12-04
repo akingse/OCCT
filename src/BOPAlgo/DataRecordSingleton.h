@@ -106,11 +106,11 @@ namespace test
             BOPAlgo_ListOfCheckResult m_checkAfter;
         };
 
-        struct FaceInfo
+        struct FaceDetail
         {
-            std::vector<TopoDS_Shape> m_facesTarget;
-            std::vector<TopoDS_Shape> m_facesTool;
-            std::vector<TopoDS_Shape> m_edgesIntersect;
+            TopoDS_Shape m_faceObject;
+            TopoDS_Shape m_faceTool;
+            TopoDS_Shape m_edgeIntersect;
         };
 
         //DataCompareSingleton
@@ -125,7 +125,7 @@ namespace test
         OPENCASCADE_TEST_API static bool sm_openTime;// =false
         OPENCASCADE_TEST_API static bool sm_openCheck;// =false
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
-        OPENCASCADE_TEST_API static std::vector<FaceInfo> sm_recordFace;
+        OPENCASCADE_TEST_API static std::vector<std::vector<FaceDetail>> sm_recordFace;
 
     public:
 #pragma region inline_function

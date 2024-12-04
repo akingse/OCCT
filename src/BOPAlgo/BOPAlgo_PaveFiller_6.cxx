@@ -517,20 +517,21 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
       Standard_Boolean bIsValid = IntTools_Tools::CheckCurve(aIC, aBox);
       if (bIsValid) {
 #ifdef USING_OPENCASCADE_TEST
-        //add Shape
+        //get Shape Edge
         TopoDS_Edge topoedge = BRepBuilderAPI_MakeEdge(aIC.Curve());
         BOPDS_ShapeInfo shapeinfo;
         shapeinfo.SetShape(topoedge);
-        Standard_Integer index = myDS->Append(shapeinfo);
-        //FaceInfo
+        Standard_Integer index = myDS->Append(shapeinfo);// add to myLines
+        //FaceInfo hold PaveBlock
         Handle(BOPDS_PaveBlock) paveblock = new BOPDS_PaveBlock;
         paveblock->SetEdge(index);
         BOPDS_FaceInfo faceinfo1;
         BOPDS_FaceInfo faceinfo2;
         faceinfo1.SetIndex(nF1);
-        faceinfo2.SetIndex(nF2);
         faceinfo1.ChangePaveBlocksSc().Add(paveblock);
+        faceinfo2.SetIndex(nF2);
         faceinfo2.ChangePaveBlocksSc().Add(paveblock);
+        //ShapeInfo 
         BOPDS_ShapeInfo& shapeinfo1 = myDS->ChangeShapeInfo(nF1);
         BOPDS_ShapeInfo& shapeinfo2 = myDS->ChangeShapeInfo(nF2);
         myDS->myFaceInfoPoolCopy.Append(faceinfo1);
