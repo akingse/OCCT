@@ -531,26 +531,6 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
         faceDetail.m_faceObject = TopoDS::Face(shapeInfo1.Shape());
         faceDetail.m_faceTool = TopoDS::Face(shapeInfo2.Shape());
         instance.appendFaceDetial(faceDetail);
-
-        BOPDS_ShapeInfo shapeinfo;
-        shapeinfo.SetShape(shapeEdge);
-        Standard_Integer index = myDS->Append(shapeinfo);// add to myLines
-        //FaceInfo hold PaveBlock
-        Handle(BOPDS_PaveBlock) paveblock = new BOPDS_PaveBlock;
-        paveblock->SetEdge(index);
-        BOPDS_FaceInfo faceinfo1;
-        BOPDS_FaceInfo faceinfo2;
-        faceinfo1.SetIndex(nF1);
-        faceinfo1.ChangePaveBlocksSc().Add(paveblock);
-        faceinfo2.SetIndex(nF2);
-        faceinfo2.ChangePaveBlocksSc().Add(paveblock);
-        //ShapeInfo 
-        BOPDS_ShapeInfo& shapeinfo1 = myDS->ChangeShapeInfo(nF1);
-        BOPDS_ShapeInfo& shapeinfo2 = myDS->ChangeShapeInfo(nF2);
-        myDS->myFaceInfoPoolCopy.Append(faceinfo1);
-        shapeinfo1.myReferenceCopy = myDS->myFaceInfoPoolCopy.Size() - 1;
-        myDS->myFaceInfoPoolCopy.Append(faceinfo2);
-        shapeinfo2.myReferenceCopy = myDS->myFaceInfoPoolCopy.Size() - 1;
 #endif//USING_OPENCASCADE_TEST
 
         BOPDS_Curve& aNC = aVNC.Appended();

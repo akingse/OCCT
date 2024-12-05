@@ -121,7 +121,7 @@ static CsgTree getBooleanTest_06()
 	return csgtree;
 }
 
-//简单布尔(sphere-sphere-com)
+//简单布尔(sphere-common-sphere)
 static CsgTree getBooleanTest_07()
 {
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeSphere(2).Shape();
@@ -137,7 +137,7 @@ static CsgTree getBooleanTest_07()
 	return csgtree;
 }
 
-//简单布尔
+//简单布尔(box-cut-sphere)
 static CsgTree getBooleanTest_08()
 {
     TopoDS_Shape theShapeA = BRepPrimAPI_MakeBox(30, 20, 10).Shape();
@@ -162,11 +162,21 @@ static CsgTree getBooleanTest_09()
 //验证布尔
 void CModelingDoc::OnTestBoolBefore() //using icon -
 {
-	//DataRecordDashboard::getInstance().setOpenOutput();
-	g_csgtree = getBooleanTest_06();
-
 	clearDisplay();
-	const std::vector<TopoDS_Shape>& shapeVct = g_csgtree.m_shapeArgument;
+	//DataRecordDashboard::getInstance().setOpenOutput();
+	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+	g_csgtree = getBooleanTest_08();
+	std::vector<DataRecordSingleton::FaceDetail> faceDetailVct = instance.getFaceDetial();
+	for (int i = 0; i < faceDetailVct.size(); i++)
+	{
+		std::array<TopoDS_Shape, 3> shapes = faceDetailVct[i].getShapes();
+		for (int j = 0; j < shapes.size(); j++)
+		{
+			oneShapeDisplay(shapes[j]);
+		}
+	}
+
+	std::vector<TopoDS_Shape> shapeVct;// = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{
 		oneShapeDisplay(shapeVct[i]);

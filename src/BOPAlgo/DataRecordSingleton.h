@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <array>
 #include <map>
 #include <set>
 #include <memory>
@@ -172,6 +173,14 @@ namespace test
             TopoDS_Face m_faceObject;
             TopoDS_Face m_faceTool;
             TopoDS_Edge m_edgeIntersect;
+            inline std::array<TopoDS_Shape, 3> getShapes() const
+            {
+                std::array<TopoDS_Shape, 3> res;
+                res[0] = m_faceObject;
+                res[1] = m_faceTool;
+                res[2] = m_edgeIntersect;
+                return res;
+            }
         };
 
     public:
@@ -234,6 +243,10 @@ namespace test
         static void appendFaceDetial(const FaceDetail& faceDetail)
         {
             sm_recordFace.push_back(faceDetail);
+        }
+        static const std::vector<FaceDetail>& getFaceDetial()
+        {
+            return sm_recordFace;
         }
 
 #pragma endregion

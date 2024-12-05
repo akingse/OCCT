@@ -126,7 +126,7 @@ BRepAlgoAPI_BooleanOperation::BRepAlgoAPI_BooleanOperation
   myArguments.Append(theS1);
   myTools.Append(theS2);
 #ifdef USING_OPENCASCADE_TEST
-  //before do boolean(one-one)
+  //before do boolean(one-one) check
   if (DataRecordDashboard::getInstance().isOpenCheck())
   {
       DataRecordSingleton& instance = DataRecordSingleton::getInstance();
@@ -216,7 +216,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       aLArgs.Append(it.Value());
 
 #ifdef USING_OPENCASCADE_TEST
-    //before do boolean(multi-multi and one-one) 
+    //before do boolean(multi-multi and one-one) check
     if (DataRecordDashboard::getInstance().isOpenCheck())
     {
         DataRecordSingleton& instance = DataRecordSingleton::getInstance();
@@ -267,7 +267,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
     return;
   }
 #ifdef USING_OPENCASCADE_TEST
-  // after do boolean
+  // after do boolean check
   DataRecordSingleton& instance = DataRecordSingleton::getInstance();
   if (DataRecordDashboard::getInstance().isOpenCheck())
   {
@@ -282,33 +282,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
   {
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
   }
-  // get intersect detail
-  std::vector<DataRecordSingleton::FaceDetail> faceDetailVct;
-  const BOPDS_DS& datastruct = myDSFiller->DS();
-  BOPDS_VectorOfFaceInfo faceinfoVct = myDSFiller->DS().myFaceInfoPoolCopy;
-  for (auto iter = faceinfoVct.begin(); iter != faceinfoVct.end(); iter++)
-  {
-      BOPDS_FaceInfo faceinfo = *iter;
-  }
-  DataRecordSingleton::FaceDetail faceDetail;
-
-  for (int i = 0; i < faceinfoVct.Size(); i++)
-  {
-      BOPDS_FaceInfo faceinfo = faceinfoVct[i];
-      NCollection_IndexedMap<Handle(BOPDS_PaveBlock)> paveblocks = faceinfo.PaveBlocksSc();
-      const BOPDS_ShapeInfo& shapeinfo = datastruct.ShapeInfo(faceinfo.Index());
-      if (i == 0)
-          faceDetail.m_faceObject = TopoDS::Face(shapeinfo.Shape());
-      else
-          faceDetail.m_faceTool = TopoDS::Face(shapeinfo.Shape());
-
-      for (auto itPB = paveblocks.cbegin(); itPB != paveblocks.cend(); itPB++)
-      {
-          Handle(BOPDS_PaveBlock) paveblock = *itPB;
-          faceDetail.m_edgeIntersect = TopoDS::Edge(datastruct.Shape(paveblock->Edge()));
-      }
-
-  }
+  //output tcl file
   if (DataRecordDashboard::getInstance().isOpenOutput())
   {
       //force to output

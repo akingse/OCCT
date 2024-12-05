@@ -264,7 +264,26 @@ class BRep_TVertex : public TopoDS_TVertex
 
 ![image-20241128175916864](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241128175916864.png)
 
-坐标系gp_Ax
+```cpp
+class BRep_TFace继承自TopoDS_TFace，在TopoDS_Face拓扑列表成员myTShape中；
+//BRep_TFace拓扑面有多个成员数据，主要是mySurface，基类Geom_Surface纯几何数据
+class BRep_TEdge继承自TopoDS_TEdge，在TopoDS_Edge拓扑列表成员myTShape中；
+//BRep_TEdge拓扑面有3个成员数据，主要是myCurves列表，数据是BRep_CurveRepresentation/BRep_GCurve，子类持有Geom_Curve指针，对Geom_Curve进行一层封装
+
+class BRep_Curve3D 
+  Handle(Geom_Curve) myCurve;
+
+class BRep_CurveOnSurface用于表示在某个表面上定义的曲线
+  myUV1 是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的起始参数坐标（U、V）。这通常用于定义曲线在表面上的起点位置。
+  myUV2 同样是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的结束参数坐标（U、V）。这用于定义曲线在表面上的终点位置。
+  Handle(Geom2d_Curve) myPCurve;
+  Handle(Geom_Surface) mySurface;
+
+```
+
+
+
+### 数学类型gp_Ax
 
 ```cpp
 //gp_Ax1
@@ -294,6 +313,16 @@ class gp_GTrsf //通用变换，仿射变换
 
 class gp_Pln //持有gp_Ax3
 
+
+```
+
+### 容器
+
+![image-20241205185243138](C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241205185243138.png)
+
+```cpp
+OCCT中有两个容器集
+//TCollection 包在 1998 年标准化之前用于模拟模板。从 OССТ 开始7.0 中，它被相应的 NCollection 实例取代。NCollection 包是一个较新的基于模板的包，提供现代容器。
     
 //容器 new collect 新集合
 NCollection_DynamicArray(NCollection_Vector) //动态数组容器，允许动态调整大小
@@ -316,7 +345,9 @@ size_t myUsedSize;当前已使用
 临时性：非持久变换通常是指在进行某些计算或操作时应用的变换，这些变换在操作完成后不会影响原始几何对象的定义。 
 ```
 
-几何点线面
+
+
+### 几何点线面
 
 ```C++
 public Geom_Geometry
@@ -381,6 +412,42 @@ public BRep_PointRepresentation
         class BRep_PointOnCurveOnSurface
             
 public BRep_SurfaceRepresentation  //not exist
+```
+
+### Adaptor包装器
+
+<img src="C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241205185959027.png" alt="image-20241205185959027" style="zoom:50%;" />
+
+<img src="C:/Users/Aking/AppData/Roaming/Typora/typora-user-images/image-20241205190243238.png" alt="image-20241205190243238" style="zoom:50%;" />
+
+```cpp
+//OCCT 为 OSD 包中的低级操作系统设施提供独立于平台的接口
+
+public Adaptor3d_Surface//虚基类，用于几何算法对曲面的操作
+    //允许将曲面在 U 和 V 方向上按任意连续性分解为多个间隔//BSpline 曲面的多项式系数会被缓存以提高性能
+class GeomAdaptor_Surface //用于连接 Geom 包中的曲面服务和使用这些曲面的算法所需的功能
+  Handle(Geom_Surface) mySurface;对 Geom 包中的曲面的句柄。它表示当前适配的曲面实例
+  Standard_Real myUFirst;表示曲面在 U 方向上的起始参数值。
+  Standard_Real myULast;表示曲面在 U 方向上的结束参数值
+  Standard_Real myVFirst;表示曲面在 V 方向上的起始参数值
+  Standard_Real myVLast;表示曲面在 V 方向上的结束参数值
+  Standard_Real myTolU;表示在 U 方向上的公差值
+  Standard_Real myTolV;表示在 V 方向上的公差值
+  Handle(Geom_BSplineSurface) myBSplineSurface; ///< B-spline representation to prevent downcasts
+  mutable Handle(BSplSLib_Cache) mySurfaceCache; //缓存B-spline or Bezier surface
+  GeomAbs_SurfaceType mySurfaceType;曲面的类型
+  Handle(GeomEvaluator_Surface) myNestedEvaluator; 对嵌套评估器的句柄，负责计算嵌套复杂曲面的值
+class BRepAdaptor_Surface //将 BRep 拓扑中的面（Face）视为一个三维曲面
+  GeomAdaptor_Surface mySurf;它用于适配和管理与 BRep 面相关的几何曲面。利用 GeomAdaptor_Surface 提供的功能来访问和操作 BRep 拓扑中的面
+  gp_Trsf myTrsf;几何变换
+  TopoDS_Face myFace;表示 BRep 拓扑中的一个面
+    
+    
+public Adaptor3d_Curve
+class GeomAdaptor_Curve
+class BRepAdaptor_Curve
+    
+    
 ```
 
 
@@ -452,21 +519,11 @@ class BRepPrimAPI_MakeSweep
     BRepOffsetAPI_MakePipeShell 
     BRepPrimAPI_MakePrism //linear swept, called prisms
     BRepPrimAPI_MakeRevol //revolved sweep topologies，持有BRepSweep_Revol
+    
+    
 ```
 
 
 
 
-
-### BRep_CurveOnSurface
-
-```
-用于表示在某个表面上定义的曲线
-  Handle(Geom2d_Curve) myPCurve;
-  Handle(Geom_Surface) mySurface;
-myUV1 是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的起始参数坐标（U、V）。这通常用于定义曲线在表面上的起点位置。
-myUV2 同样是一个二维点（gp_Pnt2d），表示曲线在其所在表面上的结束参数坐标（U、V）。这用于定义曲线在表面上的终点位置。
-
-
-```
 
