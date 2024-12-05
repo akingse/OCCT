@@ -638,11 +638,11 @@ protected: //! Analyzing Progress steps
 
 protected: //! Fields
 
-  TopTools_ListOfShape myArguments;
-  BOPDS_PDS myDS;
-  BOPDS_PIterator myIterator;
+  TopTools_ListOfShape myArguments; //NCollection_List<TopoDS_Shape>
+  BOPDS_DS* myDS;
+  BOPDS_Iterator* myIterator;
   Handle(IntTools_Context) myContext;
-  BOPAlgo_SectionAttribute mySectionAttribute;
+  BOPAlgo_SectionAttribute mySectionAttribute; //3 bool
   Standard_Boolean myNonDestructive;
   Standard_Boolean myIsPrimary;
   Standard_Boolean myAvoidBuildPCurve;

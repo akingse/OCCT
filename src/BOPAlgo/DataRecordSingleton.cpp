@@ -15,8 +15,9 @@ bool DataRecordSingleton::sm_openCheck = false;
 bool DataRecordSingleton::sm_isAverage = false;
 double DataRecordSingleton::sm_toleDist = 1e-6;
 double DataRecordSingleton::sm_tolerence = 1e-6;
+DataRecordSingleton::ShapeCheck DataRecordSingleton::sm_recordCheck;
 std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
-std::vector<std::vector<DataRecordSingleton::FaceDetail>> DataRecordSingleton::sm_recordFace;
+std::vector<DataRecordSingleton::FaceDetail> DataRecordSingleton::sm_recordFace;
 static const int _unvalid_id = -1;
 
 void DataRecordSingleton::writeToCsvInOne(const std::string& filename)

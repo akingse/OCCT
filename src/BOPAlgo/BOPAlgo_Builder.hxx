@@ -522,8 +522,8 @@ protected: //! @name Fields
 
   TopTools_ListOfShape myArguments;             //!< Arguments of the operation
   TopTools_MapOfShape myMapFence;               //!< Fence map providing the uniqueness of the shapes in the list of arguments
-  BOPAlgo_PPaveFiller myPaveFiller;             //!< Pave Filler - algorithm for sub-shapes intersection
-  BOPDS_PDS myDS;                               //!< Data Structure - holder of intersection information
+  BOPAlgo_PaveFiller* myPaveFiller;             //!< Pave Filler - algorithm for sub-shapes intersection
+  BOPDS_DS* myDS;                               //!< Data Structure - holder of intersection information
   Handle(IntTools_Context) myContext;           //!< Context - tool for cashing heavy algorithms such as Projectors and Classifiers
   Standard_Integer myEntryPoint;                //!< EntryPoint - controls the deletion of the PaveFiller, which could live longer than the Builder
   TopTools_DataMapOfShapeListOfShape myImages;  //!< Images - map of Images of the sub-shapes of arguments

@@ -497,15 +497,15 @@ protected:
   Standard_Integer myNbShapes;
   Standard_Integer myNbSourceShapes;
   BOPDS_VectorOfIndexRange myRanges;
-  BOPDS_VectorOfShapeInfo myLines;
-  TopTools_DataMapOfShapeInteger myMapShapeIndex;
-  BOPDS_VectorOfListOfPaveBlock myPaveBlocksPool;
-  BOPDS_DataMapOfPaveBlockCommonBlock myMapPBCB;
-  BOPDS_VectorOfFaceInfo myFaceInfoPool;
-  TColStd_DataMapOfIntegerInteger myShapesSD;
-  TColStd_DataMapOfIntegerListOfInteger myMapVE;
-  BOPDS_MapOfPair myInterfTB;
-  BOPDS_VectorOfInterfVV myInterfVV;
+  NCollection_Vector<BOPDS_ShapeInfo> myLines; //BOPDS_VectorOfShapeInfo
+  NCollection_DataMap<TopoDS_Shape, int, TopTools_ShapeMapHasher> myMapShapeIndex; //TopTools_DataMapOfShapeInteger
+  NCollection_Vector<BOPDS_ListOfPaveBlock> myPaveBlocksPool; //BOPDS_VectorOfListOfPaveBlock
+  NCollection_DataMap<Handle(BOPDS_PaveBlock), Handle(BOPDS_CommonBlock)>  myMapPBCB;//BOPDS_DataMapOfPaveBlockCommonBlock
+  NCollection_Vector<BOPDS_FaceInfo> myFaceInfoPool; //BOPDS_VectorOfFaceInfo
+  TColStd_DataMapOfIntegerInteger myShapesSD; //NCollection_DataMap<int, int>
+  TColStd_DataMapOfIntegerListOfInteger myMapVE; //NCollection_DataMap<int, NCollection_List<int>>
+  NCollection_Map<BOPDS_Pair> myInterfTB; //BOPDS_MapOfPair
+  BOPDS_VectorOfInterfVV myInterfVV; //NCollection_Vector<BOPDS_InterfVV>
   BOPDS_VectorOfInterfVE myInterfVE;
   BOPDS_VectorOfInterfVF myInterfVF;
   BOPDS_VectorOfInterfEE myInterfEE;

@@ -75,7 +75,10 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopTools_DataMapOfShapeInteger.hxx>
 #include <TopTools_ListOfShape.hxx>
+
 #include "BRepBuilderAPI_MakeEdge.hxx"
+#include "../BOPAlgo/DataRecordSingleton.h"
+using namespace test;
 
 //
 static Standard_Real ToleranceFF(const BRepAdaptor_Surface& aBAS1,
@@ -516,11 +519,21 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
       const IntTools_Curve& aIC = aCvsX(i);
       Standard_Boolean bIsValid = IntTools_Tools::CheckCurve(aIC, aBox);
       if (bIsValid) {
+
 #ifdef USING_OPENCASCADE_TEST
         //get Shape Edge
-        TopoDS_Edge topoedge = BRepBuilderAPI_MakeEdge(aIC.Curve());
+        TopoDS_Edge shapeEdge = BRepBuilderAPI_MakeEdge(aIC.Curve());
+        DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+        const BOPDS_ShapeInfo& shapeInfo1 = myDS->ShapeInfo(nF1);
+        const BOPDS_ShapeInfo& shapeInfo2 = myDS->ShapeInfo(nF2);
+        DataRecordSingleton::FaceDetail faceDetail;
+        faceDetail.m_edgeIntersect = shapeEdge;
+        faceDetail.m_faceObject = TopoDS::Face(shapeInfo1.Shape());
+        faceDetail.m_faceTool = TopoDS::Face(shapeInfo2.Shape());
+        instance.appendFaceDetial(faceDetail);
+
         BOPDS_ShapeInfo shapeinfo;
-        shapeinfo.SetShape(topoedge);
+        shapeinfo.SetShape(shapeEdge);
         Standard_Integer index = myDS->Append(shapeinfo);// add to myLines
         //FaceInfo hold PaveBlock
         Handle(BOPDS_PaveBlock) paveblock = new BOPDS_PaveBlock;

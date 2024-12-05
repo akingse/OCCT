@@ -6,8 +6,9 @@
 #include <memory>
 #ifdef USING_OPENCASCADE_CLASS
 #include <TopoDS_Shape.hxx>
-#include <BRep_Builder.hxx>
-#include <BRepTools.hxx>
+#include <TopoDS_Edge.hxx>
+#include <BRep_Builder.hxx> //TopoDS:: create
+#include <BRepTools.hxx> //Read and Write
 #include <BRepAlgoAPI_Check.hxx>
 #endif //USING_OPENCASCADE_CLASS
 
@@ -102,21 +103,28 @@ namespace test
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
 //#ifdef USING_OPENCASCADE_CLASS //keep same define
             std::shared_ptr<TopoDS_Shape> m_shape;//std::vector<>
-            BOPAlgo_ListOfCheckResult m_checkBefore;
-            BOPAlgo_ListOfCheckResult m_checkAfter;
+        };
+
+        //for boolean once
+        struct ShapeCheck
+        {
+            NCollection_List<BOPAlgo_CheckResult> m_checkObsolete; //one-one boolean
+            NCollection_List<BOPAlgo_CheckResult> m_checkBefore;
+            NCollection_List<BOPAlgo_CheckResult> m_checkAfter;
+            Handle(Message_Report) m_msgReport;
         };
 
         struct FaceDetail
         {
-            TopoDS_Shape m_faceObject;
-            TopoDS_Shape m_faceTool;
-            TopoDS_Shape m_edgeIntersect;
+            TopoDS_Face m_faceObject;
+            TopoDS_Face m_faceTool;
+            TopoDS_Edge m_edgeIntersect;
         };
 
         //DataCompareSingleton
     public:
-        static double sm_toleDist;
-        static double sm_tolerence;
+        OPENCASCADE_TEST_API static double sm_toleDist;
+        OPENCASCADE_TEST_API static double sm_tolerence;
 
     private:
         //static int sm_index;
@@ -124,8 +132,9 @@ namespace test
         static bool sm_isAverage;
         OPENCASCADE_TEST_API static bool sm_openTime;// =false
         OPENCASCADE_TEST_API static bool sm_openCheck;// =false
+        OPENCASCADE_TEST_API static ShapeCheck sm_recordCheck;
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
-        OPENCASCADE_TEST_API static std::vector<std::vector<FaceDetail>> sm_recordFace;
+        OPENCASCADE_TEST_API static std::vector<FaceDetail> sm_recordFace;
 
     public:
 #pragma region inline_function
@@ -154,6 +163,7 @@ namespace test
         {
             return sm_openTime;
         }
+        //mutual exclusion
         static void setOpenTime(bool isOpen = true)
         {
             sm_openTime = isOpen;
@@ -190,6 +200,15 @@ namespace test
                     sm_recordData[i].m_name = std::to_string(i);
             }
         }
+        static ShapeCheck& getShapeCheck()
+        {
+            return sm_recordCheck;
+        }
+        static void appendFaceDetial(const FaceDetail& faceDetail)
+        {
+            sm_recordFace.push_back(faceDetail);
+        }
+
 #pragma endregion
 
         OPENCASCADE_TEST_API static TopoDS_Shape readBinToShape(const std::string& filename);

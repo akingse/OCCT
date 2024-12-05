@@ -29,8 +29,11 @@
 #include <TCollection_AsciiString.hxx>
 
 #include <stdio.h>
+#include <direct.h> //_getcwd
 #include "../BOPAlgo/DataRecordSingleton.h"
 #include "../BOPDS/BOPDS_DS.hxx"
+#include "../TopoDS/TopoDS.hxx"
+using namespace test;
 
 //=======================================================================
 //class : BRepAlgoAPI_DumpOper
@@ -51,11 +54,14 @@ class BRepAlgoAPI_DumpOper {
   virtual ~BRepAlgoAPI_DumpOper() {
   };
   //
+  void SetIsDump(const Standard_Boolean bFlag) { //extra
+      myIsDump = bFlag;
+  }
   Standard_Boolean IsDump()const {
     return myIsDump;
   };
   //
-  void SetIsDumpArgs(const Standard_Boolean bFlag) {
+  void SetIsDumpArgs(const Standard_Boolean bFlag) { //checked before boolean
     myIsDumpArgs=bFlag;
   }
   //
@@ -63,7 +69,7 @@ class BRepAlgoAPI_DumpOper {
     return myIsDumpArgs;
   };
   //
-  void SetIsDumpRes(const Standard_Boolean bFlag) {
+  void SetIsDumpRes(const Standard_Boolean bFlag) { //checked after boolean
     myIsDumpRes=bFlag;
   };
   //
@@ -120,16 +126,14 @@ BRepAlgoAPI_BooleanOperation::BRepAlgoAPI_BooleanOperation
   myArguments.Append(theS1);
   myTools.Append(theS2);
 #ifdef USING_OPENCASCADE_TEST
+  //before do boolean(one-one)
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
   if (instance.isOpenCheck())
   {
-      BRepAlgoAPI_Check checkBefore = BRepAlgoAPI_Check(theS1, theS2, theOp);
-      Message_ProgressRange rangeBefore;
-      checkBefore.Perform(rangeBefore);
-      BOPAlgo_ListOfCheckResult resultBefore = checkBefore.Result();
-      test::DataRecordSingleton::DataMap data;
-      data.m_checkBefore = resultBefore;
-      instance.getData().push_back(data);
+      BRepAlgoAPI_Check checkObsolete = BRepAlgoAPI_Check(theS1, theS2, theOp);
+      Message_ProgressRange rangeObsolete;
+      checkObsolete.Perform(rangeObsolete);
+      instance.getShapeCheck().m_checkObsolete = checkObsolete.Result();
   }
 #endif//USING_OPENCASCADE_TEST
 }
@@ -181,7 +185,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       aDumpOper.SetIsDumpArgs(!aChekArgs.IsValid());
     }
   }
-
+  
   TCollection_AsciiString aPSName;
   switch (myOperation)
   {
@@ -213,6 +217,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
 
 #ifdef USING_OPENCASCADE_TEST
     test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+    //before do boolean(multi-multi and one-one) 
     if (instance.isOpenCheck())
     {
         BOPAlgo_ListOfCheckResult resultBefore;
@@ -224,9 +229,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
             BOPAlgo_ListOfCheckResult temp = checkBefore.Result();
             resultBefore.Append(temp);
         }
-        test::DataRecordSingleton::DataMap data;
-        data.m_checkBefore = resultBefore;
-        instance.getData().push_back(data);
+        instance.getShapeCheck().m_checkBefore = resultBefore;
     }
 #endif//USING_OPENCASCADE_TEST
 
@@ -265,29 +268,29 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
   }
 #ifdef USING_OPENCASCADE_TEST
   test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  std::vector<test::DataRecordSingleton::DataMap>& dataMap = instance.getData();
-  BOPAlgo_ListOfCheckResult resultAfter;
+  std::vector<DataRecordSingleton::DataMap>& dataMap = instance.getData();
+  // after do boolean
   if (instance.isOpenCheck())
   {
       BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(myShape);
       Message_ProgressRange rangeAfter;
       checkAfter.Perform(rangeAfter);
-      resultAfter = checkAfter.Result();
+      instance.getShapeCheck().m_checkAfter = checkAfter.Result();
+      instance.getShapeCheck().m_msgReport = GetReport(); //from parent class
   }
   if (!dataMap.empty())
   {
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
-      dataMap.back().m_checkAfter = resultAfter;
   }
   // get intersect detail
-  std::vector<test::DataRecordSingleton::FaceDetail> faceDetailVct;
+  std::vector<DataRecordSingleton::FaceDetail> faceDetailVct;
   const BOPDS_DS& datastruct = myDSFiller->DS();
   BOPDS_VectorOfFaceInfo faceinfoVct = myDSFiller->DS().myFaceInfoPoolCopy;
   for (auto iter = faceinfoVct.begin(); iter != faceinfoVct.end(); iter++)
   {
       BOPDS_FaceInfo faceinfo = *iter;
   }
-  test::DataRecordSingleton::FaceDetail faceDetail;
+  DataRecordSingleton::FaceDetail faceDetail;
 
   for (int i = 0; i < faceinfoVct.Size(); i++)
   {
@@ -295,19 +298,24 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       NCollection_IndexedMap<Handle(BOPDS_PaveBlock)> paveblocks = faceinfo.PaveBlocksSc();
       const BOPDS_ShapeInfo& shapeinfo = datastruct.ShapeInfo(faceinfo.Index());
       if (i == 0)
-          faceDetail.m_faceObject = shapeinfo.Shape();
+          faceDetail.m_faceObject = TopoDS::Face(shapeinfo.Shape());
       else
-          faceDetail.m_faceTool = shapeinfo.Shape();
+          faceDetail.m_faceTool = TopoDS::Face(shapeinfo.Shape());
 
       for (auto itPB = paveblocks.cbegin(); itPB != paveblocks.cend(); itPB++)
       {
           Handle(BOPDS_PaveBlock) paveblock = *itPB;
-          const TopoDS_Shape& shapeEdge = datastruct.Shape(paveblock->Edge());
-          faceDetail.m_edgeIntersect = shapeEdge;
+          faceDetail.m_edgeIntersect = TopoDS::Edge(datastruct.Shape(paveblock->Edge()));
       }
 
   }
-
+  if (DataRecordSingleton::getInstance().isOpenCheck())
+  {
+      //force to output
+      aDumpOper.SetIsDumpArgs(true);
+      aDumpOper.SetIsDumpRes(true);
+      aDumpOper.Dump(myArguments.First(), myTools.First(), myShape, myOperation);
+  }
 #endif//USING_OPENCASCADE_TEST
 
   if (aDumpOper.IsDump()) {
@@ -332,6 +340,14 @@ void BRepAlgoAPI_DumpOper::Dump(const TopoDS_Shape& theShape1,
   }
   //
   TCollection_AsciiString aPath(myPath);
+  //USING_OPENCASCADE_TEST
+  if (aPath.IsEmpty())
+  {
+      char buffer[MAX_PATH];
+      std::string path(_getcwd(buffer, sizeof(buffer)));
+      aPath = TCollection_AsciiString(path.c_str());
+      aPath += "/binFile"; //custom
+  }
   aPath += "/";
   Standard_Integer aNumOper = 1;
   Standard_Boolean isExist = Standard_True;
@@ -341,7 +357,7 @@ void BRepAlgoAPI_DumpOper::Dump(const TopoDS_Shape& theShape1,
   {
     aFileName = aPath + "BO_" + TCollection_AsciiString(aNumOper) +".tcl";
     OSD_File aScript(aFileName);
-    isExist = aScript.Exists();
+    isExist = aScript.Exists(); //avoid file cover
     if(isExist)
       aNumOper++;
   }
@@ -349,7 +365,7 @@ void BRepAlgoAPI_DumpOper::Dump(const TopoDS_Shape& theShape1,
   FILE* afile = fopen(aFileName.ToCString(), "w+");
   if(!afile)
     return;
-  if(myIsDumpArgs)
+  if(!myIsDumpArgs)
     fprintf(afile,"%s\n","# Arguments are invalid");
 
   TCollection_AsciiString aName1;
