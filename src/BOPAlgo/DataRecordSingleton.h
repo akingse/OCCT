@@ -19,7 +19,7 @@ namespace test
     /// <summary>
     /// DataRecordDashboard 测试控制面板，无具体数据，只包含开关，可以导出
     /// </summary>
-    class DataRecordDashboard
+    class DataRecordDashboard //DataRecordCtrlPanel
     {
     private:
         OPENCASCADE_TEST_API DataRecordDashboard() = default;
@@ -122,7 +122,7 @@ namespace test
     /// 用于每次修改OCC源码后作为对照；
     /// 此单例类有open开关，默认关闭，开启对比是开启，效率统计时关闭；
     /// </summary>
-    class DataRecordSingleton //DataRecordSingleton
+    class DataRecordSingleton //DataCountSingleton and DataCompareSingleton
     {
     private:
         OPENCASCADE_TEST_API DataRecordSingleton() = default;
@@ -174,7 +174,6 @@ namespace test
             TopoDS_Edge m_edgeIntersect;
         };
 
-        //DataCompareSingleton
     public:
         OPENCASCADE_TEST_API static double sm_toleDist;
         OPENCASCADE_TEST_API static double sm_tolerence;

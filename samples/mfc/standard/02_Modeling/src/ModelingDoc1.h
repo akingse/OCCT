@@ -155,7 +155,7 @@ namespace test
 			}
 		}
 
-		//从中获取指定类型的TopoDS_Shape
+		//从成员数据中获取指定类型的TopoDS_Shape
 		std::vector<TopoDS_Shape> getShapeVct(TopAbs_ShapeEnum topoType) const
 		{
 			std::vector<TopoDS_Shape> shapeRes;
@@ -216,7 +216,7 @@ namespace test
 		{
 			m_isOneOne = false;
 			m_node = std::make_shared<BoolNode>(operation);
-			//链表，不支持索引
+			//NCollection_List, nonsupport using index
 			for (const auto& iter : objects)
 				m_shapeArgument.push_back(iter);
 			for (const auto& iter : tools)
@@ -233,8 +233,7 @@ namespace test
 		void checkTopology() const
 		{
 			//close
-			DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-			instance.setOpenTime(false);
+			DataRecordDashboard::getInstance().setOpenTime(false);
 			if (m_shapeArgument.empty())
 				return;
 			if (m_isOneOne && m_shapeArgument.size() == 2)
