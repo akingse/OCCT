@@ -166,6 +166,7 @@ namespace test
             NCollection_List<BOPAlgo_CheckResult> m_checkBefore;
             NCollection_List<BOPAlgo_CheckResult> m_checkAfter;
             Handle(Message_Report) m_msgReport;
+            void writeToFile(const std::string& filename) const;
         };
 
         struct FaceDetail
@@ -252,7 +253,7 @@ namespace test
 #pragma endregion
 
         OPENCASCADE_TEST_API static TopoDS_Shape readBinToShape(const std::string& filename);
-        OPENCASCADE_TEST_API static void writeShapeToFile();
+        OPENCASCADE_TEST_API static void writeShapeToFile(const std::string& filename);
         OPENCASCADE_TEST_API static std::string readBinToString(const std::string& filename);
         OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
         OPENCASCADE_TEST_API static std::vector<int> compareBRepFormat();

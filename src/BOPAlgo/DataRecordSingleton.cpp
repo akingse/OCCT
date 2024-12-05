@@ -24,6 +24,46 @@ std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
 std::vector<DataRecordSingleton::FaceDetail> DataRecordSingleton::sm_recordFace;
 static const int _unvalid_id = -1;
 
+void DataRecordSingleton::ShapeCheck::writeToFile(const std::string& filename) const
+{
+    std::ofstream ofsFile(filename);
+    if (!ofsFile.is_open())
+        return;
+    ofsFile << "Message_Report" << "," << !m_msgReport.IsNull() << endl;
+    if (!m_msgReport.IsNull())
+    {
+        Message_Gravity theGravity = Message_Gravity::Message_Trace; //waring level
+        NCollection_List<Handle(Message_Alert)> msgAlerts = m_msgReport->GetAlerts(theGravity);
+        for (const auto& iter : msgAlerts)
+        {
+            if (!iter.IsNull())
+                ofsFile << "Message_Alert," << string(iter->GetMessageKey()) << endl;
+        }
+    }
+    ofsFile << "BOPAlgo_CheckResult" << "," << "checkObsolete" << endl;
+    for (const auto& iter : m_checkObsolete)
+    {
+        ofsFile << "CheckStatus," << iter.GetCheckStatus();
+        ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
+        ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
+    }
+    ofsFile << "BOPAlgo_CheckResult" << "," << "checkBefore" << endl;
+    for (const auto& iter : m_checkBefore)
+    {
+        ofsFile << "CheckStatus," << iter.GetCheckStatus();
+        ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
+        ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
+    }
+    ofsFile << "BOPAlgo_CheckResult" << "," << "checkAfter" << endl;
+    for (const auto& iter : m_checkAfter)
+    {
+        ofsFile << "CheckStatus," << iter.GetCheckStatus();
+        ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
+        ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
+    }
+    return;
+}
+
 void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
 {
     //merge into one DataMap
@@ -93,15 +133,19 @@ TopoDS_Shape DataRecordSingleton::readBinToShape(const std::string& filename)
     return Shape;
 }
 
-void DataRecordSingleton::writeShapeToFile()
+void DataRecordSingleton::writeShapeToFile(const std::string& fileName)
 {
     setName({});
-    char buffer[MAX_PATH];
-    std::string path(_getcwd(buffer, sizeof(buffer)));
+    std::string filename = fileName;
+    if (filename.empty())
+    {
+        char buffer[MAX_PATH];
+        filename = _getcwd(buffer, sizeof(buffer));
+    }
     for (int i = 0; i < sm_recordData.size(); i++)
     {
         const DataMap& data = sm_recordData[i];
-        std::string filename = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
+        filename += "\\binFile\\shape_std_" + data.m_name + ".txt";
         if (data.m_shape != nullptr)
             BRepTools::Write(*data.m_shape, filename.c_str());
     }

@@ -36,14 +36,7 @@ static CsgTree getBooleanTest_01()
 	return csgtree;
 }
 
-//创建拉伸体
-static CsgTree getBooleanTest_02()
-{
-	CsgTree csgtree;
-	return csgtree;
-}
-
-//OCCT布尔BUG-Torus Cut Cone
+//OCCT布尔布尔BUG Torus-Cut-Cone
 static CsgTree getBooleanTest_03()
 {
 	//DataRecordDashboard::getInstance().setOpenCheck(true);
@@ -77,7 +70,7 @@ static CsgTree getBooleanTest_03()
 	*/
 }
 
-//OCCT布尔BUG-Cylinder Cut Sphere//已修复
+//OCCT布尔BUGCylinder-Cut-Sphere//已修复
 static CsgTree getBooleanTest_04()
 {
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeCylinder(1, 1).Shape();
@@ -165,8 +158,10 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 	clearDisplay();
 	//DataRecordDashboard::getInstance().setOpenOutput();
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	g_csgtree = getBooleanTest_08();
+	g_csgtree = getBooleanTest_03();
 	std::vector<DataRecordSingleton::FaceDetail> faceDetailVct = instance.getFaceDetial();
+    DataRecordSingleton::ShapeCheck shapeCheck = instance.getShapeCheck();
+
 	for (int i = 0; i < faceDetailVct.size(); i++)
 	{
 		std::array<TopoDS_Shape, 3> shapes = faceDetailVct[i].getShapes();
