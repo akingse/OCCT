@@ -459,6 +459,14 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
   //======================================================
   // Treatment of the results
 
+#ifdef USING_OPENCASCADE_TEST
+  DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+  const BOPDS_ShapeInfo& shapeInfo1 = myDS->ShapeInfo(nF1);
+  const BOPDS_ShapeInfo& shapeInfo2 = myDS->ShapeInfo(nF2);
+  DataRecordSingleton::FaceDetail faceDetail;
+  faceDetail.m_faceObject = TopoDS::Face(shapeInfo1.Shape());
+  faceDetail.m_faceTool = TopoDS::Face(shapeInfo2.Shape());
+#endif//USING_OPENCASCADE_TEST
   for (k = 0; k < aNbFaceFace; ++k) {
     if (UserBreak(aPSOuter))
     {
@@ -519,18 +527,9 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
       const IntTools_Curve& aIC = aCvsX(i);
       Standard_Boolean bIsValid = IntTools_Tools::CheckCurve(aIC, aBox);
       if (bIsValid) {
-
 #ifdef USING_OPENCASCADE_TEST
-        //get Shape Edge
         TopoDS_Edge shapeEdge = BRepBuilderAPI_MakeEdge(aIC.Curve());
-        DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-        const BOPDS_ShapeInfo& shapeInfo1 = myDS->ShapeInfo(nF1);
-        const BOPDS_ShapeInfo& shapeInfo2 = myDS->ShapeInfo(nF2);
-        DataRecordSingleton::FaceDetail faceDetail;
-        faceDetail.m_edgeIntersect = shapeEdge;
-        faceDetail.m_faceObject = TopoDS::Face(shapeInfo1.Shape());
-        faceDetail.m_faceTool = TopoDS::Face(shapeInfo2.Shape());
-        instance.appendFaceDetial(faceDetail);
+        faceDetail.m_edgesInterf.push_back(shapeEdge);
 #endif//USING_OPENCASCADE_TEST
 
         BOPDS_Curve& aNC = aVNC.Appended();
@@ -552,6 +551,10 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
       aNP.SetPnt(aP);
     }
   }
+#ifdef USING_OPENCASCADE_TEST
+  if (!faceDetail.m_edgesInterf.empty())
+      instance.appendFaceDetial(faceDetail);
+#endif
 }
 
 //=======================================================================

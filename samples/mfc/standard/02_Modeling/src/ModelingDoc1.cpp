@@ -43,7 +43,7 @@ static CsgTree getBooleanTest_03()
 
 	double R = 10, r = 2;
 	double H = 30;
-	double offset = 0.1;
+	double offset = 0.;
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r, 0, H).Shape();
 	gp_Trsf trsfR;
@@ -164,19 +164,20 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 
 	for (int i = 0; i < faceDetailVct.size(); i++)
 	{
-		std::array<TopoDS_Shape, 3> shapes = faceDetailVct[i].getShapes();
+		std::vector<TopoDS_Shape> shapes = faceDetailVct[i].getShapes();
 		for (int j = 0; j < shapes.size(); j++)
 		{
 			oneShapeDisplay(shapes[j]);
 		}
 	}
 
-	std::vector<TopoDS_Shape> shapeVct;// = g_csgtree.m_shapeArgument;
+	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{
-		oneShapeDisplay(shapeVct[i]);
+		//oneShapeDisplay(shapeVct[i]);
 	}
 	Fit();
+	instance.clear();
 	return;
 }
 

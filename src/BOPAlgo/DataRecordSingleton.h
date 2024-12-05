@@ -173,14 +173,22 @@ namespace test
         {
             TopoDS_Face m_faceObject;
             TopoDS_Face m_faceTool;
-            TopoDS_Edge m_edgeIntersect;
-            inline std::array<TopoDS_Shape, 3> getShapes() const
+            std::vector<TopoDS_Edge> m_edgesInterf;
+			inline std::vector<TopoDS_Shape> getShapes(bool onlyEdge = false) const
             {
-                std::array<TopoDS_Shape, 3> res;
-                res[0] = m_faceObject;
-                res[1] = m_faceTool;
-                res[2] = m_edgeIntersect;
+                std::vector<TopoDS_Shape> res;
+                if (!onlyEdge)
+                {
+                    res.push_back(m_faceObject);
+                    res.push_back(m_faceTool);
+                }
+                for (const auto& iter : m_edgesInterf)
+                    res.push_back(iter);
                 return res;
+            }
+            inline std::vector<TopoDS_Shape> getFacePair() const
+            {
+                return std::vector<TopoDS_Shape>{m_faceObject, m_faceTool};
             }
         };
 
@@ -243,6 +251,15 @@ namespace test
         }
         static void appendFaceDetial(const FaceDetail& faceDetail)
         {
+            for (auto& iter : sm_recordFace)
+            {
+                if (iter.m_faceObject == faceDetail.m_faceObject &&
+                    iter.m_faceTool == faceDetail.m_faceTool)
+                {
+                    iter.m_edgesInterf.insert(iter.m_edgesInterf.end(), faceDetail.m_edgesInterf.begin(), faceDetail.m_edgesInterf.end());
+                    return;
+                }
+            }
             sm_recordFace.push_back(faceDetail);
         }
         static const std::vector<FaceDetail>& getFaceDetial()
