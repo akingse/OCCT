@@ -132,6 +132,7 @@ namespace test
         static bool sm_isAverage;
         OPENCASCADE_TEST_API static bool sm_openTime;// =false
         OPENCASCADE_TEST_API static bool sm_openCheck;// =false
+        OPENCASCADE_TEST_API static bool sm_openOutput;// =false
         OPENCASCADE_TEST_API static ShapeCheck sm_recordCheck;
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
         OPENCASCADE_TEST_API static std::vector<FaceDetail> sm_recordFace;
@@ -179,6 +180,14 @@ namespace test
             sm_openCheck = isOpen;
             if (sm_openCheck)
                 sm_openTime = false;
+        }
+        static bool isOpenOutput() //using output brep
+        {
+            return sm_openOutput;
+        }
+        static void setOpenOutput(bool isOpen = true)
+        {
+            sm_openOutput = isOpen;
         }
 
         static void hasBuild()//private only for BOPAlgo_BOP Build

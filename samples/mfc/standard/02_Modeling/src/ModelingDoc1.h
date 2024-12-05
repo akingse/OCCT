@@ -262,4 +262,44 @@ namespace test
 		}
 
 	};
+
+	inline CsgTree readBooleanFromTclFile(const std::string& filename)
+	{
+		std::ifstream infile(filename);
+		if (!infile)
+			return CsgTree();
+		TopoDS_Shape shape1, shape2;
+		BOPAlgo_Operation theOperation = BOPAlgo_Operation::BOPAlgo_UNKNOWN;
+		std::string line;
+		while (std::getline(infile, line))
+		{
+			std::vector<std::string> parts = clash::string_split(line, ' ');
+			if (parts.size() < 3)
+				continue;
+			if (parts[0] == "#")
+				continue;
+			if (parts[0] == "restore" && parts[2] == "arg1")
+			{
+				shape1 = DataRecordSingleton::readBinToShape(parts[1]);
+			}
+			else if (parts[0] == "restore" && parts[2] == "arg2")
+			{
+				shape2 = DataRecordSingleton::readBinToShape(parts[1]);
+			}
+			else if (parts[1] == "Res")
+			{
+				std::string aBopString = parts[0];
+				if (aBopString == "bcommon")
+					theOperation = BOPAlgo_Operation::BOPAlgo_COMMON;
+				else if (aBopString == "bfuse")
+					theOperation = BOPAlgo_Operation::BOPAlgo_FUSE;
+				else if (aBopString == "bcut")
+					theOperation = BOPAlgo_Operation::BOPAlgo_CUT;
+			}
+		}
+		infile.close();
+		CsgTree csgtree = CsgTree(shape1, shape2, theOperation);
+		return csgtree;
+	}
+
 }

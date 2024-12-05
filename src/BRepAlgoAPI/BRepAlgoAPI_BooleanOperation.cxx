@@ -309,7 +309,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       }
 
   }
-  if (DataRecordSingleton::getInstance().isOpenCheck())
+  if (DataRecordSingleton::getInstance().isOpenOutput())
   {
       //force to output
       aDumpOper.SetIsDumpArgs(true);

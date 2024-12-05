@@ -227,7 +227,7 @@ class TopoDS_Shape //六层次拓扑的基类，持有TopoDS_TShape
   TopLoc_Location myLocation;
   TopAbs_Orientation myOrient;
 
-class TopoDS_TShape //topological，
+class TopoDS_TShape //topological，持有TopoDS_Shape列表
   TopoDS_ListOfShape myShapes;
   Standard_Integer   myFlags;
 
