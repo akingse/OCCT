@@ -3,12 +3,6 @@ namespace test
 {
 	using opencascade::handle;
 
-	inline std::string getExePath()
-	{
-		char buffer[MAX_PATH];
-		return std::string(_getcwd(buffer, sizeof(buffer))); //get current work directory
-	}
-
 	struct TopoInfoRecord
 	{
 		std::vector<const BRep_TFace*> m_brepFaceVct;

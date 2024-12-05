@@ -19,6 +19,7 @@
 using namespace std;
 using namespace occ;
 using namespace test;
+using namespace clash;
 using opencascade::handle;
 
 CsgTree g_csgtree;
@@ -32,7 +33,7 @@ void writeTimeDataToCsv()
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
 	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
 
-	std::string filename = getExePath();
+	std::string filename = get_exe_path();
 	//windows系统函数，用于获取自系统启动以来所经过的毫秒数
 	filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
 	instance.writeToCsvInOne(filename);
@@ -44,7 +45,7 @@ void writeShapeDataToTxt()
 {
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
 	const std::vector<DataRecordSingleton::DataMap>& data = instance.getData();
-	std::string path = getExePath();
+	std::string path = get_exe_path();
 
 	//read
 	std::string filenameStd = path + "\\binFile\\shape_std_0.txt";
@@ -73,6 +74,43 @@ void writeShapeDataToTxt()
 	CString cs = isEq ? L"true" : L"false";
 	AfxMessageBox(cs);
 	instance.clear();
+}
+
+static CsgTree readBooleanFromTclFile(const std::string& filename)
+{
+	std::ifstream infile(filename); 
+	if (!infile)
+		return CsgTree();
+	TopoDS_Shape shape1, shape2;
+	BOPAlgo_Operation theOperation = BOPAlgo_Operation::BOPAlgo_UNKNOWN;
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		std::vector<std::string> parts = string_split(line, ' ');
+		if (parts.size() < 3)
+			continue;
+        if (parts[0] == "restore" && parts[2] == "arg1")
+		{
+			shape1 = DataRecordSingleton::readBinToShape(parts[1]);
+		}
+		else if (parts[0] == "restore" && parts[2] == "arg2")
+		{
+			shape2 = DataRecordSingleton::readBinToShape(parts[1]);
+		}
+		else if (parts[1] == "Res")
+		{
+			string aBopString = parts[0];
+			if (aBopString == "bcommon")
+				theOperation = BOPAlgo_Operation::BOPAlgo_COMMON;
+			else if (aBopString == "bfuse")
+				theOperation = BOPAlgo_Operation::BOPAlgo_FUSE;
+			else if (aBopString == "bcut")
+				theOperation = BOPAlgo_Operation::BOPAlgo_CUT;
+		}
+	}
+	infile.close();
+	CsgTree csgtree = CsgTree(shape1, shape2, theOperation);
+	return csgtree;
 }
 
 //两个共面立方体-布尔Fuse
@@ -362,7 +400,14 @@ static void getShapeCreate_03()
 //验证布尔
 void CModelingDoc::OnTestBoolBefore() //using icon -
 {
-	g_csgtree = getBooleanTest_08();
+	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+	instance.setOpenCheck();
+
+	//g_csgtree = getBooleanTest_06();
+	std::string filename = get_exe_path();
+	filename += "/binFile/BO_1.tcl";
+	g_csgtree = readBooleanFromTclFile(filename);
+
 	clearDisplay();
 	const std::vector<TopoDS_Shape>& shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
