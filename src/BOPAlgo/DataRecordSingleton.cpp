@@ -5,15 +5,18 @@
 #include <direct.h> //_getcwd
 
 #ifdef USING_OPENCASCADE_TEST
-using namespace test;
 using namespace std;
-//init
+using namespace test;
+
+//Dashboard
+bool DataRecordDashboard::sm_openTime = false;
+bool DataRecordDashboard::sm_openCheck = false;
+bool DataRecordDashboard::sm_openOutput = false;
+bool DataRecordDashboard::sm_isAverage = false;
+
+// Singleton
 //int DataRecordSingleton::sm_index = 0;
 int DataRecordSingleton::sm_hasBuild = 0;
-bool DataRecordSingleton::sm_openTime = false;
-bool DataRecordSingleton::sm_openCheck = false;
-bool DataRecordSingleton::sm_isAverage = false;
-bool DataRecordSingleton::sm_openOutput = false;
 double DataRecordSingleton::sm_toleDist = 1e-6;
 double DataRecordSingleton::sm_tolerence = 1e-6;
 DataRecordSingleton::ShapeCheck DataRecordSingleton::sm_recordCheck;
@@ -38,7 +41,7 @@ void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
                 mergeData.m_dataTimeVct[j].second += sm_recordData[i].m_dataTimeVct[j].second;
         }
     }
-    if (sm_isAverage && time != 1)
+    if (DataRecordDashboard::isAverage() && time != 1)
     {
         for (int j = 0; j < size; j++)
             mergeData.m_dataTimeVct[j].second /= time;

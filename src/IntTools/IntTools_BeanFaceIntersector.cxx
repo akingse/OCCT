@@ -368,28 +368,28 @@ void IntTools_BeanFaceIntersector::Perform()
   Standard_Boolean isLocalized = bLocalize && ComputeLocalized();
 
   // Perform real intersection
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  if (instance.isOpenTime())
-  {
-      std::chrono::steady_clock::time_point timestart;
-      std::chrono::steady_clock::time_point timeend;
-      std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-      test::DataRecordSingleton::DataMap& current = instance.getDataP().back();
-      if (!isLocalized)
-      {
-          MACRO_EXPANSION_TIME_START()
-          ComputeAroundExactIntersection();
-          MACRO_EXPANSION_TIME_END("ComputeAroundExactIntersection")
-          MACRO_EXPANSION_TIME_START()
-          ComputeUsingExtremum();
-          MACRO_EXPANSION_TIME_END("ComputeUsingExtremum")
-          MACRO_EXPANSION_TIME_START()
-          ComputeNearRangeBoundaries();
-          MACRO_EXPANSION_TIME_END("ComputeNearRangeBoundaries")
-      }
-  }
-  else
-  {
+  //test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
+  //if (instance.isOpenTime())
+  //{
+  //    std::chrono::steady_clock::time_point timestart;
+  //    std::chrono::steady_clock::time_point timeend;
+  //    std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
+  //    test::DataRecordSingleton::DataMap& current = instance.getDataP().back();
+  //    if (!isLocalized)
+  //    {
+  //        MACRO_EXPANSION_TIME_START()
+  //        ComputeAroundExactIntersection();
+  //        MACRO_EXPANSION_TIME_END("ComputeAroundExactIntersection")
+  //        MACRO_EXPANSION_TIME_START()
+  //        ComputeUsingExtremum();
+  //        MACRO_EXPANSION_TIME_END("ComputeUsingExtremum")
+  //        MACRO_EXPANSION_TIME_START()
+  //        ComputeNearRangeBoundaries();
+  //        MACRO_EXPANSION_TIME_END("ComputeNearRangeBoundaries")
+  //    }
+  //}
+  //else
+  
   if (!isLocalized)
   {
     ComputeAroundExactIntersection();
@@ -398,7 +398,7 @@ void IntTools_BeanFaceIntersector::Perform()
 
     ComputeNearRangeBoundaries();
   }
-  }
+  
   myIsDone = Standard_True;
 
   // Treatment of the results

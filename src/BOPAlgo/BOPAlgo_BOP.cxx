@@ -41,6 +41,7 @@
 //time consuming
 #include <chrono>
 #include "DataRecordSingleton.h"
+using namespace test;
 
 static
   TopAbs_ShapeEnum TypeToExplore(const Standard_Integer theDim);
@@ -421,9 +422,10 @@ void BOPAlgo_BOP::fillPIConstants (const Standard_Real theWhole, BOPAlgo_PISteps
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  if (instance.isOpenTime())
-  {  // USING_OPENCASCADE_TEST
+  // USING_OPENCASCADE_TEST
+  if (DataRecordDashboard::getInstance().isOpenTime())
+  {
+  DataRecordSingleton& instance = DataRecordSingleton::getInstance();
   std::chrono::steady_clock::time_point timestart;
   std::chrono::steady_clock::time_point timeend;
   std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second

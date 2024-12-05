@@ -4,16 +4,7 @@
 #include <map>
 #include <set>
 #include <memory>
-#ifdef USING_OPENCASCADE_CLASS
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Edge.hxx>
-#include <BRep_Builder.hxx> //TopoDS:: create
-#include <BRepTools.hxx> //Read and Write
-#include <BRepAlgoAPI_Check.hxx>
-#endif //USING_OPENCASCADE_CLASS
 
-//#define USING_OPENCASCADE_TEST //set in project config
-#ifdef USING_OPENCASCADE_TEST
 //custom export macro
 #ifdef OPENCASCADE_TEST_EXPORTS
 #define OPENCASCADE_TEST_API __declspec(dllexport)
@@ -21,19 +12,82 @@
 #define OPENCASCADE_TEST_API __declspec(dllimport)
 #endif //OPENCASCADE_TEST_EXPORTS
 
-#ifndef USING_OPENCASCADE_CLASS
-class TopoDS_Shape;
-#endif
+//#define USING_OPENCASCADE_TEST //set in project config
+#ifdef USING_OPENCASCADE_TEST
+namespace test
+{
+    /// <summary>
+    /// DataRecordDashboard 测试控制面板，无具体数据，只包含开关，可以导出
+    /// </summary>
+    class DataRecordDashboard
+    {
+    private:
+        OPENCASCADE_TEST_API DataRecordDashboard() = default;
+        OPENCASCADE_TEST_API ~DataRecordDashboard() = default;
+        DataRecordDashboard(const DataRecordDashboard&) = delete;
+        DataRecordDashboard(DataRecordDashboard&&) = delete;
 
-/*
- //communal
-  std::chrono::steady_clock::time_point timestart;
-  std::chrono::steady_clock::time_point timeend;
-  std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  //respective
+    private:
+        OPENCASCADE_TEST_API static bool sm_openTime;// =false
+        OPENCASCADE_TEST_API static bool sm_openCheck;// =false
+        OPENCASCADE_TEST_API static bool sm_openOutput;// =false
+        OPENCASCADE_TEST_API static bool sm_isAverage;// =false
 
-*/
+    public:
+#pragma region inline_function
+        static DataRecordDashboard& getInstance()
+        {
+            static DataRecordDashboard instance;
+            return instance;
+        }
+        //xor alternative option
+        static bool isOpenTime() //using time count
+        {
+            return sm_openTime;
+        }
+        //mutual exclusion
+        static void setOpenTime(bool isOpen = true)
+        {
+            sm_openTime = isOpen;
+            if (sm_openTime)
+                sm_openCheck = false;
+        }
+        static bool isOpenCheck() //using check shape
+        {
+            return sm_openCheck;
+        }
+        static void setOpenCheck(bool isOpen = true)
+        {
+            sm_openCheck = isOpen;
+            if (sm_openCheck)
+                sm_openTime = false;
+        }
+        static bool isOpenOutput() //using output brep
+        {
+            return sm_openOutput;
+        }
+        static void setOpenOutput(bool isOpen = true)
+        {
+            sm_openOutput = isOpen;
+        }
+        static bool& isAverage() //set and get
+        {
+            return sm_isAverage;
+        }
+
+#pragma endregion
+
+    };
+}
+#endif //USING_OPENCASCADE_TEST
+
+#ifdef USING_OPENCASCADE_CLASS
+//OCC include
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Edge.hxx>
+#include <BRep_Builder.hxx> //TopoDS:: create
+#include <BRepTools.hxx> //Read and Write
+#include <BRepAlgoAPI_Check.hxx>
 
 //macro expand
 #define MACRO_EXPANSION_TIME_START() \
@@ -101,7 +155,6 @@ namespace test
             //to keep order
             std::vector<std::pair<std::string, int>> m_dataItemVct;
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
-//#ifdef USING_OPENCASCADE_CLASS //keep same define
             std::shared_ptr<TopoDS_Shape> m_shape;//std::vector<>
         };
 
@@ -129,10 +182,6 @@ namespace test
     private:
         //static int sm_index;
         static int sm_hasBuild; //to process once MakeBlocks recursion
-        static bool sm_isAverage;
-        OPENCASCADE_TEST_API static bool sm_openTime;// =false
-        OPENCASCADE_TEST_API static bool sm_openCheck;// =false
-        OPENCASCADE_TEST_API static bool sm_openOutput;// =false
         OPENCASCADE_TEST_API static ShapeCheck sm_recordCheck;
         OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
         OPENCASCADE_TEST_API static std::vector<FaceDetail> sm_recordFace;
@@ -158,36 +207,6 @@ namespace test
             sm_recordData.clear();
             sm_recordFace.clear();
             //sm_index = 0;
-        }
-        //xor alternative option
-        static bool isOpenTime() //using time count
-        {
-            return sm_openTime;
-        }
-        //mutual exclusion
-        static void setOpenTime(bool isOpen = true)
-        {
-            sm_openTime = isOpen;
-            if (sm_openTime)
-                sm_openCheck = false;
-        }
-        static bool isOpenCheck() //using check shape
-        {
-            return sm_openCheck;
-        }
-        static void setOpenCheck(bool isOpen = true)
-        {
-            sm_openCheck = isOpen;
-            if (sm_openCheck)
-                sm_openTime = false;
-        }
-        static bool isOpenOutput() //using output brep
-        {
-            return sm_openOutput;
-        }
-        static void setOpenOutput(bool isOpen = true)
-        {
-            sm_openOutput = isOpen;
         }
 
         static void hasBuild()//private only for BOPAlgo_BOP Build

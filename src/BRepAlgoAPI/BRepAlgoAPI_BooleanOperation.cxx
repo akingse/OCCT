@@ -127,9 +127,9 @@ BRepAlgoAPI_BooleanOperation::BRepAlgoAPI_BooleanOperation
   myTools.Append(theS2);
 #ifdef USING_OPENCASCADE_TEST
   //before do boolean(one-one)
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  if (instance.isOpenCheck())
+  if (DataRecordDashboard::getInstance().isOpenCheck())
   {
+      DataRecordSingleton& instance = DataRecordSingleton::getInstance();
       BRepAlgoAPI_Check checkObsolete = BRepAlgoAPI_Check(theS1, theS2, theOp);
       Message_ProgressRange rangeObsolete;
       checkObsolete.Perform(rangeObsolete);
@@ -216,10 +216,10 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       aLArgs.Append(it.Value());
 
 #ifdef USING_OPENCASCADE_TEST
-    test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
     //before do boolean(multi-multi and one-one) 
-    if (instance.isOpenCheck())
+    if (DataRecordDashboard::getInstance().isOpenCheck())
     {
+        DataRecordSingleton& instance = DataRecordSingleton::getInstance();
         BOPAlgo_ListOfCheckResult resultBefore;
         for (const auto& iter : aLArgs)
         {
@@ -267,10 +267,9 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
     return;
   }
 #ifdef USING_OPENCASCADE_TEST
-  test::DataRecordSingleton& instance = test::DataRecordSingleton::getInstance();
-  std::vector<DataRecordSingleton::DataMap>& dataMap = instance.getData();
   // after do boolean
-  if (instance.isOpenCheck())
+  DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+  if (DataRecordDashboard::getInstance().isOpenCheck())
   {
       BRepAlgoAPI_Check checkAfter = BRepAlgoAPI_Check(myShape);
       Message_ProgressRange rangeAfter;
@@ -278,6 +277,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       instance.getShapeCheck().m_checkAfter = checkAfter.Result();
       instance.getShapeCheck().m_msgReport = GetReport(); //from parent class
   }
+  std::vector<DataRecordSingleton::DataMap>& dataMap = instance.getData();
   if (!dataMap.empty())
   {
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);
@@ -309,7 +309,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       }
 
   }
-  if (DataRecordSingleton::getInstance().isOpenOutput())
+  if (DataRecordDashboard::getInstance().isOpenOutput())
   {
       //force to output
       aDumpOper.SetIsDumpArgs(true);
