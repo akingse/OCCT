@@ -554,7 +554,7 @@ void BOPAlgo_PaveFiller::PerformFF(const Message_ProgressRange& theRange)
 #ifdef USING_OPENCASCADE_TEST
   if (!faceDetail.m_edgesInterf.empty())
       instance.appendFaceDetial(faceDetail);
-#endif
+#endif //USING_OPENCASCADE_TEST
 }
 
 //=======================================================================

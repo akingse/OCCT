@@ -314,14 +314,18 @@ void BRepAlgoAPI_DumpOper::Dump(const TopoDS_Shape& theShape1,
   }
   //
   TCollection_AsciiString aPath(myPath);
-  //USING_OPENCASCADE_TEST
-  if (aPath.IsEmpty())
+#ifdef USING_OPENCASCADE_TEST
+  bool isForce = DataRecordDashboard::getInstance().isOpenOutput();
+  if (isForce) //(aPath.IsEmpty())
   {
+      aPath.Clear();
       char buffer[MAX_PATH];
       std::string path(_getcwd(buffer, sizeof(buffer)));
       aPath = TCollection_AsciiString(path.c_str());
       aPath += "/binFile"; //custom
   }
+#endif//USING_OPENCASCADE_TEST
+
   aPath += "/";
   Standard_Integer aNumOper = 1;
   Standard_Boolean isExist = Standard_True;

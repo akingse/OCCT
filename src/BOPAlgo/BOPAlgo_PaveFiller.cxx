@@ -259,7 +259,6 @@ void BOPAlgo_PaveFiller::Perform (const Message_ProgressRange& theRange)
 // purpose: all boolean intersectShape process
 //=======================================================================
 
-//#ifdef USING_OPENCASCADE_TEST
 void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 {
   // USING_OPENCASCADE_TEST
@@ -546,7 +545,6 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
 
   }
 }
-//#endif// USING_OPENCASCADE_TEST
 
 
 //=======================================================================

@@ -418,7 +418,6 @@ void BOPAlgo_BOP::fillPIConstants (const Standard_Real theWhole, BOPAlgo_PISteps
 //purpose  : all boolean BuildResult process
 //=======================================================================
 
-//#ifdef USING_OPENCASCADE_TEST
 void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
                                    const Message_ProgressRange& theRange)
 {
@@ -732,7 +731,6 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
   }
 }
-//#endif //USING_OPENCASCADE_TEST
 
 //=======================================================================
 //function : BuildRC
