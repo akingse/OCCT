@@ -13,8 +13,9 @@ bool DataRecordDashboard::sm_openTime = false;
 bool DataRecordDashboard::sm_openCheck = false;
 bool DataRecordDashboard::sm_openOutput = false;
 bool DataRecordDashboard::sm_isAverage = false;
+#endif//USING_OPENCASCADE_TEST
 
-// Singleton
+#ifdef USING_OPENCASCADE_CLASS
 //int DataRecordSingleton::sm_index = 0;
 int DataRecordSingleton::sm_hasBuild = 0;
 double DataRecordSingleton::sm_toleDist = 1e-6;
@@ -24,16 +25,23 @@ std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
 std::vector<DataRecordSingleton::FaceDetail> DataRecordSingleton::sm_recordFace;
 static const int _unvalid_id = -1;
 
-void DataRecordSingleton::ShapeCheck::writeToFile(const std::string& filename) const
+void DataRecordSingleton::writeCheckReportToFile(const std::string& fileName)
 {
+    std::string filename = fileName;
+    if (filename.empty())
+    {
+        char buffer[MAX_PATH];
+        filename = _getcwd(buffer, sizeof(buffer));
+        filename += "/ShapeCheck_" + to_string(GetTickCount()) + ".txt";
+    }
     std::ofstream ofsFile(filename);
     if (!ofsFile.is_open())
         return;
-    ofsFile << "Message_Report" << "," << !m_msgReport.IsNull() << endl;
-    if (!m_msgReport.IsNull())
+    ofsFile << "Message_Report" << "," << !sm_recordCheck.m_msgReport.IsNull() << endl;
+    if (!sm_recordCheck.m_msgReport.IsNull())
     {
         Message_Gravity theGravity = Message_Gravity::Message_Trace; //waring level
-        NCollection_List<Handle(Message_Alert)> msgAlerts = m_msgReport->GetAlerts(theGravity);
+        NCollection_List<Handle(Message_Alert)> msgAlerts = sm_recordCheck.m_msgReport->GetAlerts(theGravity);
         for (const auto& iter : msgAlerts)
         {
             if (!iter.IsNull())
@@ -41,21 +49,21 @@ void DataRecordSingleton::ShapeCheck::writeToFile(const std::string& filename) c
         }
     }
     ofsFile << "BOPAlgo_CheckResult" << "," << "checkObsolete" << endl;
-    for (const auto& iter : m_checkObsolete)
+    for (const auto& iter : sm_recordCheck.m_checkObsolete)
     {
         ofsFile << "CheckStatus," << iter.GetCheckStatus();
         ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
         ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
     }
     ofsFile << "BOPAlgo_CheckResult" << "," << "checkBefore" << endl;
-    for (const auto& iter : m_checkBefore)
+    for (const auto& iter : sm_recordCheck.m_checkBefore)
     {
         ofsFile << "CheckStatus," << iter.GetCheckStatus();
         ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
         ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
     }
     ofsFile << "BOPAlgo_CheckResult" << "," << "checkAfter" << endl;
-    for (const auto& iter : m_checkAfter)
+    for (const auto& iter : sm_recordCheck.m_checkAfter)
     {
         ofsFile << "CheckStatus," << iter.GetCheckStatus();
         ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();

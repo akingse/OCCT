@@ -127,19 +127,17 @@ namespace test
     {
     private:
         OPENCASCADE_TEST_API DataRecordSingleton() = default;
-        OPENCASCADE_TEST_API ~DataRecordSingleton() = default;
+        OPENCASCADE_TEST_API ~DataRecordSingleton() { clear(); };//default
         DataRecordSingleton(const DataRecordSingleton&) = delete;
         DataRecordSingleton(DataRecordSingleton&&) = delete;
 
     public:
         struct Point3d
         {
-            double x;
-            double y;
-            double z;
+            double xyz[3];
 			inline bool isEqual(const Point3d& rhs, double tolerance = 0.0) const
             {
-				return fabs(x - rhs.x) <= tolerance && fabs(y - rhs.y) <= tolerance && fabs(z - rhs.z) <= tolerance;
+				return fabs(xyz[0] - rhs.xyz[0]) <= tolerance && fabs(xyz[1] - rhs.xyz[1]) <= tolerance && fabs(xyz[2] - rhs.xyz[2]) <= tolerance;
             }
         };
 
@@ -166,7 +164,6 @@ namespace test
             NCollection_List<BOPAlgo_CheckResult> m_checkBefore;
             NCollection_List<BOPAlgo_CheckResult> m_checkAfter;
             Handle(Message_Report) m_msgReport;
-            void writeToFile(const std::string& filename) const;
         };
 
         struct FaceDetail
@@ -275,6 +272,7 @@ namespace test
         OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
         OPENCASCADE_TEST_API static std::vector<int> compareBRepFormat();
         OPENCASCADE_TEST_API static std::vector<DataMap> compareDataMap(const std::vector<DataMap>& stdDataRead);
+        OPENCASCADE_TEST_API static void writeCheckReportToFile(const std::string& filename);
 
     };
 	
@@ -297,9 +295,9 @@ namespace test
             { //copy from BPGraphicsInputOutput::graphicsOutputToJsonValue
                 Json::Value root;
                 Json::Value pointValue;
-                pointValue["x"] = rec.second.x;
-                pointValue["y"] = rec.second.y;
-                pointValue["z"] = rec.second.z;
+                pointValue["x"] = rec.second.xyz[0];
+                pointValue["y"] = rec.second.xyz[1];
+                pointValue["z"] = rec.second.xyz[2];
                 root["GePoint3d"] = pointValue;
                 oneRecord[rec.first.c_str()] = root;
             }
@@ -377,4 +375,4 @@ namespace test
 #endif //USING_TPL_JSONCPP
 
 }
-#endif //USING_OPENCASCADE_TEST
+#endif //USING_OPENCASCADE_CLASS
