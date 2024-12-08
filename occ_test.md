@@ -527,3 +527,13 @@ class BRepPrimAPI_MakeSweep
 
 
 
+### OCC源码修改-TKBO-BOPAlgo
+
+| source                           | process                                                      |
+| -------------------------------- | ------------------------------------------------------------ |
+| BOPAlgo_PaveFiller.cxx           | IntersectShapes求交阶段的计时                                |
+| BOPAlgo_BOP.cxx                  | BuildResult构建阶段的计时                                    |
+| BRepAlgoAPI_BooleanOperation.cxx | 布尔前后的BRepAlgoAPI_Check<br />BRepAlgoAPI_DumpOper输出布尔数据 |
+| BOPAlgo_PaveFiller_6.cxx         | PerformFF记录中间求交信息                                    |
+|                                  |                                                              |
+

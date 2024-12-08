@@ -267,27 +267,38 @@ namespace test
 		std::ifstream infile(filename);
 		if (!infile)
 			return CsgTree();
+		///get current directory
+		std::vector<std::string> dirVct = clash::string_split(filename, '/');
+		dirVct.pop_back();
+		std::string dirCurrent;// dirVct[0];
+		for (int i = 0; i < dirVct.size(); i++)
+			dirCurrent += dirVct[i] + "/";
 		TopoDS_Shape shape1, shape2;
 		BOPAlgo_Operation theOperation = BOPAlgo_Operation::BOPAlgo_UNKNOWN;
 		std::string line;
 		while (std::getline(infile, line))
 		{
-			std::vector<std::string> parts = clash::string_split(line, ' ');
-			if (parts.size() < 3)
+			std::vector<std::string> partsSpace = clash::string_split(line, ' ');
+			if (partsSpace.size() < 3)
 				continue;
-			if (parts[0] == "#")
+			if (partsSpace[0] == "#")
 				continue;
-			if (parts[0] == "restore" && parts[2] == "arg1")
+            std::vector<std::string> partsSlash = clash::string_split(partsSpace[1], '/');
+			if (partsSpace[0] == "restore" && partsSpace[2] == "arg1")
 			{
-				shape1 = DataRecordSingleton::readBinToShape(parts[1]);
+                shape1 = DataRecordSingleton::readBinToShape(partsSpace[1]);
+				if (shape1.IsNull())
+                    shape1 = DataRecordSingleton::readBinToShape(dirCurrent + partsSlash.back());
 			}
-			else if (parts[0] == "restore" && parts[2] == "arg2")
+			else if (partsSpace[0] == "restore" && partsSpace[2] == "arg2")
 			{
-				shape2 = DataRecordSingleton::readBinToShape(parts[1]);
+				shape2 = DataRecordSingleton::readBinToShape(partsSpace[1]);
+				if (shape2.IsNull())
+					shape2 = DataRecordSingleton::readBinToShape(dirCurrent + partsSlash.back());
 			}
-			else if (parts[1] == "Res")
+			else if (partsSpace[1] == "Res")
 			{
-				std::string aBopString = parts[0];
+				std::string aBopString = partsSpace[0];
 				if (aBopString == "bcommon")
 					theOperation = BOPAlgo_Operation::BOPAlgo_COMMON;
 				else if (aBopString == "bfuse")

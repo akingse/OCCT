@@ -148,7 +148,8 @@ static CsgTree getBooleanTest_08()
 static CsgTree getBooleanTest_09()
 {
 	std::string filename = get_exe_path();
-	filename += "/binFile/BO_1.tcl";
+	//filename += "/binFile/BO_1.tcl";
+	filename += "/binFile/bo1/BO_1.tcl";
 	return readBooleanFromTclFile(filename);
 }
 
@@ -158,23 +159,24 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 	clearDisplay();
 	//DataRecordDashboard::getInstance().setOpenOutput();
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	g_csgtree = getBooleanTest_03();
+	g_csgtree = getBooleanTest_09();
 	std::vector<DataRecordSingleton::FaceDetail> faceDetailVct = instance.getFaceDetial();
     DataRecordSingleton::ShapeCheck shapeCheck = instance.getShapeCheck();
+	//instance.writeCheckReportToFile({});
 
 	for (int i = 0; i < faceDetailVct.size(); i++)
 	{
-		std::vector<TopoDS_Shape> shapes = faceDetailVct[i].getShapes();
+		std::vector<TopoDS_Shape> shapes = faceDetailVct[i].getShapes(true);
 		for (int j = 0; j < shapes.size(); j++)
 		{
-			oneShapeDisplay(shapes[j]);
+			//oneShapeDisplay(shapes[j]);
 		}
 	}
 
 	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{
-		//oneShapeDisplay(shapeVct[i]);
+		oneShapeDisplay(shapeVct[i]);
 	}
 	Fit();
 	instance.clear();
