@@ -43,7 +43,7 @@ static CsgTree getBooleanTest_03()
 
 	double R = 10, r = 2;
 	double H = 30;
-	double offset = 0.;
+	double offset = 0.1;
 	TopoDS_Shape theShapeA = BRepPrimAPI_MakeTorus(R, r).Shape();
 	TopoDS_Shape theShapeB = BRepPrimAPI_MakeCone(r, 0, H).Shape();
 	gp_Trsf trsfR;
@@ -158,12 +158,18 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 {
 	clearDisplay();
 	//DataRecordDashboard::getInstance().setOpenOutput();
+	DataRecordDashboard::getInstance().setOpenTime();
 	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	g_csgtree = getBooleanTest_09();
-	std::vector<DataRecordSingleton::FaceDetail> faceDetailVct = instance.getFaceDetial();
-    DataRecordSingleton::ShapeCheck shapeCheck = instance.getShapeCheck();
-	//instance.writeCheckReportToFile({});
+	g_csgtree = getBooleanTest_03();
 
+	//输出文件
+	//instance.writeCheckReportToFile({});
+	writeTimeDataToCsv();
+	//writeShapeDataToTxt();
+
+	//绘制中间交线
+	std::vector<DataRecordSingleton::FaceDetail> faceDetailVct = instance.getFaceDetial();
+    //DataRecordSingleton::ShapeCheck shapeCheck = instance.getShapeCheck();
 	for (int i = 0; i < faceDetailVct.size(); i++)
 	{
 		std::vector<TopoDS_Shape> shapes = faceDetailVct[i].getShapes(true);
@@ -173,6 +179,7 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 		}
 	}
 
+	//绘制布尔前shape
 	std::vector<TopoDS_Shape> shapeVct = g_csgtree.m_shapeArgument;
 	for (int i = 0; i < shapeVct.size(); i++)
 	{

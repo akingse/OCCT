@@ -26,51 +26,6 @@ static TopoInfoRecord g_topoInfo;
 static std::vector<TopoDS_Shape> g_shapeVct;
 static std::vector<handle<Geom_Geometry>> g_GeomVct;
 
-//输出耗时信息
-static void writeTimeDataToCsv()
-{
-	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
-
-	std::string filename = get_exe_path();
-	//windows系统函数，用于获取自系统启动以来所经过的毫秒数
-	filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
-	instance.writeToCsvInOne(filename);
-	instance.clear();
-}
-
-//输出shape二进制数据
-static void writeShapeDataToTxt()
-{
-	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-	const std::vector<DataRecordSingleton::DataMap>& data = instance.getData();
-	std::string path = get_exe_path();
-
-	//read
-	std::string filenameStd = path + "\\binFile\\shape_std_0.txt";
-	TopoDS_Shape shapeStd = instance.readBinToShape(filenameStd);
-	//compare
-	TopoDS_Shape shapeTest = *(data.back().m_shape);
-	std::string filenameTest = path + "\\binFile\\shape_0.txt";
-	BRepTools::Write(shapeTest, filenameTest.c_str());
-
-	UINT64 sz0 = sizeof(shapeTest); //24 内存对齐
-	UINT64 sz1 = sizeof(Handle(TopoDS_TShape));//8
-	UINT64 sz2 = sizeof(TopLoc_Location);//8 成员的成员是Handle
-	UINT64 sz3 = sizeof(TopAbs_Orientation);//4 int枚举
-	bool isE1 = shapeStd.IsEqual(shapeTest); //只比较myTShape指针是否相等
-
-	//compare
-	std::string str_shape0 = instance.readBinToString(filenameStd);
-	std::string str_shape1 = instance.readBinToString(filenameTest);
-	bool isEq = str_shape0 == str_shape1;
-	std::vector<int> cmpRes = instance.compareBRepFormat();
-
-	CString cs = isEq ? L"true" : L"false";
-	AfxMessageBox(cs);
-	instance.clear();
-}
-
 //遍历拓扑
 static TopoInfoRecord getTopoInfoTest_01()
 {
@@ -230,6 +185,7 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 	//getShapeCreate_01();
 	//getShapeCreate_02();
 	getShapeCreate_03();
+
 	//绘制TopoDS_Shape
 	for (int i = 0; i < g_shapeVct.size(); i++)
 	{

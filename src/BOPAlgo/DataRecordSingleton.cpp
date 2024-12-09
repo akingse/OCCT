@@ -69,10 +69,11 @@ void DataRecordSingleton::writeCheckReportToFile(const std::string& fileName)
         ofsFile << ",ShapeType1," << iter.GetShape1().ShapeType();
         ofsFile << ",ShapeType2," << iter.GetShape2().ShapeType() << endl;
     }
+    ofsFile.close();
     return;
 }
 
-void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
+void DataRecordSingleton::writeToCsvInOne(const std::string& fileName)
 {
     //merge into one DataMap
     if (sm_recordData.empty())
@@ -95,12 +96,24 @@ void DataRecordSingleton::writeToCsvInOne(const std::string& filename)
             mergeData.m_dataTimeVct[j].second /= time;
     }
     //output
+    std::string filename = fileName;
     std::ofstream ofsFile(filename);
     //ofsFile.open(filename, std::ios::out | std::ios::out);
     if (!ofsFile.is_open())
     {
         std::cerr << "Could not open the file!" << std::endl;
-        return;
+        char buffer[MAX_PATH];
+        filename = _getcwd(buffer, sizeof(buffer));
+        string filenameCsv = filename + "/binFile/" + to_string(GetTickCount()) + ".csv";
+        ofsFile = std::ofstream(filenameCsv);
+        if (!ofsFile.is_open())
+        {
+            string dirName = filename + "/binFile";
+            int res = mkdir(dirName.c_str()); // 0 is success
+        }
+        ofsFile = std::ofstream(filenameCsv);
+        if (!ofsFile.is_open())
+            return;
     }
     ofsFile << "function" << "," << "time/ms" << endl;
     for (int i = 0; i < mergeData.m_dataTimeVct.size(); i++)

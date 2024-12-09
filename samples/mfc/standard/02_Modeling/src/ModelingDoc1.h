@@ -262,17 +262,53 @@ namespace test
 
 	};
 
+	//输出耗时信息
+	inline void writeTimeDataToCsv()
+	{
+		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+		const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
+		std::string filename = clash::get_exe_path();
+		//windows系统函数，用于获取自系统启动以来所经过的毫秒数
+		filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
+		//instance.writeToCsvInOne(filename);
+		instance.writeToCsvInOne({});
+		instance.clear();
+	}
+
+	//输出shape.brep二进制数据
+	inline void writeShapeDataToTxt()
+	{
+		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+		const std::vector<DataRecordSingleton::DataMap>& data = instance.getData();
+		std::string path = clash::get_exe_path();
+		//read
+		std::string filenameStd = path + "\\binFile\\shape_std_0.brep";
+		TopoDS_Shape shapeStd = instance.readBinToShape(filenameStd);
+		//compare
+		TopoDS_Shape shapeTest = *(data.back().m_shape);
+		std::string filenameTest = path + "\\binFile\\shape_0.brep";
+		BRepTools::Write(shapeTest, filenameTest.c_str());
+		//compare
+		std::string str_shape0 = instance.readBinToString(filenameStd);
+		std::string str_shape1 = instance.readBinToString(filenameTest);
+		std::vector<int> cmpRes = instance.compareBRepFormat();
+		//isEqual
+		CString cs = str_shape0 == str_shape1 ? L"true" : L"false";
+		AfxMessageBox(cs);
+		instance.clear();
+	}
+
 	inline CsgTree readBooleanFromTclFile(const std::string& filename)
 	{
 		std::ifstream infile(filename);
 		if (!infile)
 			return CsgTree();
 		///get current directory
-		std::vector<std::string> dirVct = clash::string_split(filename, '/');
-		dirVct.pop_back();
+		std::vector<std::string> partsDir = clash::string_split(filename, '/');
+		partsDir.pop_back();
 		std::string dirCurrent;// dirVct[0];
-		for (int i = 0; i < dirVct.size(); i++)
-			dirCurrent += dirVct[i] + "/";
+		for (int i = 0; i < partsDir.size(); i++)
+			dirCurrent += partsDir[i] + "/";
 		TopoDS_Shape shape1, shape2;
 		BOPAlgo_Operation theOperation = BOPAlgo_Operation::BOPAlgo_UNKNOWN;
 		std::string line;
