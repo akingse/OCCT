@@ -12,6 +12,8 @@
 #include <TopExp_Explorer.hxx>
 #include <BRep_TEdge.hxx>
 #include <TopoDS_Iterator.hxx>
+#include <GeomAPI_Interpolate.hxx>
+#include <Geom2dAPI_Interpolate.hxx>
 #include "commonOCCUtility.h" 
 #include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
 #include "ModelingDoc1.h" //custom class
@@ -175,6 +177,43 @@ static void getShapeCreate_03()
 	TopoDS_Shape Torus1 = BRepPrimAPI_MakeTorus(ax2, 60., 20., M_PI / 2).Shape();
 	TopoDS_Shape Torus2 = BRepPrimAPI_MakeTorus(ax2, 60., 20., -M_PI / 4, M_PI / 4, M_PI / 2).Shape();
 	g_shapeVct = { Torus1,Torus2 };
+
+}
+
+//插值与近似
+//Interpolation and approximation
+static void getShapeCreate_04()
+{
+	// Prepare data to be converted.
+	int aPos = 1;
+	Handle(TColgp_HArray1OfPnt) aPnts = new TColgp_HArray1OfPnt(1, 100);
+
+	//OCCT 曲线插值算法（经过点）
+	GeomAPI_Interpolate anInterpolate (aPnts, false, Precision::Confusion());
+	anInterpolate.Perform();
+	if (!anInterpolate.IsDone())
+		return;
+	Handle(Geom_BSplineCurve) aCurve = anInterpolate.Curve();
+		
+}
+
+static void getShapeCreate_05()
+{
+	//OCCT 曲线近似算法（控制点）
+	TColgp_HArray1OfPnt aPnts = TColgp_HArray1OfPnt(1, 100);
+
+	GeomAPI_PointsToBSpline anApprox;
+	anApprox.Init(aPnts, 1., 0., 0., 8, GeomAbs_C2, 0.001);
+	if (!anApprox.IsDone())
+		return;
+	Handle(Geom_Curve) aCurve = anApprox.Curve();
+	
+	TColgp_Array2OfPnt aPnt2(1, 3, 1, 3);
+	GeomAPI_PointsToBSplineSurface aSurfMaker(aPnt2);
+	if (!aSurfMaker.IsDone())
+		return;
+	Handle(Geom_BSplineSurface) aSuface = aSurfMaker.Surface();
+
 
 }
 
