@@ -36,8 +36,8 @@ static TopoInfoRecord getTopoInfoTest_01()
 	//MakeOneAxis
     //topoinfo.m_shape = BRepPrimAPI_MakeSphere(gp_Pnt(0, 0, 0), 10).Shape();
 	//topoinfo.m_shape = BRepPrimAPI_MakeCone(3, 2, 10).Shape();
-	topoinfo.m_shape = BRepPrimAPI_MakeCylinder(1, 5).Shape();
-	//topoinfo.m_shape = BRepPrimAPI_MakeTorus(10, 2).Shape();
+	//topoinfo.m_shape = BRepPrimAPI_MakeCylinder(1, 5).Shape();
+	topoinfo.m_shape = BRepPrimAPI_MakeTorus(10, 2).Shape();
 	topoinfo.TraverseShape(topoinfo.m_shape); //write shape data to topoInfo
 	topoinfo.getGeomAndShape();
 
@@ -223,7 +223,12 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 	clearDisplay();
 	//getShapeCreate_01();
 	//getShapeCreate_02();
-	getShapeCreate_03();
+	//getShapeCreate_03();
+
+	//getTopoInfo
+	g_topoInfo = getTopoInfoTest_01();
+	//g_topoInfo = getTopoInfoTest_02();
+	//oneShapeDisplay(g_topoInfo.m_shape);
 
 	//ªÊ÷∆TopoDS_Shape
 	for (int i = 0; i < g_shapeVct.size(); i++)
@@ -245,8 +250,5 @@ void CModelingDoc::OnTestBoolDetail() //using icon common
 void CModelingDoc::OnTestBoolExtra() //using icon section
 {
 	clearDisplay();
-	g_topoInfo = getTopoInfoTest_01();
-	g_topoInfo = getTopoInfoTest_02();
-	//oneShapeDisplay(g_topoInfo.m_shape);
 	return;
 }
