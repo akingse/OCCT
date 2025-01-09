@@ -104,7 +104,7 @@ void DataRecordSingleton::writeToCsvInOne(const std::string& fileName)
         std::cerr << "Could not open the file!" << std::endl;
         char buffer[MAX_PATH];
         filename = _getcwd(buffer, sizeof(buffer));
-        string filenameCsv = filename + "/binFile/" + to_string(GetTickCount()) + ".csv";
+        string filenameCsv = filename + "/binFile/" + to_string(GetTickCount64()) + ".csv";
         ofsFile = std::ofstream(filenameCsv);
         if (!ofsFile.is_open())
         {

@@ -1,6 +1,10 @@
 #include "stdafx.h"
-
+#include <sstream>
+#include <iomanip>
+#include <string>
+#include <Standard.hxx>
 #include <iostream>
+
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Wire.hxx>
@@ -12,20 +16,34 @@
 //add
 #include "GC_MakeSegment.hxx"
 #include "BRepBuilderAPI_MakeEdge.hxx"
-//#pragma comment(lib,"TKPrim.lib")
+#include <AIS_Shape.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakeCone.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <BRepPrimAPI_MakeSphere.hxx>
+#include <BRepPrimAPI_MakePrism.hxx>
+#include <BRepPrimAPI_MakeTorus.hxx>
+//boolean
+#include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
+#include <BRepAlgoAPI_Common.hxx>
+#include "GC_MakeArcOfCircle.hxx"
+#include "BRepFilletAPI_MakeFillet.hxx"
+#include "TopExp_Explorer.hxx"
+#include "BRepOffsetAPI_MakeThickSolid.hxx"
+#include "Geom_CylindricalSurface.hxx"
+#include "Geom2d_Ellipse.hxx"
+#include "Geom_Plane.hxx"
+#include "BRepOffsetAPI_ThruSections.hxx"
+#include "GCE2d_MakeSegment.hxx"
+#include "BRepLib.hxx"
 
 #ifdef USING_BIMBASE_SLN
 #include "commonOCCUtility.h"
-//move to occt.sln
+//move to occt.sln //origin testBooleanOperation.cpp
 using namespace occ;
 #endif
 using namespace std;
-//using namespace opencascade;
-
-#include <sstream>
-#include <iomanip>
-#include <string>
-#include <Standard.hxx>
 
 std::string doubleToString(double value) 
 {
@@ -78,30 +96,6 @@ static void test0()
 
     return;
 }
-
-#include <AIS_Shape.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
-#include <BRepPrimAPI_MakeCone.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRepPrimAPI_MakeSphere.hxx>
-#include <BRepPrimAPI_MakePrism.hxx>
-#include <BRepPrimAPI_MakeTorus.hxx>
-//builder
-#include <BRepBuilderAPI_Transform.hxx>
-//boolean
-#include <BRepAlgoAPI_Cut.hxx>
-#include <BRepAlgoAPI_Fuse.hxx>
-#include <BRepAlgoAPI_Common.hxx>
-#include "GC_MakeArcOfCircle.hxx"
-#include "BRepFilletAPI_MakeFillet.hxx"
-#include "TopExp_Explorer.hxx"
-#include "BRepOffsetAPI_MakeThickSolid.hxx"
-#include "Geom_CylindricalSurface.hxx"
-#include "Geom2d_Ellipse.hxx"
-#include "Geom_Plane.hxx"
-#include "BRepOffsetAPI_ThruSections.hxx"
-#include "GCE2d_MakeSegment.hxx"
-#include "BRepLib.hxx"
 
 //box-sphere
 static void test1()
@@ -285,13 +279,44 @@ static void test3()
 
     Standard_Integer degree = 4;
     //Handle(Geom_BSplineCurve) bspline = CreateBSplineCurve(poles, degree);
+    TopoDS_Shape ConeO = BRepPrimAPI_MakeCylinder(100., 300.).Shape();
 
     return;
 }
 
+//测试精度 Precision
 static void test4()
 {
-    TopoDS_Shape ConeO = BRepPrimAPI_MakeCylinder(100., 300.).Shape();
+    gp_Vec V1(0, 0, 1e8);
+    gp_Vec V2(1, 0, 1e8);
+    if (V1.IsParallel(V2, Precision::Angular()))
+    {
+        //其中Angle经过特殊处理，能准确算出微小夹角的值
+        double tole = 1.e-12; //角度很小，几乎没有对容差的兼容，只有对机器误差的兼容
+    }
+
+    //perpendicular
+    gp_Dir D1(0, 0, 1e6);
+    gp_Dir D2(1e6, 0, 1);
+    if ((fabs(D1 * D2) < Precision::Angular()))
+    {
+        double tole = 1.e-12;
+    }
+
+    gp_Pnt P1(0, 0, 1e8);
+    gp_Pnt P2(1, 0, 1e8);
+
+    if (P1.IsEqual(P2, Precision::Confusion()))
+    {
+        double tole = 1.e-7;
+    }
+
+    gp_Vec V(0, 0, 1e-8);
+    if (V.Magnitude() < Precision::Confusion()) //Magnitude=Modulus=norm
+    {
+        double tole = 1.e-7;
+    }
+
 
 }
 

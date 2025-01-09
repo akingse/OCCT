@@ -95,22 +95,22 @@ namespace occ
 
 namespace clash
 {
-    inline std::string get_exe_path()
-    {
-        char buffer[MAX_PATH];
-        return std::string(_getcwd(buffer, sizeof(buffer))); //get current work directory
-    }
+    //inline std::string get_exe_path()
+    //{
+    //    char buffer[MAX_PATH];
+    //    return std::string(_getcwd(buffer, sizeof(buffer))); //get current work directory
+    //}
 
-    inline std::vector<std::string> string_split(const std::string& text, char delimiter)
-    {
-        std::vector<std::string> tokens;
-        std::string token;
-        std::istringstream tokenStream(text);
-        while (std::getline(tokenStream, token, delimiter))
-        {
-            tokens.push_back(token);
-        }
-        return tokens;
-    }
+    //inline std::vector<std::string> string_split(const std::string& text, char delimiter)
+    //{
+    //    std::vector<std::string> tokens;
+    //    std::string token;
+    //    std::istringstream tokenStream(text);
+    //    while (std::getline(tokenStream, token, delimiter))
+    //    {
+    //        tokens.push_back(token);
+    //    }
+    //    return tokens;
+    //}
 
 }
