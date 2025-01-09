@@ -302,10 +302,10 @@ Geom_AxisPlacement持有gp_Ax1，是位矢
     
 class gp_Trsf //
   Standard_Real scale;
-  gp_TrsfForm shape;
+  gp_TrsfForm shape; //emun
   gp_Mat matrix;
   gp_XYZ loc;
-class gp_GTrsf //通用变换，仿射变换
+class gp_GTrsf //General通用变换，仿射变换
   gp_Mat matrix;
   gp_XYZ loc;
   gp_TrsfForm shape;
