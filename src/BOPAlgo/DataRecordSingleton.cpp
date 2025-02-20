@@ -23,7 +23,7 @@ double DataRecordSingleton::sm_tolerence = 1e-6;
 DataRecordSingleton::ShapeCheck DataRecordSingleton::sm_recordCheck;
 std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
 std::vector<DataRecordSingleton::FaceDetail> DataRecordSingleton::sm_recordFace;
-static const int _unvalid_id = -1;
+static const int _invalid_id = -1;
 
 void DataRecordSingleton::writeCheckReportToFile(const std::string& fileName)
 {
@@ -73,7 +73,7 @@ void DataRecordSingleton::writeCheckReportToFile(const std::string& fileName)
     return;
 }
 
-void DataRecordSingleton::writeToCsvInOne(const std::string& fileName)
+void DataRecordSingleton::writeToCsvInOne(const std::string& fileName /*= {}*/)
 {
     //merge into one DataMap
     if (sm_recordData.empty())
@@ -255,7 +255,7 @@ vector<DataRecordSingleton::DataMap> DataRecordSingleton::compareDataMap(const v
 				idDifferent.insert(i);
 			}
 			else
-				dataDiff.m_dataCount[keyDataCount[j]] = _unvalid_id;// INT_MAX;
+				dataDiff.m_dataCount[keyDataCount[j]] = _invalid_id;// INT_MAX;
 		}
 		for (int j = 0; j < min(readDataFloat.size(), testDataFloat.size()); j++)
 		{

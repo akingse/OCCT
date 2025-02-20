@@ -269,7 +269,7 @@ namespace test
         OPENCASCADE_TEST_API static TopoDS_Shape readBinToShape(const std::string& filename);
         OPENCASCADE_TEST_API static void writeShapeToFile(const std::string& filename);
         OPENCASCADE_TEST_API static std::string readBinToString(const std::string& filename);
-        OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename);
+        OPENCASCADE_TEST_API static void writeToCsvInOne(const std::string& filename = {});
         OPENCASCADE_TEST_API static std::vector<int> compareBRepFormat();
         OPENCASCADE_TEST_API static std::vector<DataMap> compareDataMap(const std::vector<DataMap>& stdDataRead);
         OPENCASCADE_TEST_API static void writeCheckReportToFile(const std::string& filename);
