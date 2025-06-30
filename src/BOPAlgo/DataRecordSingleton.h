@@ -137,7 +137,10 @@ namespace test
             double xyz[3];
 			inline bool isEqual(const Point3d& rhs, double tolerance = 0.0) const
             {
-				return fabs(xyz[0] - rhs.xyz[0]) <= tolerance && fabs(xyz[1] - rhs.xyz[1]) <= tolerance && fabs(xyz[2] - rhs.xyz[2]) <= tolerance;
+				return 
+                    fabs(xyz[0] - rhs.xyz[0]) <= tolerance && 
+                    fabs(xyz[1] - rhs.xyz[1]) <= tolerance && 
+                    fabs(xyz[2] - rhs.xyz[2]) <= tolerance;
             }
         };
 
