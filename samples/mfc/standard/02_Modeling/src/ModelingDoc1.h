@@ -202,15 +202,17 @@ namespace test
 			m_shapeArgument.push_back(object);
 			m_shapeArgument.push_back(tool);
 			m_node = std::make_shared<BoolNode>(operation);
-			TopoDS_Shape result;
+			BRepAlgoAPI_BooleanOperation result;
+			result.SetUseOBB(true); //inherit from
+			result.SetFuzzyValue(1e-6);
+
 			if (BOPAlgo_Operation::BOPAlgo_COMMON == operation)
 				result = BRepAlgoAPI_Common(object, tool);
 			else if (BOPAlgo_Operation::BOPAlgo_FUSE == operation)
 				result = BRepAlgoAPI_Fuse(object, tool);
 			else if (BOPAlgo_Operation::BOPAlgo_CUT == operation)
 				result = BRepAlgoAPI_Cut(object, tool);
-			//m_shapeVct.push_back(result);
-			m_shapeResult = result;
+			m_shapeResult = result.Shape();//BRepBuilderAPI_MakeShape
 		}
 		CsgTree(const TopTools_ListOfShape& objects, const TopTools_ListOfShape& tools, BOPAlgo_Operation operation)
 		{
