@@ -92,7 +92,7 @@ namespace occ
 
 }
 
-namespace clash
+namespace occ
 {
     inline std::string get_exe_path()
     {
