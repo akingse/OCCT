@@ -424,11 +424,8 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   // USING_OPENCASCADE_TEST
   if (DataRecordDashboard::getInstance().isOpenTime())
   {
-  DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-  std::chrono::steady_clock::time_point timestart;
-  std::chrono::steady_clock::time_point timeend;
-  std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  test::DataRecordSingleton::DataMap& current = instance.getDataP().back();
+  MACRO_EXPANSION_TIME_DEFINE;
+  test::DataRecordSingleton::DataMap& current = DataRecordSingleton::getInstance().getDatasP().back();
 
   myPaveFiller=(BOPAlgo_PaveFiller*)&theFiller;
   myDS=myPaveFiller->PDS();
@@ -437,14 +434,14 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   myNonDestructive = myPaveFiller->NonDestructive();
   
   // 1. CheckData
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   CheckData();
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::CheckData")
   if (HasErrors()) {
     return;
   }
   // 2. Prepare
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   Prepare();
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::Prepare")
   if (HasErrors()) {
@@ -461,110 +458,110 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   }
   Message_ProgressScope aPS(theRange, "Building the result of Boolean operation", 100);
   BOPAlgo_PISteps aSteps (PIOperation_Last);
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   analyzeProgress (100, aSteps);
   MACRO_EXPANSION_TIME_END("BOPAlgo_Algo::analyze")
 
   // 3. Fill Images
   // 3.1 Vertices
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesVertices(aPS.Next(aSteps.GetStep(PIOperation_TreatVertices)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesVertices")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_VERTEX);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.2 Edges
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesEdges(aPS.Next(aSteps.GetStep(PIOperation_TreatEdges)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesEdges")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_EDGE);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.3 Wires
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesContainers(TopAbs_WIRE, aPS.Next(aSteps.GetStep(PIOperation_TreatWires)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_WIRE")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_WIRE);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.4 Faces
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesFaces(aPS.Next(aSteps.GetStep(PIOperation_TreatFaces)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesFaces")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_FACE);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.5 Shells
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesContainers(TopAbs_SHELL, aPS.Next(aSteps.GetStep(PIOperation_TreatShells)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_SHELL")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_SHELL);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.6 Solids
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesSolids(aPS.Next(aSteps.GetStep(PIOperation_TreatSolids)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesSolids")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_SOLID);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.7 CompSolids
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesContainers(TopAbs_COMPSOLID, aPS.Next(aSteps.GetStep(PIOperation_TreatCompsolids)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImages_COMPSOLID")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_COMPSOLID);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
     return;
   }
   // 3.8 Compounds
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   FillImagesCompounds(aPS.Next(aSteps.GetStep(PIOperation_TreatCompounds)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::FillImagesCompounds")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildResult(TopAbs_COMPOUND);
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildResult")
   if (HasErrors()) {
@@ -572,7 +569,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   }
   
   // 4.BuildShape;
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   BuildShape(aPS.Next(aSteps.GetStep(PIOperation_BuildShape)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_BOP::BuildShape")
   if (HasErrors()) {
@@ -580,7 +577,7 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   }
   
   // 5.History
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PrepareHistory(aPS.Next(aSteps.GetStep(PIOperation_FillHistory)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PrepareHistory")
   if (HasErrors()) {
@@ -588,11 +585,11 @@ void BOPAlgo_BOP::PerformInternal1(const BOPAlgo_PaveFiller& theFiller,
   }
   
   // 6 Post-treatment 
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PostTreat(aPS.Next(aSteps.GetStep(PIOperation_PostTreat)));
   MACRO_EXPANSION_TIME_END("BOPAlgo_Builder::PostTreat")
   //reset data, process recursion
-  instance.hasBuild();
+  DataRecordSingleton::getInstance().hasBuild();
   }
   else //origin //==============================================================
   { 

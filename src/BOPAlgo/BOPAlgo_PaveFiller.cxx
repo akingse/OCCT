@@ -264,15 +264,11 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   // USING_OPENCASCADE_TEST
   if (DataRecordDashboard::getInstance().isOpenTime())
   {
-  DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-  std::chrono::steady_clock::time_point timestart;
-  std::chrono::steady_clock::time_point timeend;
-  std::chrono::duration<double, std::milli> duration_ms; // milli=ratio<1, 1000> second
-  std::vector<test::DataRecordSingleton::DataMap>& dataCount = instance.getDataP();
+  MACRO_EXPANSION_TIME_DEFINE;
   test::DataRecordSingleton::DataMap current;
 
   Message_ProgressScope aPS (theRange, "Performing intersection of shapes", 100);
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   Init (aPS.Next (5));
   MACRO_EXPANSION_TIME_END("PaveFiller::Init")
   if (HasErrors()) {
@@ -280,76 +276,76 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
   }
   // Compute steps of the PI=(Progress Indicator)
   BOPAlgo_PISteps aSteps (PIOperation_Last);
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   analyzeProgress (95, aSteps);
   MACRO_EXPANSION_TIME_END("PaveFiller::analyze")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   Prepare (aPS.Next (aSteps.GetStep (PIOperation_Prepare)));
   MACRO_EXPANSION_TIME_END("PaveFiller::Prepare")
   if (HasErrors()) {
     return;
   }
   // 00
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformVV (aPS.Next (aSteps.GetStep (PIOperation_PerformVV)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformVV")
   if (HasErrors()) {
     return;
   }
   // 01
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformVE (aPS.Next (aSteps.GetStep (PIOperation_PerformVE)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformVE")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdatePaveBlocksWithSDVertices(); //主要用于处理几何体的拼接和重建 //SDVertices=same domain vertex
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
   // 11
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformEE (aPS.Next (aSteps.GetStep (PIOperation_PerformEE)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformEE")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdatePaveBlocksWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
   // 02
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformVF (aPS.Next (aSteps.GetStep (PIOperation_PerformVF)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformVF")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdatePaveBlocksWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
   // 12
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformEF (aPS.Next (aSteps.GetStep (PIOperation_PerformEF)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformEF")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdatePaveBlocksWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
 
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdateInterfsWithSDVertices(); //用于处理几何体的接口更新，尤其是在涉及到相交或重叠的几何体 (Interference)
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdateInterfs")
 
   // Repeat Intersection with increased vertices
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   RepeatIntersection (aPS.Next (aSteps.GetStep (PIOperation_RepeatIntersection)));
   MACRO_EXPANSION_TIME_END("PaveFiller::RepeatIntersection")
   if (HasErrors())
     return;
   // Force intersection of edges after increase of the tolerance values of their vertices
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   ForceInterfEE (aPS.Next (aSteps.GetStep (PIOperation_ForceInterfEE)));
   MACRO_EXPANSION_TIME_END("PaveFiller::ForceInterfEE")
   if (HasErrors())
@@ -357,7 +353,7 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
     return;
   }
   // Force Edge/Face intersection after increase of the tolerance values of their vertices
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   ForceInterfEF (aPS.Next (aSteps.GetStep (PIOperation_ForceInterfEF)));
   MACRO_EXPANSION_TIME_END("PaveFiller::ForceInterfEF")
   if (HasErrors())
@@ -365,74 +361,74 @@ void BOPAlgo_PaveFiller::PerformInternal (const Message_ProgressRange& theRange)
     return;
   }
   // 22
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   PerformFF (aPS.Next (aSteps.GetStep (PIOperation_PerformFF)));
   MACRO_EXPANSION_TIME_END("PaveFiller::PerformFF")
   if (HasErrors()) {
     return;
   }
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdateBlocksWithSharedVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdateBlocks")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   myDS->RefineFaceInfoIn();
   MACRO_EXPANSION_TIME_END("BOPDS_DS::RefineFaceInfoIn")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   MakeSplitEdges (aPS.Next (aSteps.GetStep (PIOperation_MakeSplitEdges)));
   MACRO_EXPANSION_TIME_END("PaveFiller::MakeSplitEdges")
   if (HasErrors()) {
     return;
   }
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdatePaveBlocksWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdatePave")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   MakeBlocks (aPS.Next (aSteps.GetStep (PIOperation_MakeBlocks)));
   MACRO_EXPANSION_TIME_END("PaveFiller::MakeBlocks")
   if (HasErrors()) {
     return;
   }
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   CheckSelfInterference();
   MACRO_EXPANSION_TIME_END("PaveFiller::CheckSelfInter")
 
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   UpdateInterfsWithSDVertices();
   MACRO_EXPANSION_TIME_END("PaveFiller::UpdateInterfs")
 
   //BOPDS_DS
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   myDS->ReleasePaveBlocks();
   MACRO_EXPANSION_TIME_END("BOPDS_DS::ReleasePaveBlocks")
 
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   myDS->RefineFaceInfoOn();
   MACRO_EXPANSION_TIME_END("BOPDS_DS::RefineFaceInfoOn")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   RemoveMicroEdges();
   MACRO_EXPANSION_TIME_END("PaveFiller::RemoveMicroEdges")
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   MakePCurves (aPS.Next (aSteps.GetStep (PIOperation_MakePCurves)));
   MACRO_EXPANSION_TIME_END("PaveFiller::MakePCurves")
   if (HasErrors()) {
     return;
   }
   
-  MACRO_EXPANSION_TIME_START()
+  MACRO_EXPANSION_TIME_START
   ProcessDE (aPS.Next (aSteps.GetStep (PIOperation_ProcessDE)));
   MACRO_EXPANSION_TIME_END("PaveFiller::ProcessDE")
   if (HasErrors()) {
     return;
   }
   //add current to recordData
-  dataCount.push_back(current);
+  DataRecordSingleton::getInstance().getDatasP().push_back(current);
   }
   else //origin //==============================================================
   {

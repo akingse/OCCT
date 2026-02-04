@@ -277,7 +277,7 @@ void BRepAlgoAPI_BooleanOperation::Build(const Message_ProgressRange& theRange)
       instance.getShapeCheck().m_checkAfter = checkAfter.Result();
       instance.getShapeCheck().m_msgReport = GetReport(); //from parent class
   }
-  std::vector<DataRecordSingleton::DataMap>& dataMap = instance.getData();
+  std::vector<DataRecordSingleton::DataMap>& dataMap = instance.getDatas();
   if (!dataMap.empty())
   {
       dataMap.back().m_shape = std::make_shared<TopoDS_Shape>(myShape);

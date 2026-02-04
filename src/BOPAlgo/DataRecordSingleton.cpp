@@ -18,10 +18,13 @@ bool DataRecordDashboard::sm_isAverage = false;
 #ifdef USING_OPENCASCADE_CLASS
 //int DataRecordSingleton::sm_index = 0;
 int DataRecordSingleton::sm_hasBuild = 0;
+double DataRecordSingleton::sm_toleFiecd = 1e-10;
+double DataRecordSingleton::sm_toleAngle = 1e-8;
 double DataRecordSingleton::sm_toleDist = 1e-6;
-double DataRecordSingleton::sm_tolerence = 1e-6;
+double DataRecordSingleton::sm_tolerence = FLT_EPSILON;
 DataRecordSingleton::ShapeCheck DataRecordSingleton::sm_recordCheck;
-std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordData;
+DataRecordSingleton::DataMap DataRecordSingleton::sm_recordData;
+std::vector<DataRecordSingleton::DataMap> DataRecordSingleton::sm_recordDatas;
 std::vector<DataRecordSingleton::FaceDetail> DataRecordSingleton::sm_recordFace;
 static const int _invalid_id = -1;
 
@@ -76,18 +79,18 @@ void DataRecordSingleton::writeCheckReportToFile(const std::string& fileName)
 void DataRecordSingleton::writeToCsvInOne(const std::string& fileName /*= {}*/)
 {
     //merge into one DataMap
-    if (sm_recordData.empty())
+    if (sm_recordDatas.empty())
         return;
-    DataMap mergeData = sm_recordData[0];//copy
-    const int time = (int)sm_recordData.size();
+    DataMap mergeData = sm_recordDatas[0];//copy
+    const int time = (int)sm_recordDatas.size();
     const int size = (int)mergeData.m_dataTimeVct.size();
-    for (int i = 1; i < sm_recordData.size(); i++)
+    for (int i = 1; i < sm_recordDatas.size(); i++)
     {
         for (int j = 0; j < size; j++) //default same size
         {
-            if (size == sm_recordData[i].m_dataTimeVct.size() &&
-                mergeData.m_dataTimeVct[j].first == sm_recordData[i].m_dataTimeVct[j].first)
-                mergeData.m_dataTimeVct[j].second += sm_recordData[i].m_dataTimeVct[j].second;
+            if (size == sm_recordDatas[i].m_dataTimeVct.size() &&
+                mergeData.m_dataTimeVct[j].first == sm_recordDatas[i].m_dataTimeVct[j].first)
+                mergeData.m_dataTimeVct[j].second += sm_recordDatas[i].m_dataTimeVct[j].second;
         }
     }
     if (DataRecordDashboard::isAverage() && time != 1)
@@ -163,9 +166,9 @@ void DataRecordSingleton::writeShapeToFile(const std::string& fileName)
         char buffer[MAX_PATH];
         filename = _getcwd(buffer, sizeof(buffer));
     }
-    for (int i = 0; i < sm_recordData.size(); i++)
+    for (int i = 0; i < sm_recordDatas.size(); i++)
     {
-        const DataMap& data = sm_recordData[i];
+        const DataMap& data = sm_recordDatas[i];
         filename += "\\binFile\\shape_std_" + data.m_name + ".txt";
         if (data.m_shape != nullptr)
             BRepTools::Write(*data.m_shape, filename.c_str());
@@ -186,9 +189,9 @@ std::vector<int> DataRecordSingleton::compareBRepFormat()
     std::vector<std::string> formatRec;
     std::vector<int> strRes;
     std::vector<int> cmpRes;
-    for (int i = 0; i < sm_recordData.size(); i++)
+    for (int i = 0; i < sm_recordDatas.size(); i++)
     {
-        const DataMap& data = sm_recordData[i];
+        const DataMap& data = sm_recordDatas[i];
         if (data.m_shape == nullptr)
             continue;
         std::string filenameStd = path + "\\binFile\\shape_std_" + data.m_name + ".txt";
@@ -228,20 +231,20 @@ std::vector<string> mapkey2vector(const std::map<std::string, T>& data)
 
 vector<DataRecordSingleton::DataMap> DataRecordSingleton::compareDataMap(const vector<DataRecordSingleton::DataMap>& stdDataRead)
 {
-	if (stdDataRead.size() != sm_recordData.size())
+	if (stdDataRead.size() != sm_recordDatas.size())
 		return {};
 	std::set<int> idDifferent;
 	std::vector<DataRecordSingleton::DataMap> dataDifferent;
 	for (int i = 0; i < stdDataRead.size(); i++)
 	{
 		const DataRecordSingleton::DataMap& read = stdDataRead[i]; //从Json中读取的标准数据
-		const DataRecordSingleton::DataMap& test = sm_recordData[i]; //当前测试计算的数据
+		const DataRecordSingleton::DataMap& test = sm_recordDatas[i]; //当前测试计算的数据
 		std::vector<int> readDataCount = mapvalue2vector(read.m_dataCount);
 		std::vector<int> testDataCount = mapvalue2vector(test.m_dataCount);
 		std::vector<double> readDataFloat = mapvalue2vector(read.m_dataFloat);
 		std::vector<double> testDataFloat = mapvalue2vector(test.m_dataFloat);
-		std::vector<Point3d> readDataPoint = mapvalue2vector(read.m_dataPoint);
-		std::vector<Point3d> testDataPoint = mapvalue2vector(test.m_dataPoint);
+		std::vector<Vect3d> readDataPoint = mapvalue2vector(read.m_dataPoint);
+		std::vector<Vect3d> testDataPoint = mapvalue2vector(test.m_dataPoint);
 		std::vector<std::string> keyDataCount = mapkey2vector(read.m_dataCount);
 		std::vector<std::string> keyDataFloat = mapkey2vector(read.m_dataFloat);
 		std::vector<std::string> keyDataPoint = mapkey2vector(read.m_dataPoint);
@@ -277,7 +280,7 @@ vector<DataRecordSingleton::DataMap> DataRecordSingleton::compareDataMap(const v
 				idDifferent.insert(i);
 			}
 			else
-				dataDiff.m_dataPoint[keyDataCount[j]] = Point3d{ std::nan("0"), std::nan("0"), std::nan("0") };
+				dataDiff.m_dataPoint[keyDataCount[j]] = Vect3d{ std::nan("0"), std::nan("0"), std::nan("0") };
 		}
 		if (!dataDiff.m_name.empty())
 			dataDifferent.push_back(dataDiff);

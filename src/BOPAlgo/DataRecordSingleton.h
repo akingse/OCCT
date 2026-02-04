@@ -91,12 +91,16 @@ namespace test
 #include <BRepAlgoAPI_Check.hxx>
 
 //macro expand
-#define MACRO_EXPANSION_TIME_START() \
-    timestart = std::chrono::high_resolution_clock::now();
-#define MACRO_EXPANSION_TIME_END(name)\
+#define MACRO_EXPANSION_TIME_DEFINE \
+    std::chrono::steady_clock::time_point timestart, timeend;\
+
+#define MACRO_EXPANSION_TIME_START \
+    timestart = std::chrono::high_resolution_clock::now();\
+
+#define MACRO_EXPANSION_TIME_END(dataName) \
     timeend = std::chrono::high_resolution_clock::now();\
-    duration_ms = timeend - timestart;\
-    current.m_dataTimeVct.push_back(std::make_pair(name, duration_ms.count()));
+    current.m_dataTimeVct.push_back(std::make_pair(dataName, std::chrono::duration<double, std::milli>(timeend - timestart).count()));
+
 
 namespace test
 {
@@ -132,10 +136,10 @@ namespace test
         DataRecordSingleton(DataRecordSingleton&&) = delete;
 
     public:
-        struct Point3d
+        struct Vect3d
         {
             double xyz[3];
-			inline bool isEqual(const Point3d& rhs, double tolerance = 0.0) const
+			inline bool isEqual(const Vect3d& rhs, double tolerance = 0.0) const
             {
 				return 
                     fabs(xyz[0] - rhs.xyz[0]) <= tolerance && 
@@ -152,12 +156,29 @@ namespace test
             std::map<std::string, int> m_dataCount;
             std::map<std::string, double> m_dataFloat;
             std::map<std::string, double> m_dataTime;
-            std::map<std::string, Point3d> m_dataPoint;
-            std::map<std::string, std::string> m_dataByte; // equal std::vector<unsigned char>
+            std::map<std::string, Vect3d> m_dataPoint;
+            std::map<std::string, std::string> m_dataByte;
             //to keep order
             std::vector<std::pair<std::string, int>> m_dataItemVct;
             std::vector<std::pair<std::string, double>> m_dataTimeVct;
+            //clash pair
+            std::vector<std::pair<int, int>> m_dataPairId;
+            //mesh check
+            std::vector<std::pair<int, std::string>> m_errInfoVct;
             std::shared_ptr<TopoDS_Shape> m_shape;//std::vector<>
+            inline void clear()
+            {
+                m_name.clear();
+                m_dataCount.clear();
+                m_dataFloat.clear();
+                m_dataTime.clear();
+                m_dataPoint.clear();
+                m_dataByte.clear();
+                m_dataItemVct.clear();
+                m_dataTimeVct.clear();
+                m_dataPairId.clear();
+                m_errInfoVct.clear();
+            }
         };
 
         //for boolean once
@@ -193,56 +214,96 @@ namespace test
         };
 
     public:
-        OPENCASCADE_TEST_API static double sm_toleDist;
-        OPENCASCADE_TEST_API static double sm_tolerence;
+        static double sm_toleFiecd;
+        static double sm_toleAngle;
+        static double sm_toleDist;
+        static double sm_tolerence;
+        //attach
+        static int sm_testmode;
+        static std::string sm_testname;
 
     private:
         //static int sm_index;
+        OPENCASCADE_TEST_API static DataMap sm_recordData;
+        OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordDatas;
+
         static int sm_hasBuild; //to process once MakeBlocks recursion
         OPENCASCADE_TEST_API static ShapeCheck sm_recordCheck;
-        OPENCASCADE_TEST_API static std::vector<DataMap> sm_recordData;
         OPENCASCADE_TEST_API static std::vector<FaceDetail> sm_recordFace;
 
-    public:
 #pragma region inline_function
+    public:
         static DataRecordSingleton& getInstance()
         {
             static DataRecordSingleton instance;
             return instance;
         }
-        static std::vector<DataMap>& getData()
+        static DataMap& getData()
         {
             return sm_recordData;
         }
-        static std::vector<DataMap>& getDataP() //private only for BOPAlgo-PerformInternal
+        static std::vector<DataMap>& getDatas()
+        {
+            return sm_recordDatas;
+        }
+        static std::vector<DataMap>& getDatasP() //private only for BOPAlgo-PerformInternal
         {
             sm_hasBuild++;
-            return sm_recordData;
+            return sm_recordDatas;
         }
         static void clear()
         {
+            //member
             sm_recordData.clear();
+            sm_recordDatas.clear();
             sm_recordFace.clear();
             //sm_index = 0;
+        }
+
+        //DataMap sm_recordData
+        static void dataCountAppend(const std::string& key, int value = 1)
+        {
+            if (sm_recordData.m_dataCount.find(key) == sm_recordData.m_dataCount.end())
+                sm_recordData.m_dataCount.emplace(key, value);
+            else
+                sm_recordData.m_dataCount.at(key) += value;
+        }
+        static void dataTimeAppend(const std::string& key, double value)
+        {
+            if (sm_recordData.m_dataTime.find(key) == sm_recordData.m_dataTime.end())
+                sm_recordData.m_dataTime.emplace(key, value);
+            else
+                sm_recordData.m_dataTime.at(key) += value;
+        }
+        static std::string getDataString(bool clear = true)
+        {
+            std::string str;
+            for (const auto& iter : DataRecordSingleton::getData().m_dataTime)
+                str += iter.first + "=" + std::to_string(iter.second) + "\n";
+            for (const auto& iter : DataRecordSingleton::getData().m_dataCount)
+                str += iter.first + "=" + std::to_string(iter.second) + "\n";
+            if (clear)
+                DataRecordSingleton::clear();
+            return str;
         }
 
         static void hasBuild()//private only for BOPAlgo_BOP Build
         {
             if (sm_hasBuild == 3) //when MakeBlocks call recursion
-                sm_recordData.erase(sm_recordData.begin() + sm_recordData.size() - 2);
+                sm_recordDatas.erase(sm_recordDatas.begin() + sm_recordDatas.size() - 2);
             sm_hasBuild = 0;
         }
         static void setName(const std::vector<std::string>& names)
         {
-            if (sm_recordData.size() == names.size())
+            if (sm_recordDatas.size() == names.size())
             {
-                for (int i = 0; i < sm_recordData.size(); i++)
-                    sm_recordData[i].m_name = names[i];
+                for (int i = 0; i < sm_recordDatas.size(); i++)
+                    sm_recordDatas[i].m_name = names[i];
             }
             else
             {
-                for (int i = 0; i < sm_recordData.size(); i++)
-                    sm_recordData[i].m_name = std::to_string(i);
+                for (int i = 0; i < sm_recordDatas.size(); i++)
+                    sm_recordDatas[i].m_name = std::to_string(i);
             }
         }
         static ShapeCheck& getShapeCheck()
