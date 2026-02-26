@@ -21,7 +21,6 @@
 using namespace std;
 using namespace occ;
 using namespace test;
-using namespace clash;
 using opencascade::handle;
 
 static TopoInfoRecord g_topoInfo;

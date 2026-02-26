@@ -268,8 +268,8 @@ namespace test
 	inline void writeTimeDataToCsv()
 	{
 		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-		const std::vector<DataRecordSingleton::DataMap>& datas = instance.getData();
-		std::string filename = clash::get_exe_path();
+		const std::vector<DataRecordSingleton::DataMap>& datas = instance.getDatas();
+		std::string filename = occ::get_exe_path();
 		//windows系统函数，用于获取自系统启动以来所经过的毫秒数
 		filename += "\\..\\csv\\DataCount_" + std::to_string(GetTickCount()) + ".csv";
 		//instance.writeToCsvInOne(filename);
@@ -281,8 +281,8 @@ namespace test
 	inline void writeShapeDataToTxt()
 	{
 		DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-		const std::vector<DataRecordSingleton::DataMap>& data = instance.getData();
-		std::string path = clash::get_exe_path();
+		const std::vector<DataRecordSingleton::DataMap>& data = instance.getDatas();
+		std::string path = occ::get_exe_path();
 		//read
 		std::string filenameStd = path + "\\binFile\\shape_std_0.brep";
 		TopoDS_Shape shapeStd = instance.readBinToShape(filenameStd);
@@ -306,7 +306,7 @@ namespace test
 		if (!infile)
 			return CsgTree();
 		///get current directory
-		std::vector<std::string> partsDir = clash::string_split(filename, '/');
+		std::vector<std::string> partsDir = occ::string_split(filename, '/');
 		partsDir.pop_back();
 		std::string dirCurrent;// dirVct[0];
 		for (int i = 0; i < partsDir.size(); i++)
@@ -316,12 +316,12 @@ namespace test
 		std::string line;
 		while (std::getline(infile, line))
 		{
-			std::vector<std::string> partsSpace = clash::string_split(line, ' ');
+			std::vector<std::string> partsSpace = occ::string_split(line, ' ');
 			if (partsSpace.size() < 3)
 				continue;
 			if (partsSpace[0] == "#")
 				continue;
-            std::vector<std::string> partsSlash = clash::string_split(partsSpace[1], '/');
+            std::vector<std::string> partsSlash = occ::string_split(partsSpace[1], '/');
 			if (partsSpace[0] == "restore" && partsSpace[2] == "arg1")
 			{
                 shape1 = DataRecordSingleton::readBinToShape(partsSpace[1]);
