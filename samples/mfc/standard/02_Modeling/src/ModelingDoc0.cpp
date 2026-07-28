@@ -38,6 +38,11 @@
 #include "GCE2d_MakeSegment.hxx"
 #include "BRepLib.hxx"
 
+//read
+#include <STEPControl_Reader.hxx>
+#include <IGESControl_Reader.hxx>
+#include <IFSelect_ReturnStatus.hxx>
+
 #ifdef USING_BIMBASE_SLN
 #include "commonOCCUtility.h"
 //move to occt.sln //origin testBooleanOperation.cpp
@@ -93,6 +98,19 @@ static void test0()
     BRepTools::Write(sweptSolid, "sweptSolid.stp");
 
     std::cout << "Swept solid created and saved as 'sweptSolid.stp'." << std::endl;
+
+    return;
+}
+
+//读取step文件
+static void test01()
+{
+    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
+    STEPControl_Reader reader;
+    reader.ReadFile(filename.c_str());
+    reader.TransferRoots(); // 关键步骤：转换为 BREP
+    TopoDS_Shape shape = reader.OneShape(); // 获取 BREP 形状
+
 
     return;
 }
@@ -327,6 +345,8 @@ static int enrol = []()
         //test2();
         //test3();
         //test4();
+
+        test01();
         return 0;
     }();
 
