@@ -43,12 +43,14 @@
 #include <IGESControl_Reader.hxx>
 #include <IFSelect_ReturnStatus.hxx>
 
+#include "..\..\..\OCCT\src\BOPAlgo\DataRecordSingleton.h" //USING_OPENCASCADE_TEST
 #ifdef USING_BIMBASE_SLN
 #include "commonOCCUtility.h"
 //move to occt.sln //origin testBooleanOperation.cpp
 using namespace occ;
 #endif
 using namespace std;
+using namespace test;
 
 std::string doubleToString(double value) 
 {
@@ -105,12 +107,37 @@ static void test0()
 //读取step文件
 static void test01()
 {
-    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
+    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
+    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\linkrods.step)";
+    string filename = R"(D:\Alluser\ODA\Step_vc17_amd64mtdbg_26.12\exe\vc17_amd64mtdbg\Cis2Database\aisc-shape.stp)";
     STEPControl_Reader reader;
     reader.ReadFile(filename.c_str());
     reader.TransferRoots(); // 关键步骤：转换为 BREP
     TopoDS_Shape shape = reader.OneShape(); // 获取 BREP 形状
+    //g_shapeVct.push_back(shape);
+    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+    DataRecordSingleton::DataMap& data = instance.getData();
+    data.m_shape = make_shared<TopoDS_Shape>(shape);
 
+    return;
+}
+
+//读取iges文件
+static void test02()
+{
+    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\hammer.iges)";
+    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\bearing.iges)";
+    IGESControl_Reader reader;
+    IFSelect_ReturnStatus status = reader.ReadFile(filename.c_str());
+    if (status != IFSelect_RetDone)
+        return;
+    reader.TransferRoots(); // 关键步骤：转换为 BREP
+    TopoDS_Shape shape = reader.OneShape(); // 获取合并后的 BREP 形状
+    
+    //g_shapeVct.push_back(shape);
+    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+    DataRecordSingleton::DataMap& data = instance.getData();
+    data.m_shape = make_shared<TopoDS_Shape>(shape);
 
     return;
 }
@@ -347,6 +374,7 @@ static int enrol = []()
         //test4();
 
         test01();
+        //test02();
         return 0;
     }();
 
