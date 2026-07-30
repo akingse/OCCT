@@ -22,6 +22,7 @@ using namespace test;
 using opencascade::handle;
 
 static CsgTree g_csgtree;
+std::vector<TopoDS_Shape> g_shapeVct;
 
 //两个共面立方体-布尔Fuse
 static CsgTree getBooleanTest_01()
@@ -52,10 +53,11 @@ static CsgTree getBooleanTest_03()
 	trsfT.SetTranslation(gp_Vec(R - H + r + offset, 0, 0));
 
 	BRepBuilderAPI_Transform theShapeC(theShapeB, trsfT * trsfR);
-	//TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
-	CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);
-
+	TopoDS_Shape shapeBool = BRepAlgoAPI_Cut(theShapeA, theShapeC);
+	//CsgTree csgtree = CsgTree(theShapeA, theShapeC, BOPAlgo_Operation::BOPAlgo_CUT);//crush
+	CsgTree csgtree = CsgTree(theShapeA, theShapeB, BOPAlgo_Operation::BOPAlgo_COMMON);
 	csgtree.checkTopology();
+
 	//writeTimeDataToCsv();
 	//writeShapeDataToTxt();
 	//CsgTree::TraverseShape(theShapeA);
@@ -153,7 +155,7 @@ static CsgTree getBooleanTest_09()
 }
 
 //验证布尔
-void CModelingDoc::OnTestBoolBefore() //using icon -
+void CModelingDoc::OnTestBoolBefore_01() //using icon -
 {
 	clearDisplay();
 	//DataRecordDashboard::getInstance().setOpenOutput();
@@ -186,6 +188,22 @@ void CModelingDoc::OnTestBoolBefore() //using icon -
 	}
 	Fit();
 	instance.clear();
+	return;
+}
+
+void CModelingDoc::OnTestBoolBefore() //using icon -
+{
+	DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+	DataRecordSingleton::DataMap& data = instance.getData();
+	clearDisplay();
+	for (int i = 0; i < g_shapeVct.size(); i++)
+	{
+		//oneShapeDisplay(g_shapeVct[i]);
+	}
+	oneShapeDisplay(*data.m_shape);
+
+	Fit();
+	g_shapeVct.clear();
 	return;
 }
 
