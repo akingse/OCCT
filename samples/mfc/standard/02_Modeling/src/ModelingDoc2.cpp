@@ -251,3 +251,12 @@ void CModelingDoc::OnTestBoolExtra() //using icon section
 	clearDisplay();
 	return;
 }
+
+//OCC¶ÁÈ¡stepÎÄ¼ş
+
+std::vector<TopoDS_Shape> read_step(const string& filename)
+{
+
+
+	return {};
+}
