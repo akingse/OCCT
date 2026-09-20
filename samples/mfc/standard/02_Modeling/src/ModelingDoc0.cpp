@@ -108,8 +108,7 @@ static void test0()
 static void test01()
 {
     //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
-    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\linkrods.step)";
-    string filename = R"(D:\Alluser\ODA\Step_vc17_amd64mtdbg_26.12\exe\vc17_amd64mtdbg\Cis2Database\aisc-shape.stp)";
+    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\linkrods.step)";
     STEPControl_Reader reader;
     reader.ReadFile(filename.c_str());
     reader.TransferRoots(); // 关键步骤：转换为 BREP
@@ -118,6 +117,19 @@ static void test01()
     DataRecordSingleton& instance = DataRecordSingleton::getInstance();
     DataRecordSingleton::DataMap& data = instance.getData();
     data.m_shape = make_shared<TopoDS_Shape>(shape);
+
+
+    GProp_GProps System;
+    BRepGProp::SurfaceProperties(shape, System);
+    gp_Pnt GA = System.CentreOfMass();
+    Standard_Real Area = System.Mass();
+    gp_Mat IA = System.MatrixOfInertia();
+
+    //GProp_GProps System;
+    BRepGProp::VolumeProperties(shape, System);
+    gp_Pnt GV = System.CentreOfMass();
+    Standard_Real Volume = System.Mass();
+    gp_Mat IV = System.MatrixOfInertia();
 
     return;
 }
