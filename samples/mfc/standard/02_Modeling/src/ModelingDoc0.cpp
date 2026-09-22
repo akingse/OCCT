@@ -377,7 +377,39 @@ static void test4()
 
 }
 
+#include <STEPControl_Reader.hxx>
+#include <IFSelect_ReturnStatus.hxx>
+#include <TopoDS_Shape.hxx>
 
+TopoDS_Shape ReadStep(const char* fileName)
+{
+    STEPControl_Reader reader;
+
+    IFSelect_ReturnStatus status = reader.ReadFile(fileName);
+    if (status != IFSelect_RetDone)
+    {
+        return TopoDS_Shape();
+    }
+
+    // 可选：输出读取检查信息
+    reader.PrintCheckLoad(
+        Standard_False,
+        IFSelect_ItemsByEntity);
+
+    // STEP 中可转换的根实体数量
+    Standard_Integer rootCount = reader.NbRootsForTransfer();
+
+    // 将 STEP 实体转换为 OCCT 拓扑对象
+    Standard_Integer transferredCount = reader.TransferRoots();
+
+    if (transferredCount <= 0 || reader.NbShapes() <= 0)
+    {
+        return TopoDS_Shape();
+    }
+
+    // 如果存在多个根实体，OneShape() 通常返回 Compound
+    return reader.OneShape();
+}
 static int enrol = []()
     {
         //test1();
