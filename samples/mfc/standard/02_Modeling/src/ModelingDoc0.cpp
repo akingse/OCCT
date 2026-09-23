@@ -60,100 +60,6 @@ std::string doubleToString(double value)
     //return std::to_string(value);
 }
 
-//输出STEP
-static void test0() 
-{
-    // 创建截面形状
-    gp_Pnt p1(0, 0, 0);
-    gp_Pnt p2(10, 0, 0);
-    gp_Pnt p3(10, 10, 0);
-    gp_Pnt p4(0, 10, 0);
-
-    Handle(Geom_TrimmedCurve) curve = GC_MakeSegment(p1, p2);
-    TopoDS_Edge edge1 = BRepBuilderAPI_MakeEdge(curve);
-    curve = GC_MakeSegment(p2, p3);
-    TopoDS_Edge edge2 = BRepBuilderAPI_MakeEdge(curve);
-    curve = GC_MakeSegment(p3, p4);
-    TopoDS_Edge edge3 = BRepBuilderAPI_MakeEdge(curve);
-    curve = GC_MakeSegment(p4, p1);
-    TopoDS_Edge edge4 = BRepBuilderAPI_MakeEdge(curve);
-
-    BRepBuilderAPI_MakeWire wireMaker;
-    wireMaker.Add(edge1);
-    wireMaker.Add(edge2);
-    wireMaker.Add(edge3);
-    wireMaker.Add(edge4);
-    TopoDS_Wire sectionWire = wireMaker.Wire();
-
-    // 创建路径
-    gp_Pnt pathStart(0, 0, 0);
-    gp_Pnt pathEnd(0, 0, 10);
-    Handle(Geom_TrimmedCurve) pathCurve = GC_MakeSegment(pathStart, pathEnd);
-    TopoDS_Edge pathEdge = BRepBuilderAPI_MakeEdge(pathCurve);
-    TopoDS_Wire pathWire = BRepBuilderAPI_MakeWire(pathEdge);
-
-    // 创建扫描体
-    BRepPrimAPI_MakePrism prismMaker(sectionWire, gp_Vec(pathStart, pathEnd));//append lib
-    TopoDS_Shape sweptSolid = prismMaker.Shape();
-
-    // 将扫描体保存为STEP文件
-    BRepTools::Write(sweptSolid, "sweptSolid.stp");
-
-    std::cout << "Swept solid created and saved as 'sweptSolid.stp'." << std::endl;
-
-    return;
-}
-
-//读取step文件
-static void test01()
-{
-    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
-    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\linkrods.step)";
-    STEPControl_Reader reader;
-    reader.ReadFile(filename.c_str());
-    reader.TransferRoots(); // 关键步骤：转换为 BREP
-    TopoDS_Shape shape = reader.OneShape(); // 获取 BREP 形状
-    //g_shapeVct.push_back(shape);
-    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-    DataRecordSingleton::DataMap& data = instance.getData();
-    data.m_shape = make_shared<TopoDS_Shape>(shape);
-
-
-    GProp_GProps System;
-    BRepGProp::SurfaceProperties(shape, System);
-    gp_Pnt GA = System.CentreOfMass();
-    Standard_Real Area = System.Mass();
-    gp_Mat IA = System.MatrixOfInertia();
-
-    //GProp_GProps System;
-    BRepGProp::VolumeProperties(shape, System);
-    gp_Pnt GV = System.CentreOfMass();
-    Standard_Real Volume = System.Mass();
-    gp_Mat IV = System.MatrixOfInertia();
-
-    return;
-}
-
-//读取iges文件
-static void test02()
-{
-    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\hammer.iges)";
-    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\bearing.iges)";
-    IGESControl_Reader reader;
-    IFSelect_ReturnStatus status = reader.ReadFile(filename.c_str());
-    if (status != IFSelect_RetDone)
-        return;
-    reader.TransferRoots(); // 关键步骤：转换为 BREP
-    TopoDS_Shape shape = reader.OneShape(); // 获取合并后的 BREP 形状
-    
-    //g_shapeVct.push_back(shape);
-    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
-    DataRecordSingleton::DataMap& data = instance.getData();
-    data.m_shape = make_shared<TopoDS_Shape>(shape);
-
-    return;
-}
-
 //box-sphere
 static void test1()
 {
@@ -318,6 +224,7 @@ TopoDS_Shape MakeBottle(const Standard_Real myWidth, const Standard_Real myHeigh
     return aRes;
 }
 
+//MakeCylinder
 static void test3()
 {
     TColgp_Array1OfPnt Poles(1, 4);
@@ -377,9 +284,103 @@ static void test4()
 
 }
 
-#include <STEPControl_Reader.hxx>
-#include <IFSelect_ReturnStatus.hxx>
-#include <TopoDS_Shape.hxx>
+//#include <STEPControl_Reader.hxx>
+//#include <IFSelect_ReturnStatus.hxx>
+//#include <TopoDS_Shape.hxx>
+
+//输出STEP
+static void test0()
+{
+    // 创建截面形状
+    gp_Pnt p1(0, 0, 0);
+    gp_Pnt p2(10, 0, 0);
+    gp_Pnt p3(10, 10, 0);
+    gp_Pnt p4(0, 10, 0);
+
+    Handle(Geom_TrimmedCurve) curve = GC_MakeSegment(p1, p2);
+    TopoDS_Edge edge1 = BRepBuilderAPI_MakeEdge(curve);
+    curve = GC_MakeSegment(p2, p3);
+    TopoDS_Edge edge2 = BRepBuilderAPI_MakeEdge(curve);
+    curve = GC_MakeSegment(p3, p4);
+    TopoDS_Edge edge3 = BRepBuilderAPI_MakeEdge(curve);
+    curve = GC_MakeSegment(p4, p1);
+    TopoDS_Edge edge4 = BRepBuilderAPI_MakeEdge(curve);
+
+    BRepBuilderAPI_MakeWire wireMaker;
+    wireMaker.Add(edge1);
+    wireMaker.Add(edge2);
+    wireMaker.Add(edge3);
+    wireMaker.Add(edge4);
+    TopoDS_Wire sectionWire = wireMaker.Wire();
+
+    // 创建路径
+    gp_Pnt pathStart(0, 0, 0);
+    gp_Pnt pathEnd(0, 0, 10);
+    Handle(Geom_TrimmedCurve) pathCurve = GC_MakeSegment(pathStart, pathEnd);
+    TopoDS_Edge pathEdge = BRepBuilderAPI_MakeEdge(pathCurve);
+    TopoDS_Wire pathWire = BRepBuilderAPI_MakeWire(pathEdge);
+
+    // 创建扫描体
+    BRepPrimAPI_MakePrism prismMaker(sectionWire, gp_Vec(pathStart, pathEnd));//append lib
+    TopoDS_Shape sweptSolid = prismMaker.Shape();
+
+    // 将扫描体保存为STEP文件
+    BRepTools::Write(sweptSolid, "sweptSolid.stp");
+
+    std::cout << "Swept solid created and saved as 'sweptSolid.stp'." << std::endl;
+
+    return;
+}
+
+//读取step文件
+static void test01()
+{
+    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\screw.step)";
+    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\step\linkrods.step)";
+    STEPControl_Reader reader;
+    reader.ReadFile(filename.c_str());
+    reader.TransferRoots(); // 关键步骤：转换为 BREP
+    TopoDS_Shape shape = reader.OneShape(); // 获取 BREP 形状
+    //g_shapeVct.push_back(shape);
+    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+    DataRecordSingleton::DataMap& data = instance.getData();
+    data.m_shape = make_shared<TopoDS_Shape>(shape);
+
+
+    GProp_GProps System;
+    BRepGProp::SurfaceProperties(shape, System);
+    gp_Pnt GA = System.CentreOfMass();
+    Standard_Real Area = System.Mass();
+    gp_Mat IA = System.MatrixOfInertia();
+
+    //GProp_GProps System;
+    BRepGProp::VolumeProperties(shape, System);
+    gp_Pnt GV = System.CentreOfMass();
+    Standard_Real Volume = System.Mass();
+    gp_Mat IV = System.MatrixOfInertia();
+
+    return;
+}
+
+//读取iges文件
+static void test02()
+{
+    //string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\hammer.iges)";
+    string filename = R"(C:\Users\Aking\source\repos\OCCT\data\iges\bearing.iges)";
+    IGESControl_Reader reader;
+    IFSelect_ReturnStatus status = reader.ReadFile(filename.c_str());
+    if (status != IFSelect_RetDone)
+        return;
+    reader.TransferRoots(); // 关键步骤：转换为 BREP
+    TopoDS_Shape shape = reader.OneShape(); // 获取合并后的 BREP 形状
+
+    //g_shapeVct.push_back(shape);
+    DataRecordSingleton& instance = DataRecordSingleton::getInstance();
+    DataRecordSingleton::DataMap& data = instance.getData();
+    data.m_shape = make_shared<TopoDS_Shape>(shape);
+
+    return;
+}
 
 TopoDS_Shape ReadStep(const char* fileName)
 {
@@ -410,6 +411,7 @@ TopoDS_Shape ReadStep(const char* fileName)
     // 如果存在多个根实体，OneShape() 通常返回 Compound
     return reader.OneShape();
 }
+
 static int enrol = []()
     {
         //test1();
